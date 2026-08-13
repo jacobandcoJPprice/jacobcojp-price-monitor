@@ -324,193 +324,193 @@ def main():
     print("=" * 70)
 
     current_rows, monitored_urls = load_current_monitor()
-official_variant_urls = get_official_variant_urls()
-
-matched_variant_urls = official_variant_urls & monitored_urls
-missing_variant_urls = official_variant_urls - monitored_urls
-extra_monitored_urls = monitored_urls - official_variant_urls
-
-print()
-print("=" * 70)
-print("OFFICIAL VARIANT SITEMAP CHECK")
-print("=" * 70)
-print("Official variant URLs :", len(official_variant_urls))
-print("Current monitored URLs:", len(monitored_urls))
-print("Matched URLs          :", len(matched_variant_urls))
-print("Missing from monitor  :", len(missing_variant_urls))
-print("Extra monitored URLs  :", len(extra_monitored_urls))
-
-if official_variant_urls:
-    variant_coverage = (
-        len(matched_variant_urls)
-        / len(official_variant_urls)
-        * 100
-    )
-    print(f"Variant URL coverage  : {variant_coverage:.2f}%")
-
-print()
-print("MISSING VARIANT URLS")
-print("-" * 70)
-
-if missing_variant_urls:
-    for url in sorted(missing_variant_urls):
-        print(url)
-else:
-    print("NONE")
-
-print()
-print("EXTRA MONITORED URLS")
-print("-" * 70)
-
-if extra_monitored_urls:
-    for url in sorted(extra_monitored_urls):
-        print(url)
-else:
-    print("NONE")
-    print()
-    print("Current monitor rows:", len(current_rows))
-    print("Current monitor unique URLs:", len(monitored_urls))
-    print()
-
-    all_urls, sitemaps = crawl_sitemaps()
-
-    print()
-    print("Sitemaps checked:", len(sitemaps))
-    print("Total URLs found in sitemaps:", len(all_urls))
-
-    candidates = sorted(
-        url for url in all_urls
-        if looks_like_product_url(url)
-    )
-
-    print("Potential product URLs:", len(candidates))
-    print()
-    print("Now checking candidate product pages...")
-    print()
-
-    products = []
-
-    for i, url in enumerate(candidates, 1):
-        print(f"[{i}/{len(candidates)}] {url}")
-
-        result = analyze_product_page(url)
-
-        if result:
-            products.append(result)
-
-        time.sleep(0.15)
-
-    official_urls = {
-        p["url"].rstrip("/")
-        for p in products
-    }
-
-    priced = [
-        p for p in products
-        if p["has_price"]
-    ]
-
-    no_public_price = [
-        p for p in products
-        if not p["has_price"]
-    ]
-
-    inquire = [
-        p for p in products
-        if p["inquire"] and not p["has_price"]
-    ]
-
-    missing_from_monitor = sorted(
-        official_urls - monitored_urls
-    )
-
-    monitored_not_found = sorted(
-        monitored_urls - official_urls
-    )
-
+    official_variant_urls = get_official_variant_urls()
+    
+    matched_variant_urls = official_variant_urls & monitored_urls
+    missing_variant_urls = official_variant_urls - monitored_urls
+    extra_monitored_urls = monitored_urls - official_variant_urls
+    
     print()
     print("=" * 70)
-    print("COVERAGE REPORT")
+    print("OFFICIAL VARIANT SITEMAP CHECK")
     print("=" * 70)
-
-    print("Official product pages detected :", len(products))
-    print("Pages with public USD price     :", len(priced))
-    print("Pages without public USD price  :", len(no_public_price))
-    print("Inquire-type pages              :", len(inquire))
-    print("Current monitored rows          :", len(current_rows))
-    print("Current monitored unique URLs   :", len(monitored_urls))
-    print("Official URLs missing monitor   :", len(missing_from_monitor))
-    print("Monitor URLs not found official :", len(monitored_not_found))
-
-    if official_urls:
-        coverage = (
-            len(official_urls & monitored_urls)
-            / len(official_urls)
+    print("Official variant URLs :", len(official_variant_urls))
+    print("Current monitored URLs:", len(monitored_urls))
+    print("Matched URLs          :", len(matched_variant_urls))
+    print("Missing from monitor  :", len(missing_variant_urls))
+    print("Extra monitored URLs  :", len(extra_monitored_urls))
+    
+    if official_variant_urls:
+        variant_coverage = (
+            len(matched_variant_urls)
+            / len(official_variant_urls)
             * 100
         )
-
-        print(f"URL coverage                    : {coverage:.2f}%")
-
+        print(f"Variant URL coverage  : {variant_coverage:.2f}%")
+    
     print()
-    print("=" * 70)
-    print("OFFICIAL PAGES MISSING FROM CURRENT MONITOR")
-    print("=" * 70)
-
-    if not missing_from_monitor:
-        print("NONE")
-    else:
-        for url in missing_from_monitor:
+    print("MISSING VARIANT URLS")
+    print("-" * 70)
+    
+    if missing_variant_urls:
+        for url in sorted(missing_variant_urls):
             print(url)
-
+    else:
+        print("NONE")
+    
     print()
-    print("=" * 70)
-    print("NO PUBLIC PRICE / INQUIRE PAGES")
-    print("=" * 70)
-
-    for p in no_public_price:
-        print(
-            p["title"],
-            "|",
-            p["item_number"],
-            "|",
-            p["url"]
+    print("EXTRA MONITORED URLS")
+    print("-" * 70)
+    
+    if extra_monitored_urls:
+        for url in sorted(extra_monitored_urls):
+            print(url)
+    else:
+        print("NONE")
+        print()
+        print("Current monitor rows:", len(current_rows))
+        print("Current monitor unique URLs:", len(monitored_urls))
+        print()
+    
+        all_urls, sitemaps = crawl_sitemaps()
+    
+        print()
+        print("Sitemaps checked:", len(sitemaps))
+        print("Total URLs found in sitemaps:", len(all_urls))
+    
+        candidates = sorted(
+            url for url in all_urls
+            if looks_like_product_url(url)
         )
-
-    # 保存详细报告
-    with open(
-        "coverage_report.csv",
-        "w",
-        encoding="utf-8-sig",
-        newline=""
-    ) as f:
-
-        writer = csv.writer(f)
-
-        writer.writerow([
-            "Title",
-            "Item Number",
-            "Has Public Price",
-            "Inquire",
-            "Prices Found",
-            "Currently Monitored",
-            "URL",
-        ])
-
-        for p in products:
-            writer.writerow([
+    
+        print("Potential product URLs:", len(candidates))
+        print()
+        print("Now checking candidate product pages...")
+        print()
+    
+        products = []
+    
+        for i, url in enumerate(candidates, 1):
+            print(f"[{i}/{len(candidates)}] {url}")
+    
+            result = analyze_product_page(url)
+    
+            if result:
+                products.append(result)
+    
+            time.sleep(0.15)
+    
+        official_urls = {
+            p["url"].rstrip("/")
+            for p in products
+        }
+    
+        priced = [
+            p for p in products
+            if p["has_price"]
+        ]
+    
+        no_public_price = [
+            p for p in products
+            if not p["has_price"]
+        ]
+    
+        inquire = [
+            p for p in products
+            if p["inquire"] and not p["has_price"]
+        ]
+    
+        missing_from_monitor = sorted(
+            official_urls - monitored_urls
+        )
+    
+        monitored_not_found = sorted(
+            monitored_urls - official_urls
+        )
+    
+        print()
+        print("=" * 70)
+        print("COVERAGE REPORT")
+        print("=" * 70)
+    
+        print("Official product pages detected :", len(products))
+        print("Pages with public USD price     :", len(priced))
+        print("Pages without public USD price  :", len(no_public_price))
+        print("Inquire-type pages              :", len(inquire))
+        print("Current monitored rows          :", len(current_rows))
+        print("Current monitored unique URLs   :", len(monitored_urls))
+        print("Official URLs missing monitor   :", len(missing_from_monitor))
+        print("Monitor URLs not found official :", len(monitored_not_found))
+    
+        if official_urls:
+            coverage = (
+                len(official_urls & monitored_urls)
+                / len(official_urls)
+                * 100
+            )
+    
+            print(f"URL coverage                    : {coverage:.2f}%")
+    
+        print()
+        print("=" * 70)
+        print("OFFICIAL PAGES MISSING FROM CURRENT MONITOR")
+        print("=" * 70)
+    
+        if not missing_from_monitor:
+            print("NONE")
+        else:
+            for url in missing_from_monitor:
+                print(url)
+    
+        print()
+        print("=" * 70)
+        print("NO PUBLIC PRICE / INQUIRE PAGES")
+        print("=" * 70)
+    
+        for p in no_public_price:
+            print(
                 p["title"],
+                "|",
                 p["item_number"],
-                "YES" if p["has_price"] else "NO",
-                "YES" if p["inquire"] else "NO",
-                " | ".join(p["prices_found"]),
-                "YES" if p["url"].rstrip("/") in monitored_urls else "NO",
-                p["url"],
+                "|",
+                p["url"]
+            )
+    
+        # 保存详细报告
+        with open(
+            "coverage_report.csv",
+            "w",
+            encoding="utf-8-sig",
+            newline=""
+        ) as f:
+    
+            writer = csv.writer(f)
+    
+            writer.writerow([
+                "Title",
+                "Item Number",
+                "Has Public Price",
+                "Inquire",
+                "Prices Found",
+                "Currently Monitored",
+                "URL",
             ])
-
-    print()
-    print("Detailed report saved as coverage_report.csv")
-    print("=" * 70)
-
+    
+            for p in products:
+                writer.writerow([
+                    p["title"],
+                    p["item_number"],
+                    "YES" if p["has_price"] else "NO",
+                    "YES" if p["inquire"] else "NO",
+                    " | ".join(p["prices_found"]),
+                    "YES" if p["url"].rstrip("/") in monitored_urls else "NO",
+                    p["url"],
+                ])
+    
+        print()
+        print("Detailed report saved as coverage_report.csv")
+        print("=" * 70)
+    
 
 if __name__ == "__main__":
     main()
