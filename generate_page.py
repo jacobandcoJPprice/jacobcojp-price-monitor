@@ -3,222 +3,363 @@ import html
 import os
 from datetime import datetime
 
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-CURRENT_CSV = os.path.join(BASE_DIR, "current_prices.csv")
-HISTORY_CSV = os.path.join(BASE_DIR, "price_history_v2.csv")
-OUTPUT_HTML = os.path.join(BASE_DIR, "index.html")
+CURRENT_CSV = os.path.join(
+    BASE_DIR,
+    "current_prices.csv"
+)
 
+HISTORY_CSV = os.path.join(
+    BASE_DIR,
+    "price_history_v2.csv"
+)
+
+OUTPUT_HTML = os.path.join(
+    BASE_DIR,
+    "index.html"
+)
+
+
+# ============================================================
+# BASIC
+# ============================================================
 
 def read_csv(path):
+
     if not os.path.exists(path):
         return []
 
-    with open(path, "r", encoding="utf-8-sig", newline="") as f:
-        return list(csv.DictReader(f))
+    with open(
+        path,
+        "r",
+        encoding="utf-8-sig",
+        newline=""
+    ) as f:
+
+        return list(
+            csv.DictReader(f)
+        )
 
 
 def esc(value):
-    return html.escape(str(value or ""))
+
+    return html.escape(
+        str(value or ""),
+        quote=True
+    )
 
 
-def money(value):
+def format_price(value):
+
+    if value is None:
+        return "—"
+
+    value = str(value).strip()
+
+    if not value:
+        return "—"
+
     try:
-        if value is None or str(value).strip() == "":
-            return "-"
-        return "${:,.0f}".format(float(value))
-    except (ValueError, TypeError):
-        return esc(value)
 
-
-def number(value):
-    try:
-        return float(value)
-    except (ValueError, TypeError):
-        return 0
-
-
-def get_last_scan(products):
-    values = []
-
-    for product in products:
-        value = product.get("Last Seen", "")
-        if value:
-            values.append(value)
-
-    if values:
-        return max(values)
-
-    return "-"
-
-
-def availability_text(value):
-    value = str(value or "")
-
-    if "InStock" in value:
-        return "在庫あり"
-
-    if "OutOfStock" in value:
-        return "在庫なし"
-
-    if value:
-        return esc(value)
-
-    return "-"
-
-
-products = read_csv(CURRENT_CSV)
-history = read_csv(HISTORY_CSV)
-
-products.sort(
-    key=lambda x: number(x.get("Price")),
-    reverse=True
-)
-
-history.reverse()
-
-collections = sorted(
-    {
-        p.get("Collection", "").strip()
-        for p in products
-        if p.get("Collection", "").strip()
-    }
-)
-
-last_scan = get_last_scan(products)
-
-
-product_rows = []
-
-for p in products:
-
-    collection = esc(p.get("Collection", ""))
-    variant = esc(p.get("Variant", ""))
-    item_number = esc(p.get("Item Number", "")) or "-"
-    price = money(p.get("Price"))
-    availability = availability_text(p.get("Availability", ""))
-    last_seen = esc(p.get("Last Seen", ""))
-    url = esc(p.get("URL", ""))
-
-    if url:
-        link = (
-            f'<a class="official-link" href="{url}" '
-            f'target="_blank" rel="noopener noreferrer">'
-            f'公式サイトを見る →</a>'
+        number = float(
+            value.replace(",", "")
         )
-    else:
-        link = "-"
 
-    product_rows.append(
+        return "${:,.0f}".format(
+            number
+        )
+
+    except Exception:
+
+        return esc(value)
+
+
+# ============================================================
+# LOAD DATA
+# ============================================================
+
+current_rows = read_csv(
+    CURRENT_CSV
+)
+
+history_rows = read_csv(
+    HISTORY_CSV
+)
+
+
+# Sort current prices
+current_rows.sort(
+    key=lambda x: (
+        str(
+            x.get("Collection", "")
+        ).lower(),
+        str(
+            x.get("Item Number", "")
+        ).lower()
+    )
+)
+
+
+# Latest changes first
+history_rows = list(
+    reversed(
+        history_rows
+    )
+)
+
+
+# ============================================================
+# CURRENT PRICE CARDS
+# ============================================================
+
+current_cards = []
+
+for row in current_rows:
+
+    collection = esc(
+        row.get(
+            "Collection",
+            ""
+        )
+    )
+
+    variant = esc(
+        row.get(
+            "Variant",
+            ""
+        )
+    )
+
+    item_number = esc(
+        row.get(
+            "Item Number",
+            ""
+        )
+    )
+
+    price = format_price(
+        row.get(
+            "Price",
+            ""
+        )
+    )
+
+    url = esc(
+        row.get(
+            "URL",
+            ""
+        )
+    )
+
+    search_text = esc(
+        " ".join([
+            str(
+                row.get(
+                    "Collection",
+                    ""
+                )
+            ),
+            str(
+                row.get(
+                    "Variant",
+                    ""
+                )
+            ),
+            str(
+                row.get(
+                    "Item Number",
+                    ""
+                )
+            )
+        ]).lower()
+    )
+
+    if not variant:
+        variant = collection
+
+    current_cards.append(
         f"""
-        <tr data-collection="{collection}">
-            <td>{collection}</td>
-            <td>{variant}</td>
-            <td class="item-number">{item_number}</td>
-            <td class="price">{price}</td>
-            <td><span class="status">{availability}</span></td>
-            <td>{last_seen}</td>
-            <td>{link}</td>
-        </tr>
+        <a
+            class="price-card"
+            href="{url}"
+            target="_blank"
+            rel="noopener noreferrer"
+            data-search="{search_text}"
+        >
+            <div class="card-top">
+
+                <div class="collection">
+                    {collection}
+                </div>
+
+                <div class="price">
+                    {price}
+                </div>
+
+            </div>
+
+            <div class="variant">
+                {variant}
+            </div>
+
+            <div class="item-label">
+                ITEM NUMBER
+            </div>
+
+            <div class="item-number">
+                {item_number}
+            </div>
+
+            <div class="official-link">
+                JACOB &amp; CO. USA ↗
+            </div>
+
+        </a>
         """
     )
 
 
-history_rows = []
+current_cards_html = "\n".join(
+    current_cards
+)
 
-for h in history[:100]:
 
-    old_price = number(h.get("Old Price"))
-    new_price = number(h.get("New Price"))
-    difference = new_price - old_price
+# ============================================================
+# PRICE HISTORY
+# ============================================================
 
-    if difference > 0:
-        diff_html = (
-            f'<span class="price-up">'
-            f'↑ +${difference:,.0f}</span>'
+history_cards = []
+
+for row in history_rows[:50]:
+
+    collection = esc(
+        row.get(
+            "Collection",
+            ""
         )
+    )
 
-    elif difference < 0:
-        diff_html = (
-            f'<span class="price-down">'
-            f'↓ -${abs(difference):,.0f}</span>'
+    variant = esc(
+        row.get(
+            "Variant",
+            ""
         )
+    )
 
-    else:
-        diff_html = "—"
-
-    url = esc(h.get("URL", ""))
-
-    if url:
-        link = (
-            f'<a class="official-link" href="{url}" '
-            f'target="_blank" rel="noopener noreferrer">'
-            f'公式サイトを見る →</a>'
+    item_number = esc(
+        row.get(
+            "Item Number",
+            ""
         )
-    else:
-        link = "-"
+    )
 
-    history_rows.append(
+    old_price = format_price(
+        row.get(
+            "Old Price",
+            ""
+        )
+    )
+
+    new_price = format_price(
+        row.get(
+            "New Price",
+            ""
+        )
+    )
+
+    changed_at = esc(
+        row.get(
+            "Changed At",
+            ""
+        )
+    )
+
+    url = esc(
+        row.get(
+            "URL",
+            ""
+        )
+    )
+
+    history_cards.append(
         f"""
-        <tr>
-            <td>{esc(h.get("Changed At", ""))}</td>
-            <td>{esc(h.get("Collection", ""))}</td>
-            <td>{esc(h.get("Variant", ""))}</td>
-            <td class="item-number">
-                {esc(h.get("Item Number", "")) or "-"}
-            </td>
-            <td>{money(h.get("Old Price"))}</td>
-            <td class="price">{money(h.get("New Price"))}</td>
-            <td>{diff_html}</td>
-            <td>{link}</td>
-        </tr>
+        <a
+            class="change-card"
+            href="{url}"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+
+            <div class="change-info">
+
+                <div class="change-collection">
+                    {collection}
+                </div>
+
+                <div class="change-variant">
+                    {variant}
+                </div>
+
+                <div class="change-item">
+                    {item_number}
+                </div>
+
+                <div class="change-date">
+                    {changed_at}
+                </div>
+
+            </div>
+
+            <div class="change-prices">
+
+                <span class="old-price">
+                    {old_price}
+                </span>
+
+                <span class="arrow">
+                    →
+                </span>
+
+                <span class="new-price">
+                    {new_price}
+                </span>
+
+            </div>
+
+        </a>
         """
     )
 
 
-collection_options = "".join(
-    f'<option value="{esc(c)}">{esc(c)}</option>'
-    for c in collections
-)
+if history_cards:
 
-
-if history_rows:
-
-    history_content = f"""
-    <div class="table-wrap">
-
-        <table>
-
-            <thead>
-                <tr>
-                    <th>変更日時</th>
-                    <th>コレクション</th>
-                    <th>モデル</th>
-                    <th>Item Number</th>
-                    <th>旧価格</th>
-                    <th>新価格</th>
-                    <th>変更額</th>
-                    <th>公式商品ページ</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {''.join(history_rows)}
-            </tbody>
-
-        </table>
-
-    </div>
-    """
+    history_html = "\n".join(
+        history_cards
+    )
 
 else:
 
-    history_content = """
-    <div class="empty">
-        現在、価格変更は検出されていません。
-    </div>
+    history_html = """
+        <div class="no-changes">
+            現在、記録されている価格変更はありません。
+        </div>
     """
 
+
+# ============================================================
+# UPDATED TIME
+# ============================================================
+
+updated_at = datetime.now().strftime(
+    "%Y-%m-%d %H:%M"
+)
+
+
+# ============================================================
+# HTML
+# ============================================================
 
 page = f"""<!DOCTYPE html>
 
@@ -230,18 +371,12 @@ page = f"""<!DOCTYPE html>
 
 <meta
     name="viewport"
-    content="width=device-width, initial-scale=1"
->
-
-<meta
-    http-equiv="refresh"
-    content="300"
+    content="width=device-width, initial-scale=1.0"
 >
 
 <title>
-Jacob & Co. Japan | 米国公式サイト価格モニター
+Jacob & Co. USA Price Monitor
 </title>
-
 
 <style>
 
@@ -249,313 +384,367 @@ Jacob & Co. Japan | 米国公式サイト価格モニター
     box-sizing: border-box;
 }}
 
-body {{
-    margin: 0;
-    font-family:
-        Arial,
-        "Yu Gothic",
-        "YuGothic",
-        "Meiryo",
-        sans-serif;
-
-    background: #f5f5f5;
-    color: #171717;
+html {{
+    scroll-behavior: smooth;
 }}
 
+body {{
+    margin: 0;
+    background: #f5f5f3;
+    color: #111;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}}
 
 .header {{
-    background: #080808;
-    color: #ffffff;
-    padding: 34px 4%;
+    background: #000;
+    color: #fff;
+    padding: 42px 24px 38px;
 }}
 
 .header-inner {{
-    max-width: 1700px;
-    margin: auto;
+    width: min(1400px, 94%);
+    margin: 0 auto;
 }}
 
 .brand {{
-    font-size: 30px;
-    font-weight: 600;
-    letter-spacing: 2px;
+    font-size: 13px;
+    letter-spacing: 4px;
+    opacity: 0.72;
+    margin-bottom: 14px;
+}}
+
+h1 {{
+    margin: 0;
+    font-size: clamp(
+        28px,
+        4vw,
+        52px
+    );
+    font-weight: 500;
+    letter-spacing: -1px;
 }}
 
 .subtitle {{
-    margin-top: 9px;
-    color: #c4c4c4;
-    font-size: 15px;
-    letter-spacing: 1px;
+    margin-top: 15px;
+    color: #aaa;
+    font-size: 14px;
 }}
-
-.internal {{
-    margin-top: 13px;
-    display: inline-block;
-    padding: 6px 11px;
-    border-radius: 20px;
-    background: #242424;
-    color: #d0d0d0;
-    font-size: 11px;
-}}
-
-
-.container {{
-    width: 94%;
-    max-width: 1700px;
-    margin: 28px auto 50px;
-}}
-
 
 .stats {{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    margin-bottom: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
 }}
 
-.stat-card {{
-    background: #ffffff;
-    padding: 23px;
-    border-radius: 11px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.055);
-}}
-
-.stat-label {{
-    color: #777;
-    font-size: 12px;
-    letter-spacing: .5px;
-}}
-
-.stat-number {{
-    margin-top: 9px;
-    font-size: 29px;
-    font-weight: 700;
-}}
-
-
-.guide {{
-    background: #ffffff;
-    padding: 20px 22px;
-    border-radius: 11px;
-    margin-bottom: 22px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.055);
+.stat {{
+    border: 1px solid #333;
+    padding: 11px 16px;
     font-size: 13px;
-    line-height: 1.9;
 }}
 
-.guide-title {{
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 5px;
+.main {{
+    width: min(1400px, 94%);
+    margin: 0 auto;
+    padding: 45px 0 80px;
 }}
 
-.monitor-status {{
+.section {{
+    margin-bottom: 60px;
+}}
+
+.section-header {{
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 20px;
+    margin-bottom: 20px;
+}}
+
+.section-title {{
+    margin: 0;
+    font-size: 26px;
+    font-weight: 500;
+}}
+
+.section-description {{
+    color: #777;
+    font-size: 13px;
+}}
+
+.change-list {{
+    display: grid;
+    gap: 10px;
+}}
+
+.change-card {{
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    padding: 20px 22px;
+
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-    font-size: 15px;
-    font-weight: 700;
+    justify-content: space-between;
+
+    gap: 25px;
+
+    transition:
+        transform .15s ease,
+        border-color .15s ease;
 }}
 
-.status-dot {{
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #20a464;
-    box-shadow: 0 0 0 4px rgba(32,164,100,.12);
+.change-card:hover {{
+    transform: translateY(-1px);
+    border-color: #888;
 }}
 
-.monitor-grid {{
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-top: 17px;
-}}
-
-.monitor-item {{
-    background: #f7f7f7;
-    border-radius: 8px;
-    padding: 13px 15px;
-}}
-
-.monitor-label {{
-    color: #777;
+.change-collection {{
     font-size: 11px;
-    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #888;
 }}
 
-.monitor-value {{
-    font-size: 14px;
-    font-weight: 700;
+.change-variant {{
+    margin-top: 5px;
+    font-size: 16px;
 }}
 
-@media(max-width: 850px) {{
-    .monitor-grid {{
-        grid-template-columns: 1fr 1fr;
-    }}
+.change-item {{
+    margin-top: 7px;
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
 }}
-.controls {{
-    display: flex;
-    gap: 12px;
-    padding: 18px;
-    background: #ffffff;
-    border-radius: 11px;
-    margin-bottom: 22px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.055);
+
+.change-date {{
+    margin-top: 5px;
+    color: #999;
+    font-size: 11px;
+}}
+
+.change-prices {{
+    white-space: nowrap;
+    font-size: 18px;
+}}
+
+.old-price {{
+    color: #999;
+    text-decoration: line-through;
+}}
+
+.arrow {{
+    padding: 0 12px;
+    color: #999;
+}}
+
+.new-price {{
+    font-weight: bold;
+}}
+
+.no-changes {{
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 26px;
+    color: #777;
+}}
+
+.search-wrap {{
+    position: sticky;
+    top: 0;
+    z-index: 20;
+
+    background:
+        rgba(245,245,243,.95);
+
+    backdrop-filter:
+        blur(12px);
+
+    padding: 14px 0;
+    margin-bottom: 15px;
 }}
 
 .search {{
-    flex: 1;
-    border: 1px solid #dddddd;
-    border-radius: 7px;
-    padding: 14px 15px;
-    font-size: 14px;
+    width: 100%;
+    border: 1px solid #bbb;
+    background: #fff;
+    padding: 16px 18px;
+    font-size: 15px;
     outline: none;
 }}
 
 .search:focus {{
-    border-color: #777777;
+    border-color: #111;
 }}
 
-select {{
-    border: 1px solid #dddddd;
-    border-radius: 7px;
-    padding: 0 14px;
-    background: #ffffff;
-    min-width: 240px;
-    font-size: 13px;
+.result-info {{
+    color: #777;
+    font-size: 12px;
+    margin: 12px 0 18px;
 }}
 
+.grid {{
+    display: grid;
 
-.section {{
-    background: #ffffff;
-    border-radius: 11px;
-    margin-bottom: 25px;
-    overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,.055);
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(260px, 1fr)
+        );
+
+    gap: 12px;
 }}
 
-.section-header {{
-    padding: 21px 22px;
-    border-bottom: 1px solid #eeeeee;
-    font-size: 18px;
-    font-weight: 700;
+.price-card {{
+    min-height: 220px;
+
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+
+    border: 1px solid #ddd;
+
+    padding: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    transition:
+        transform .15s ease,
+        border-color .15s ease,
+        box-shadow .15s ease;
 }}
 
+.price-card:hover {{
+    transform: translateY(-2px);
+    border-color: #999;
 
-.table-wrap {{
-    overflow-x: auto;
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,.06);
 }}
 
-table {{
-    width: 100%;
-    border-collapse: collapse;
+.card-top {{
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    gap: 15px;
 }}
 
-th {{
-    text-align: left;
-    padding: 13px 14px;
-    background: #f8f8f8;
-    color: #666666;
+.collection {{
     font-size: 11px;
-    letter-spacing: .4px;
-    border-bottom: 1px solid #dddddd;
-    white-space: nowrap;
-}}
-
-td {{
-    padding: 14px;
-    border-bottom: 1px solid #eeeeee;
-    font-size: 13px;
-    vertical-align: middle;
-}}
-
-tbody tr:hover {{
-    background: #fafafa;
+    line-height: 1.4;
+    color: #777;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
 }}
 
 .price {{
-    font-size: 15px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: bold;
     white-space: nowrap;
+}}
+
+.variant {{
+    margin-top: 24px;
+
+    font-size: 17px;
+    line-height: 1.35;
+
+    min-height: 45px;
+}}
+
+.item-label {{
+    margin-top: 22px;
+
+    font-size: 9px;
+    letter-spacing: 1.6px;
+
+    color: #999;
 }}
 
 .item-number {{
-    font-family: Consolas, monospace;
-    white-space: nowrap;
-}}
+    margin-top: 5px;
 
-.status {{
-    display: inline-block;
-    padding: 5px 9px;
-    background: #efefef;
-    border-radius: 20px;
-    font-size: 11px;
-    white-space: nowrap;
+    font-family:
+        Consolas,
+        Monaco,
+        monospace;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    word-break: break-all;
 }}
 
 .official-link {{
-    color: #111111;
-    font-weight: 600;
-    text-decoration: none;
-    white-space: nowrap;
-}}
+    margin-top: auto;
+    padding-top: 20px;
 
-.official-link:hover {{
-    text-decoration: underline;
-}}
+    font-size: 10px;
+    letter-spacing: 1px;
 
-.price-up {{
-    font-weight: 700;
-}}
-
-.price-down {{
-    font-weight: 700;
+    color: #999;
 }}
 
 .empty {{
-    padding: 38px;
+    display: none;
+
+    padding: 50px 20px;
+
     text-align: center;
-    color: #888888;
-    font-size: 13px;
+    color: #777;
 }}
-
-
-.result-info {{
-    margin-left: auto;
-    padding: 14px 4px;
-    color: #777777;
-    font-size: 12px;
-    white-space: nowrap;
-}}
-
 
 .footer {{
+    border-top: 1px solid #ddd;
+
+    padding: 30px 0;
+
     text-align: center;
-    padding: 30px;
-    color: #999999;
-    font-size: 12px;
-    line-height: 1.8;
+
+    color: #999;
+    font-size: 11px;
 }}
 
+@media (
+    max-width: 700px
+) {{
 
-@media(max-width: 850px) {{
-
-    .stats {{
-        grid-template-columns: 1fr;
+    .header {{
+        padding:
+            30px 18px;
     }}
 
-    .controls {{
-        flex-direction: column;
+    .main {{
+        width: 92%;
+        padding-top: 30px;
     }}
 
-    select {{
-        width: 100%;
-        padding: 14px;
+    .section-header {{
+        display: block;
     }}
 
-    .result-info {{
-        margin-left: 0;
+    .section-description {{
+        margin-top: 8px;
+    }}
+
+    .change-card {{
+        display: block;
+    }}
+
+    .change-prices {{
+        margin-top: 16px;
+    }}
+
+    .grid {{
+        grid-template-columns:
+            1fr;
     }}
 
 }}
@@ -573,15 +762,40 @@ tbody tr:hover {{
     <div class="header-inner">
 
         <div class="brand">
-            JACOB & CO. JAPAN
+            JACOB &amp; CO. JAPAN
         </div>
+
+        <h1>
+            USA Official Price Monitor
+        </h1>
 
         <div class="subtitle">
-            米国公式サイト価格モニター
+            Jacob &amp; Co. 米国公式価格ページ監視
         </div>
 
-        <div class="internal">
-            社内利用限定
+        <div class="stats">
+
+            <div class="stat">
+                現在の登録数：
+                <strong>
+                    {len(current_rows)}
+                </strong>
+            </div>
+
+            <div class="stat">
+                価格変更履歴：
+                <strong>
+                    {len(history_rows)}
+                </strong>
+            </div>
+
+            <div class="stat">
+                最終更新：
+                <strong>
+                    {updated_at}
+                </strong>
+            </div>
+
         </div>
 
     </div>
@@ -589,200 +803,103 @@ tbody tr:hover {{
 </header>
 
 
-<main class="container">
+<main class="main">
 
 
-<div class="stats">
+    <!-- ================================================ -->
+    <!-- PRICE CHANGES FIRST -->
+    <!-- ================================================ -->
 
-    <div class="stat-card">
+    <section class="section">
 
-        <div class="stat-label">
-            バリエーション総数
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    最近の価格変更
+                </h2>
+
+                <div class="section-description">
+                    Jacob &amp; Co. 米国公式価格の変更履歴
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="stat-number">
-            {len(products)}
+
+        <div class="change-list">
+
+            {history_html}
+
         </div>
 
-    </div>
+    </section>
 
 
-    <div class="stat-card">
+    <!-- ================================================ -->
+    <!-- CURRENT OFFICIAL PRICES -->
+    <!-- ================================================ -->
 
-        <div class="stat-label">
-            価格変更履歴
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    現在の米国公式価格
+                </h2>
+
+                <div class="section-description">
+                    Item Number・Collection・Variant から検索できます
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="stat-number">
-            {len(history)}
+
+        <div class="search-wrap">
+
+            <input
+                id="search"
+                class="search"
+                type="text"
+                placeholder="ITEM NUMBER / COLLECTION / VARIANT を検索..."
+                autocomplete="off"
+            >
+
         </div>
 
-    </div>
-
-
-    <div class="stat-card">
-
-        <div class="stat-label">
-            最終価格確認
-        </div>
 
         <div
-            class="stat-number"
-            style="font-size:18px;"
+            id="resultInfo"
+            class="result-info"
         >
-            {esc(last_scan)}
+            {len(current_rows)} 件を表示
         </div>
 
-    </div>
 
-</div>
+        <div
+            id="priceGrid"
+            class="grid"
+        >
 
+            {current_cards_html}
 
-<div class="guide">
-
-    <div class="monitor-status">
-        <span class="status-dot"></span>
-        自動監視システム：正常稼働中
-    </div>
-
-    <div>
-        Jacob & Co. 米国公式サイトに掲載されている価格情報を
-        自動取得・比較する社内向けモニターです。
-        <br>
-        価格変更を検出した場合は、自動的に
-        「最近の価格変更」へ記録されます。
-    </div>
-
-    <div class="monitor-grid">
-
-        <div class="monitor-item">
-            <div class="monitor-label">
-                更新頻度
-            </div>
-            <div class="monitor-value">
-                1日2回
-            </div>
         </div>
 
-        <div class="monitor-item">
-            <div class="monitor-label">
-                監視対象
-            </div>
-            <div class="monitor-value">
-                {len(products)} バリエーション
-            </div>
+
+        <div
+            id="empty"
+            class="empty"
+        >
+            該当する商品が見つかりません。
         </div>
 
-        <div class="monitor-item">
-            <div class="monitor-label">
-                価格変更
-            </div>
-            <div class="monitor-value">
-                {len(history)} 件
-            </div>
-        </div>
-
-        <div class="monitor-item">
-            <div class="monitor-label">
-                最終確認
-            </div>
-            <div class="monitor-value">
-                {esc(last_scan)}
-            </div>
-        </div>
-
-    </div>
-
-</div>
-
-
-<div class="controls">
-
-    <input
-        id="search"
-        class="search"
-        type="text"
-        placeholder="コレクション・モデル・Item Numberを検索"
-        oninput="filterProducts()"
-    >
-
-    <select
-        id="collectionFilter"
-        onchange="filterProducts()"
-    >
-
-        <option value="">
-            すべてのコレクション
-        </option>
-
-        {collection_options}
-
-    </select>
-
-    <div
-        id="resultInfo"
-        class="result-info"
-    >
-    </div>
-
-</div>
-
-
-<section class="section">
-
-    <div class="section-header">
-        現在の米国公式価格
-    </div>
-
-    <div class="table-wrap">
-
-        <table id="productTable">
-
-            <thead>
-
-                <tr>
-
-                    <th>コレクション</th>
-
-                    <th>モデル</th>
-
-                    <th>Item Number</th>
-
-                    <th>米国公式価格</th>
-
-                    <th>在庫状況</th>
-
-                    <th>最終確認</th>
-
-                    <th>公式商品ページ</th>
-
-                </tr>
-
-            </thead>
-
-
-            <tbody>
-
-                {''.join(product_rows)}
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-</section>
-
-
-<section class="section">
-
-    <div class="section-header">
-        最近の価格変更
-    </div>
-
-    {history_content}
-
-</section>
+    </section>
 
 
 </main>
@@ -790,87 +907,88 @@ tbody tr:hover {{
 
 <footer class="footer">
 
-    Jacob & Co. Japan
-
-    <br>
-
-    米国公式サイト価格モニター
-
-    <br>
-
-    社内利用限定
+    Data source:
+    Jacob &amp; Co. USA Official Timepiece Prices
 
 </footer>
 
 
 <script>
 
-function filterProducts() {{
+const search =
+    document.getElementById(
+        "search"
+    );
 
-    const search =
-        document
-        .getElementById("search")
-        .value
-        .toLowerCase()
-        .trim();
+const cards =
+    Array.from(
+        document.querySelectorAll(
+            ".price-card"
+        )
+    );
 
-    const collection =
-        document
-        .getElementById("collectionFilter")
-        .value;
+const resultInfo =
+    document.getElementById(
+        "resultInfo"
+    );
 
-    const rows =
-        document
-        .querySelectorAll(
-            "#productTable tbody tr"
-        );
+const empty =
+    document.getElementById(
+        "empty"
+    );
+
+
+function filterCards() {{
+
+    const query =
+        search.value
+        .trim()
+        .toLowerCase();
 
     let visible = 0;
 
-    rows.forEach(row => {{
+    cards.forEach(card => {{
 
         const text =
-            row.innerText
-            .toLowerCase();
+            (
+                card.dataset.search
+                || ""
+            ).toLowerCase();
 
-        const rowCollection =
-            row.dataset.collection;
+        const match =
+            !query
+            ||
+            text.includes(query);
 
-        const matchesSearch =
-            text.includes(search);
+        card.style.display =
+            match
+            ? ""
+            : "none";
 
-        const matchesCollection =
-            collection === "" ||
-            rowCollection === collection;
-
-        if (
-            matchesSearch &&
-            matchesCollection
-        ) {{
-
-            row.style.display = "";
+        if (match) {{
             visible++;
-
-        }}
-
-        else {{
-
-            row.style.display = "none";
-
         }}
 
     }});
 
 
-    document
-    .getElementById("resultInfo")
-    .textContent =
-        visible + " 件を表示";
+    resultInfo.textContent =
+        visible
+        + " 件を表示";
+
+
+    empty.style.display =
+        visible === 0
+        ? "block"
+        : "none";
 
 }}
 
 
-filterProducts();
+search.addEventListener(
+    "input",
+    filterCards
+);
 
 </script>
 
@@ -881,6 +999,10 @@ filterProducts();
 """
 
 
+# ============================================================
+# WRITE
+# ============================================================
+
 with open(
     OUTPUT_HTML,
     "w",
@@ -890,27 +1012,21 @@ with open(
     f.write(page)
 
 
-print("=" * 60)
+print("=" * 70)
+print("PAGE GENERATED")
+print("=" * 70)
 
 print(
-    "Jacob & Co. Japan "
-    "価格モニターページを生成しました。"
-)
-
-print("=" * 60)
-
-print(
-    f"商品数: {len(products)}"
+    "Current products:",
+    len(current_rows)
 )
 
 print(
-    f"価格変更履歴: {len(history)}"
+    "Price history:",
+    len(history_rows)
 )
 
 print(
-    f"最終価格確認: {last_scan}"
-)
-
-print(
-    f"出力先: {OUTPUT_HTML}"
+    "Output:",
+    OUTPUT_HTML
 )
