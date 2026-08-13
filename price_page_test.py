@@ -18,17 +18,32 @@ async def main():
 
         page = await browser.new_page()
 
-        responses = []
+        graphql_responses = []
 
-        # 记录页面加载过程中调用的接口
+        async def capture_response(response):
+
+            if "graphql.datocms.com" not in response.url:
+                return
+
+            try:
+                body = await response.text()
+
+                graphql_responses.append({
+                    "url": response.url,
+                    "status": response.status,
+                    "body": body
+                })
+
+            except Exception as e:
+
+                print(
+                    "Could not read GraphQL response:",
+                    e
+                )
+
         page.on(
             "response",
-            lambda response: responses.append(
-                (
-                    response.status,
-                    response.url
-                )
-            )
+            capture_response
         )
 
         print("=" * 70)
@@ -43,21 +58,9 @@ async def main():
 
         await page.wait_for_timeout(5000)
 
-        # --------------------------------------------------
-        # 页面基本信息
-        # --------------------------------------------------
-
-        print()
-        print("TITLE:")
-        print(await page.title())
-
-        print()
-        print("FINAL URL:")
-        print(page.url)
-
-        # --------------------------------------------------
-        # 页面文字
-        # --------------------------------------------------
+        # ==================================================
+        # BODY TEXT
+        # ==================================================
 
         body_text = await page.locator(
             "body"
@@ -65,23 +68,21 @@ async def main():
 
         print()
         print("=" * 70)
-        print("PAGE TEXT SAMPLE")
+        print("VISIBLE PAGE TEXT")
         print("=" * 70)
 
-        print(
-            body_text[:15000]
-        )
+        print(body_text[:30000])
 
-        # --------------------------------------------------
-        # 找 Item Number
-        # --------------------------------------------------
+        # ==================================================
+        # ITEM NUMBERS
+        # ==================================================
 
         item_numbers = sorted(
             set(
                 re.findall(
-                    r"\b[A-Z]{1,5}"
-                    r"[0-9]{2,5}"
-                    r"(?:\.[A-Z0-9]+){2,8}\b",
+                    r"\b[A-Z]{1,6}"
+                    r"[0-9]{2,6}"
+                    r"(?:\.[A-Z0-9]+){2,10}\b",
                     body_text
                 )
             )
@@ -89,123 +90,127 @@ async def main():
 
         print()
         print("=" * 70)
-        print("ITEM NUMBERS FOUND")
+        print("VISIBLE ITEM NUMBERS")
         print("=" * 70)
 
-        print(
-            "COUNT:",
-            len(item_numbers)
-        )
+        print("COUNT:", len(item_numbers))
 
-        for item in item_numbers[:100]:
-
+        for item in item_numbers:
             print(item)
 
-        # --------------------------------------------------
-        # 找美元价格
-        # --------------------------------------------------
-
-        prices = re.findall(
-            r"\$\s*"
-            r"[0-9][0-9,]*"
-            r"(?:\.[0-9]{1,2})?",
-            body_text
-        )
+        # ==================================================
+        # NEXT DATA
+        # ==================================================
 
         print()
         print("=" * 70)
-        print("USD PRICES FOUND")
+        print("__NEXT_DATA__")
+        print("=" * 70)
+
+        next_data = await page.locator(
+            "#__NEXT_DATA__"
+        ).text_content()
+
+        if next_data:
+
+            print(
+                "NEXT DATA SIZE:",
+                len(next_data)
+            )
+
+            try:
+
+                parsed = json.loads(
+                    next_data
+                )
+
+                pretty = json.dumps(
+                    parsed,
+                    indent=2,
+                    ensure_ascii=False
+                )
+
+                print(
+                    pretty[:30000]
+                )
+
+            except Exception as e:
+
+                print(
+                    "NEXT DATA JSON ERROR:",
+                    e
+                )
+
+                print(
+                    next_data[:30000]
+                )
+
+        else:
+
+            print(
+                "NO __NEXT_DATA__ CONTENT"
+            )
+
+        # ==================================================
+        # GRAPHQL RESPONSES
+        # ==================================================
+
+        print()
+        print("=" * 70)
+        print("DATOCMS GRAPHQL RESPONSES")
         print("=" * 70)
 
         print(
-            "COUNT:",
-            len(prices)
+            "GRAPHQL RESPONSE COUNT:",
+            len(graphql_responses)
         )
 
-        for price in prices[:100]:
+        for index, result in enumerate(
+            graphql_responses,
+            start=1
+        ):
 
-            print(price)
-
-        # --------------------------------------------------
-        # HTML 中寻找 JSON / Next 数据
-        # --------------------------------------------------
-
-        html = await page.content()
-
-        print()
-        print("=" * 70)
-        print("HTML SIZE")
-        print("=" * 70)
-
-        print(
-            len(html)
-        )
-
-        keywords = [
-            "__NEXT_DATA__",
-            "timepiece",
-            "price",
-            "itemNumber",
-            "sku",
-            "variant"
-        ]
-
-        print()
-        print("=" * 70)
-        print("KEYWORD CHECK")
-        print("=" * 70)
-
-        lower_html = html.lower()
-
-        for keyword in keywords:
+            print()
+            print(
+                f"--- GRAPHQL RESPONSE {index} ---"
+            )
 
             print(
-                keyword,
-                ":",
-                keyword.lower()
-                in lower_html
+                "STATUS:",
+                result["status"]
             )
-
-        # --------------------------------------------------
-        # 网络请求
-        # --------------------------------------------------
-
-        print()
-        print("=" * 70)
-        print("INTERESTING NETWORK REQUESTS")
-        print("=" * 70)
-
-        seen = set()
-
-        for status, request_url in responses:
-
-            lower = request_url.lower()
-
-            interesting = any(
-                word in lower
-                for word in [
-                    "api",
-                    "json",
-                    "price",
-                    "product",
-                    "timepiece",
-                    "variant",
-                    "graphql"
-                ]
-            )
-
-            if not interesting:
-                continue
-
-            if request_url in seen:
-                continue
-
-            seen.add(request_url)
 
             print(
-                status,
-                request_url
+                "URL:",
+                result["url"]
             )
+
+            body = result["body"]
+
+            print(
+                "BODY SIZE:",
+                len(body)
+            )
+
+            try:
+
+                data = json.loads(body)
+
+                pretty = json.dumps(
+                    data,
+                    indent=2,
+                    ensure_ascii=False
+                )
+
+                print(
+                    pretty[:50000]
+                )
+
+            except Exception:
+
+                print(
+                    body[:50000]
+                )
 
         print()
         print("=" * 70)
