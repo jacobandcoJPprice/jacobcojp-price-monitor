@@ -301,7 +301,7 @@ async def main():
         if not old:
             continue
 
-        old_price = str(
+                old_price = str(
             old.get("Price", "")
         ).strip()
 
@@ -309,8 +309,25 @@ async def main():
             row.get("Price", "")
         ).strip()
 
-        if old_price == new_price:
+        try:
+            old_price_number = float(
+                old_price.replace(",", "")
+            )
+        except (ValueError, TypeError):
+            old_price_number = None
+
+        try:
+            new_price_number = float(
+                new_price.replace(",", "")
+            )
+        except (ValueError, TypeError):
+            new_price_number = None
+
+        # 数值相同就不是价格变化
+        # 例如 418000.0 和 418000 应视为同价
+        if old_price_number == new_price_number:
             continue
+
 
         history.append({
             "Changed At": now(),
