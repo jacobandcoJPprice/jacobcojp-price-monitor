@@ -69,7 +69,7 @@ async def main():
         rows = []
         seen = set()
 
-                for i in range(count):
+for i in range(count):
 
             anchor = anchors.nth(i)
 
