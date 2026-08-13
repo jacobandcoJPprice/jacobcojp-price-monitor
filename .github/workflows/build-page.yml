@@ -1,0 +1,32 @@
+name: Build Dashboard Only
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-dashboard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate dashboard
+        run: |
+          python generate_page.py
+
+      - name: Save updated dashboard
+        run: |
+          git config user.name "actions-user"
+          git config user.email "actions@github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Rebuild dashboard only"
+          git push
