@@ -7,64 +7,62 @@ from datetime import datetime
 from playwright.async_api import async_playwright
 
 
-# ============================================================
-# CONFIG
-# ============================================================
-
 PRICE_PAGE_URL = "https://jacobandco.com/timepiece-prices"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-CURRENT_CSV = os.path.join(BASE_DIR, "current_prices.csv")
-HISTORY_CSV = os.path.join(BASE_DIR, "price_history_v2.csv")
+CURRENT_CSV = os.path.join(
+    BASE_DIR,
+    "current_prices.csv"
+)
+
+HISTORY_CSV = os.path.join(
+    BASE_DIR,
+    "price_history_v2.csv"
+)
 
 
-# Jacob & Co. Item Number
-# Examples:
-# AF321.30.BB.AA.B
-# BU300.22.AA.AA.B
-# CA100.30.AB.BC.ABAI.A
 ITEM_PATTERN = re.compile(
-    r"\b[A-Z]{1,10}[0-9]{2,8}"
-    r"(?:\.[A-Z0-9]+){2,12}\b",
+    r"\b[A-Z]{1,8}[0-9]{2,8}"
+    r"(?:\.[A-Z0-9]+){2,10}\b",
     re.I
 )
 
-# Example:
-# 418,000 (USD)
 PRICE_PATTERN = re.compile(
     r"([0-9]{1,3}(?:,[0-9]{3})+)\s*\(USD\)",
     re.I
 )
 
 
-# ============================================================
-# BASIC FUNCTIONS
-# ============================================================
-
 def now():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now().strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
 
 
 def read_csv(path):
+
     if not os.path.exists(path):
         return []
 
-    try:
-        with open(
-            path,
-            "r",
-            encoding="utf-8-sig",
-            newline=""
-        ) as f:
-            return list(csv.DictReader(f))
+    with open(
+        path,
+        "r",
+        encoding="utf-8-sig",
+        newline=""
+    ) as f:
 
-    except Exception as e:
-        print("CSV READ ERROR:", path, e)
-        return []
+        return list(
+            csv.DictReader(f)
+        )
 
 
-def write_csv(path, fieldnames, rows):
+def write_csv(
+    path,
+    fieldnames,
+    rows
+):
+
     with open(
         path,
         "w",
@@ -79,21 +77,10 @@ def write_csv(path, fieldnames, rows):
         )
 
         writer.writeheader()
-
-        for row in rows:
-            writer.writerow(row)
+        writer.writerows(rows)
 
 
 def normalize_price(value):
-    """
-    Convert:
-    418000
-    418000.0
-    418,000
-    $418,000
-
-    into float 418000.0
-    """
 
     if value is None:
         return None
@@ -118,43 +105,40 @@ def normalize_price(value):
         return None
 
 
-def display_price(value):
-    """
-    Convert price into clean integer string.
-
-    418000.0 -> 418000
-    """
+def clean_price(value):
 
     number = normalize_price(value)
 
     if number is None:
         return ""
 
-    return str(int(round(number)))
+    return str(
+        int(round(number))
+    )
 
 
-def build_old_price_map(rows):
+def build_old_map(rows):
+
     result = {}
 
     for row in rows:
 
         item_number = str(
-            row.get("Item Number", "")
+            row.get(
+                "Item Number",
+                ""
+            )
         ).strip().upper()
 
-        if not item_number:
-            continue
-
-        result[item_number] = row
+        if item_number:
+            result[
+                item_number
+            ] = row
 
     return result
 
 
-# ============================================================
-# SCRAPER
-# ============================================================
-
-async def scrape_price_page():
+async def scrape_prices():
 
     rows = []
     seen = set()
@@ -172,9 +156,12 @@ async def scrape_price_page():
             }
         )
 
-        print()
-        print("Opening official price page...")
-        print(PRICE_PAGE_URL)
+        print("=" * 70)
+        print(
+            "OPENING JACOB & CO. "
+            "OFFICIAL PRICE PAGE"
+        )
+        print("=" * 70)
 
         await page.goto(
             PRICE_PAGE_URL,
@@ -182,37 +169,42 @@ async def scrape_price_page():
             timeout=120000
         )
 
-        await page.wait_for_timeout(5000)
+        await page.wait_for_timeout(
+            5000
+        )
 
-        print()
-        print("Scrolling full page...")
+        print(
+            "Scrolling full page..."
+        )
 
         last_height = 0
-        stable_count = 0
 
-        for _ in range(100):
+        for i in range(80):
 
             await page.evaluate(
-                "window.scrollTo(0, document.body.scrollHeight)"
+                "window.scrollTo("
+                "0, document.body.scrollHeight)"
             )
 
-            await page.wait_for_timeout(800)
+            await page.wait_for_timeout(
+                800
+            )
 
             new_height = await page.evaluate(
                 "document.body.scrollHeight"
             )
 
-            if new_height == last_height:
-                stable_count += 1
-            else:
-                stable_count = 0
+            if (
+                new_height == last_height
+                and i >= 5
+            ):
+                break
 
             last_height = new_height
 
-            if stable_count >= 4:
-                break
-
-        await page.wait_for_timeout(3000)
+        await page.wait_for_timeout(
+            3000
+        )
 
         anchors = page.locator(
             'a[href*="/timepieces/"]'
@@ -220,7 +212,10 @@ async def scrape_price_page():
 
         count = await anchors.count()
 
-        print("Timepiece links found:", count)
+        print(
+            "Timepiece links found:",
+            count
+        )
 
         for i in range(count):
 
@@ -228,87 +223,32 @@ async def scrape_price_page():
 
             try:
 
-                href = await anchor.get_attribute(
-                    "href"
-                )
-
                 text = (
                     await anchor.inner_text()
                 ).strip()
 
-                if not href:
+                href = (
+                    await anchor.get_attribute(
+                        "href"
+                    )
+                )
+
+                if not text or not href:
                     continue
 
-                # ------------------------------------------------
-                # Try anchor text first
-                # ------------------------------------------------
+                # ============================================
+                # IMPORTANT:
+                # Item Number always comes from the
+                # individual product link itself.
+                # ============================================
 
-                item_match = ITEM_PATTERN.search(text)
-                price_match = PRICE_PATTERN.search(text)
-
-                # ------------------------------------------------
-                # If card text isn't directly inside <a>,
-                # move upward through parent elements.
-                # ------------------------------------------------
-
-                if not item_match or not price_match:
-
-                    parent_text = await anchor.evaluate(
-                        """
-                        el => {
-                            let node = el;
-
-                            for (let i = 0; i < 8; i++) {
-
-                                if (!node) {
-                                    break;
-                                }
-
-                                const text =
-                                    node.innerText || "";
-
-                                if (
-                                    /[A-Z]{1,10}[0-9]{2,8}(\\.[A-Z0-9]+){2,12}/i.test(text)
-                                    &&
-                                    /[0-9]{1,3}(,[0-9]{3})+\\s*\\(USD\\)/i.test(text)
-                                ) {
-                                    return text;
-                                }
-
-                                node = node.parentElement;
-                            }
-
-                            return "";
-                        }
-                        """
+                item_match = (
+                    ITEM_PATTERN.search(
+                        text
                     )
-
-                    if parent_text:
-
-                        parent_item = ITEM_PATTERN.search(
-                            parent_text
-                        )
-
-                        parent_price = PRICE_PATTERN.search(
-                            parent_text
-                        )
-
-                        if parent_item:
-                            item_match = parent_item
-
-                        if parent_price:
-                            price_match = parent_price
-
-                        text = parent_text
-
-                # ------------------------------------------------
-                # Need both Item Number + Price
-                # ------------------------------------------------
+                )
 
                 if not item_match:
-                    continue
-
-                if not price_match:
                     continue
 
                 item_number = (
@@ -318,17 +258,97 @@ async def scrape_price_page():
                     .upper()
                 )
 
+                # ============================================
+                # Price first from link text
+                # ============================================
+
+                price_match = (
+                    PRICE_PATTERN.search(
+                        text
+                    )
+                )
+
+                # ============================================
+                # If price is outside the <a>,
+                # walk up parent elements.
+                #
+                # Do NOT replace Item Number here.
+                # ============================================
+
+                if not price_match:
+
+                    parent_text = (
+                        await anchor.evaluate(
+                            """
+                            el => {
+                                let node = el;
+
+                                for (
+                                    let i = 0;
+                                    i < 8;
+                                    i++
+                                ) {
+
+                                    if (!node) {
+                                        break;
+                                    }
+
+                                    const text =
+                                        node.innerText || "";
+
+                                    if (
+                                        text.includes("(USD)")
+                                    ) {
+                                        return text;
+                                    }
+
+                                    node =
+                                        node.parentElement;
+                                }
+
+                                return "";
+                            }
+                            """
+                        )
+                    )
+
+                    if parent_text:
+
+                        parent_price = (
+                            PRICE_PATTERN.search(
+                                parent_text
+                            )
+                        )
+
+                        if parent_price:
+
+                            price_match = (
+                                parent_price
+                            )
+
+                            text = (
+                                parent_text
+                            )
+
+                if not price_match:
+                    continue
+
                 price = (
                     price_match
                     .group(1)
                     .replace(",", "")
                 )
 
-                # ------------------------------------------------
-                # Normalize URL
-                # ------------------------------------------------
+                price = clean_price(
+                    price
+                )
+
+                # ============================================
+                # URL
+                # ============================================
 
                 if href.startswith("/"):
+
                     href = (
                         "https://jacobandco.com"
                         + href
@@ -341,100 +361,98 @@ async def scrape_price_page():
                     .rstrip("/")
                 )
 
-                # ------------------------------------------------
-                # One row per Item Number
-                # ------------------------------------------------
+                # ============================================
+                # Unique Item Number
+                # ============================================
 
                 if item_number in seen:
                     continue
 
-                seen.add(item_number)
+                seen.add(
+                    item_number
+                )
 
-                # ------------------------------------------------
-                # Collection from URL
-                # ------------------------------------------------
+                # ============================================
+                # Collection + Variant from URL
+                # ============================================
 
                 collection = ""
+                variant = ""
 
-                if "/timepieces/" in href:
+                parts = [
+                    part
+                    for part
+                    in href.split("/")
+                    if part
+                ]
 
-                    parts = [
-                        part
-                        for part in href.split("/")
-                        if part
-                    ]
+                try:
 
-                    try:
+                    idx = parts.index(
+                        "timepieces"
+                    )
 
-                        index = parts.index(
-                            "timepieces"
+                    if len(parts) > idx + 1:
+
+                        collection = (
+                            parts[idx + 1]
+                            .replace("-", " ")
+                            .title()
                         )
 
-                        if len(parts) > index + 1:
+                    if len(parts) > idx + 2:
 
-                            collection = (
-                                parts[index + 1]
-                                .replace("-", " ")
-                                .title()
-                            )
+                        variant = (
+                            parts[idx + 2]
+                            .replace("-", " ")
+                            .title()
+                        )
 
-                    except ValueError:
-                        pass
-
-                # ------------------------------------------------
-                # Clean card text
-                # ------------------------------------------------
+                except ValueError:
+                    pass
 
                 lines = [
                     line.strip()
-                    for line in text.splitlines()
+                    for line
+                    in text.splitlines()
                     if line.strip()
                 ]
 
-                card_text = " | ".join(lines)
-
-                # ------------------------------------------------
-                # Variant
-                # ------------------------------------------------
-
-                variant = ""
-
-                # URL normally contains collection / variant
-                if "/timepieces/" in href:
-
-                    parts = [
-                        part
-                        for part in href.split("/")
-                        if part
-                    ]
-
-                    try:
-
-                        index = parts.index(
-                            "timepieces"
-                        )
-
-                        if len(parts) > index + 2:
-
-                            variant = (
-                                parts[index + 2]
-                                .replace("-", " ")
-                                .title()
-                            )
-
-                    except ValueError:
-                        pass
+                card_text = (
+                    " | ".join(
+                        lines
+                    )
+                )
 
                 rows.append({
-                    "Collection": collection,
-                    "Variant": variant,
-                    "Item Number": item_number,
-                    "Price": display_price(price),
-                    "Currency": "USD",
-                    "Availability": "PRICE AVAILABLE",
-                    "URL": href,
-                    "Card Text": card_text,
-                    "Last Seen": now()
+
+                    "Collection":
+                        collection,
+
+                    "Variant":
+                        variant,
+
+                    "Item Number":
+                        item_number,
+
+                    "Price":
+                        price,
+
+                    "Currency":
+                        "USD",
+
+                    "Availability":
+                        "PRICE AVAILABLE",
+
+                    "URL":
+                        href,
+
+                    "Card Text":
+                        card_text,
+
+                    "Last Seen":
+                        now()
+
                 })
 
             except Exception as e:
@@ -449,25 +467,27 @@ async def scrape_price_page():
 
     rows.sort(
         key=lambda row: (
-            row["Collection"].lower(),
-            row["Item Number"].lower()
+            row.get(
+                "Collection",
+                ""
+            ).lower(),
+            row.get(
+                "Item Number",
+                ""
+            ).lower()
         )
     )
 
     return rows
 
 
-# ============================================================
-# PRICE CHANGE CHECK
-# ============================================================
-
-def detect_price_changes(
+def detect_changes(
     old_rows,
     new_rows,
-    history_rows
+    history
 ):
 
-    old_map = build_old_price_map(
+    old_map = build_old_map(
         old_rows
     )
 
@@ -476,7 +496,10 @@ def detect_price_changes(
     for row in new_rows:
 
         item_number = (
-            row["Item Number"]
+            row.get(
+                "Item Number",
+                ""
+            )
             .strip()
             .upper()
         )
@@ -485,51 +508,76 @@ def detect_price_changes(
             item_number
         )
 
-        # New product:
-        # Do NOT treat it as price change.
+        # 新加入的型号不算涨价/降价
         if not old:
             continue
 
         old_price = normalize_price(
-            old.get("Price")
+            old.get(
+                "Price",
+                ""
+            )
         )
 
         new_price = normalize_price(
-            row.get("Price")
+            row.get(
+                "Price",
+                ""
+            )
         )
 
-        # Can't compare
-        if old_price is None:
+        if (
+            old_price is None
+            or new_price is None
+        ):
             continue
 
-        if new_price is None:
-            continue
-
-        # IMPORTANT:
         # 418000.0 == 418000
         if old_price == new_price:
             continue
 
-        old_price_text = display_price(
-            old_price
-        )
-
-        new_price_text = display_price(
-            new_price
-        )
-
         change = {
-            "Changed At": now(),
-            "Collection": row["Collection"],
-            "Variant": row["Variant"],
-            "Item Number": item_number,
-            "Old Price": old_price_text,
-            "New Price": new_price_text,
-            "Currency": "USD",
-            "URL": row["URL"]
+
+            "Changed At":
+                now(),
+
+            "Collection":
+                row.get(
+                    "Collection",
+                    ""
+                ),
+
+            "Variant":
+                row.get(
+                    "Variant",
+                    ""
+                ),
+
+            "Item Number":
+                item_number,
+
+            "Old Price":
+                clean_price(
+                    old_price
+                ),
+
+            "New Price":
+                clean_price(
+                    new_price
+                ),
+
+            "Currency":
+                "USD",
+
+            "URL":
+                row.get(
+                    "URL",
+                    ""
+                )
+
         }
 
-        history_rows.append(
+        history.append(
             change
         )
 
@@ -540,25 +588,20 @@ def detect_price_changes(
     return changes
 
 
-# ============================================================
-# MAIN
-# ============================================================
-
 async def main():
 
     print("=" * 70)
-    print("JACOB & CO. USA OFFICIAL PRICE MONITOR")
+    print(
+        "JACOB & CO. USA "
+        "OFFICIAL PRICE MONITOR"
+    )
     print("=" * 70)
-
-    # --------------------------------------------------------
-    # Read previous data BEFORE scraping
-    # --------------------------------------------------------
 
     old_rows = read_csv(
         CURRENT_CSV
     )
 
-    history_rows = read_csv(
+    history = read_csv(
         HISTORY_CSV
     )
 
@@ -570,14 +613,12 @@ async def main():
 
     print(
         "Previous history rows:",
-        len(history_rows)
+        len(history)
     )
 
-    # --------------------------------------------------------
-    # Scrape
-    # --------------------------------------------------------
-
-    new_rows = await scrape_price_page()
+    new_rows = (
+        await scrape_prices()
+    )
 
     print()
     print("=" * 70)
@@ -589,37 +630,21 @@ async def main():
         len(new_rows)
     )
 
-    # --------------------------------------------------------
-    # SAFETY CHECK
-    # --------------------------------------------------------
-
-    # We already confirmed the official page currently gives
-    # about 582 item-number rows.
-    #
-    # If the site suddenly gives only 50/100/etc.,
-    # DON'T overwrite our good CSV.
-
-    if len(new_rows) < 500:
+    # 我们已经独立验证过 582 条。
+    # 如果突然远低于正常值，停止覆盖数据。
+    if len(new_rows) < 570:
 
         raise RuntimeError(
             "SAFETY STOP: "
-            f"only {len(new_rows)} rows were found. "
-            "current_prices.csv was NOT overwritten."
+            f"only {len(new_rows)} rows found. "
+            "Existing CSV will NOT be overwritten."
         )
 
-    # --------------------------------------------------------
-    # Detect changes
-    # --------------------------------------------------------
-
-    changes = detect_price_changes(
+    changes = detect_changes(
         old_rows,
         new_rows,
-        history_rows
+        history
     )
-
-    # --------------------------------------------------------
-    # Print real changes
-    # --------------------------------------------------------
 
     if changes:
 
@@ -631,30 +656,20 @@ async def main():
         for change in changes:
 
             print()
-
             print(
                 "Item Number:",
                 change["Item Number"]
             )
 
             print(
-                "Old Price:",
+                "Old:",
                 change["Old Price"]
             )
 
             print(
-                "New Price:",
+                "New:",
                 change["New Price"]
             )
-
-            print(
-                "URL:",
-                change["URL"]
-            )
-
-    # --------------------------------------------------------
-    # Save current prices
-    # --------------------------------------------------------
 
     current_fields = [
         "Collection",
@@ -668,16 +683,6 @@ async def main():
         "Last Seen"
     ]
 
-    write_csv(
-        CURRENT_CSV,
-        current_fields,
-        new_rows
-    )
-
-    # --------------------------------------------------------
-    # Save history
-    # --------------------------------------------------------
-
     history_fields = [
         "Changed At",
         "Collection",
@@ -690,14 +695,16 @@ async def main():
     ]
 
     write_csv(
-        HISTORY_CSV,
-        history_fields,
-        history_rows
+        CURRENT_CSV,
+        current_fields,
+        new_rows
     )
 
-    # --------------------------------------------------------
-    # Final report
-    # --------------------------------------------------------
+    write_csv(
+        HISTORY_CSV,
+        history_fields,
+        history
+    )
 
     print()
     print("=" * 70)
@@ -716,11 +723,14 @@ async def main():
 
     print(
         "History rows :",
-        len(history_rows)
+        len(history)
     )
 
     print("=" * 70)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+
+    asyncio.run(
+        main()
+    )
