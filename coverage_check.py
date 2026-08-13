@@ -132,7 +132,33 @@ def crawl_sitemaps():
         time.sleep(0.2)
 
     return pages, visited
+def get_official_variant_urls():
+    """
+    直接读取 Jacob & Co. 官方 sitemap-variants.xml。
+    用它作为 Variant URL 的独立基准。
+    """
+    sitemap_url = BASE_URL + "/sitemap-variants.xml"
 
+    print()
+    print("Reading official variant sitemap:", sitemap_url)
+
+    text = get_text(sitemap_url)
+
+    if not text:
+        print("WARNING: Could not read sitemap-variants.xml")
+        return set()
+
+    urls = extract_sitemap_urls(text)
+
+    variant_urls = {
+        url.rstrip("/")
+        for url in urls
+        if "/timepieces/" in url.lower()
+    }
+
+    print("Official variant URLs found:", len(variant_urls))
+
+    return variant_urls
 
 def looks_like_product_url(url):
     """
@@ -298,7 +324,49 @@ def main():
     print("=" * 70)
 
     current_rows, monitored_urls = load_current_monitor()
+official_variant_urls = get_official_variant_urls()
 
+matched_variant_urls = official_variant_urls & monitored_urls
+missing_variant_urls = official_variant_urls - monitored_urls
+extra_monitored_urls = monitored_urls - official_variant_urls
+
+print()
+print("=" * 70)
+print("OFFICIAL VARIANT SITEMAP CHECK")
+print("=" * 70)
+print("Official variant URLs :", len(official_variant_urls))
+print("Current monitored URLs:", len(monitored_urls))
+print("Matched URLs          :", len(matched_variant_urls))
+print("Missing from monitor  :", len(missing_variant_urls))
+print("Extra monitored URLs  :", len(extra_monitored_urls))
+
+if official_variant_urls:
+    variant_coverage = (
+        len(matched_variant_urls)
+        / len(official_variant_urls)
+        * 100
+    )
+    print(f"Variant URL coverage  : {variant_coverage:.2f}%")
+
+print()
+print("MISSING VARIANT URLS")
+print("-" * 70)
+
+if missing_variant_urls:
+    for url in sorted(missing_variant_urls):
+        print(url)
+else:
+    print("NONE")
+
+print()
+print("EXTRA MONITORED URLS")
+print("-" * 70)
+
+if extra_monitored_urls:
+    for url in sorted(extra_monitored_urls):
+        print(url)
+else:
+    print("NONE")
     print()
     print("Current monitor rows:", len(current_rows))
     print("Current monitor unique URLs:", len(monitored_urls))
