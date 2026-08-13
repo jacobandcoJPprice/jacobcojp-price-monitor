@@ -82,10 +82,57 @@ async def main():
                     continue
 
                 item_match = ITEM_PATTERN.search(text)
-                price_match = PRICE_PATTERN.search(text)
+                item_match = ITEM_PATTERN.search(text)
 
-                if not item_match or not price_match:
-                    continue
+if not item_match:
+    continue
+
+# 先从链接自身找价格
+price_match = PRICE_PATTERN.search(text)
+
+# 如果链接自身没有价格，
+# 就向外层商品卡找，最多向上找 6 层
+if not price_match:
+
+    try:
+        parent_text = await anchor.evaluate(
+            """
+            el => {
+                let node = el;
+
+                for (let i = 0; i < 6; i++) {
+                    if (!node) break;
+
+                    const text = node.innerText || "";
+
+                    if (
+                        /[0-9]{1,3}(,[0-9]{3})+\\s*\\(USD\\)/i.test(text)
+                    ) {
+                        return text;
+                    }
+
+                    node = node.parentElement;
+                }
+
+                return "";
+            }
+            """
+        )
+
+        price_match = PRICE_PATTERN.search(parent_text)
+
+        if price_match:
+            text = parent_text
+
+    except Exception:
+        pass
+
+if not price_match:
+    print()
+    print("ITEM WITHOUT MATCHED PRICE:")
+    print(item_match.group(0))
+    print(text[:500])
+    continue
 
                 item_number = item_match.group(0)
 
