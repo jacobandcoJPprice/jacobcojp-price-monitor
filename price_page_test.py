@@ -69,63 +69,97 @@ async def main():
         rows = []
         seen = set()
 
-        for i in range(count):
+                for i in range(count):
 
             anchor = anchors.nth(i)
 
             try:
                 text = (await anchor.inner_text()).strip()
-
                 href = await anchor.get_attribute("href")
 
                 if not text or not href:
                     continue
 
                 item_match = ITEM_PATTERN.search(text)
-                item_match = ITEM_PATTERN.search(text)
 
-if not item_match:
-    continue
+                if not item_match:
+                    continue
 
-# 先从链接自身找价格
-price_match = PRICE_PATTERN.search(text)
+                # 先从链接自身找价格
+                price_match = PRICE_PATTERN.search(text)
 
-# 如果链接自身没有价格，
-# 就向外层商品卡找，最多向上找 6 层
-if not price_match:
+                # 链接自身没有价格时，向外层商品卡找
+                if not price_match:
 
-    try:
-        parent_text = await anchor.evaluate(
-            """
-            el => {
-                let node = el;
+                    try:
+                        parent_text = await anchor.evaluate(
+                            """
+                            el => {
+                                let node = el;
 
-                for (let i = 0; i < 6; i++) {
-                    if (!node) break;
+                                for (let i = 0; i < 6; i++) {
+                                    if (!node) break;
 
-                    const text = node.innerText || "";
+                                    const text = node.innerText || "";
 
-                    if (
-                        /[0-9]{1,3}(,[0-9]{3})+\\s*\\(USD\\)/i.test(text)
-                    ) {
-                        return text;
-                    }
+                                    if (
+                                        /[0-9]{1,3}(,[0-9]{3})+\\s*\\(USD\\)/i.test(text)
+                                    ) {
+                                        return text;
+                                    }
 
-                    node = node.parentElement;
-                }
+                                    node = node.parentElement;
+                                }
 
-                return "";
-            }
-            """
-        )
+                                return "";
+                            }
+                            """
+                        )
 
-        price_match = PRICE_PATTERN.search(parent_text)
+                        price_match = PRICE_PATTERN.search(parent_text)
 
-        if price_match:
-            text = parent_text
+                        if price_match:
+                            text = parent_text
 
-    except Exception:
-        pass
+                    except Exception:
+                        pass
+
+                if not price_match:
+                    print()
+                    print("ITEM WITHOUT MATCHED PRICE:")
+                    print(item_match.group(0))
+                    print(text[:500])
+                    continue
+
+                item_number = item_match.group(0)
+                price = price_match.group(1).replace(",", "")
+
+                if href.startswith("/"):
+                    href = "https://jacobandco.com" + href
+
+                href = href.split("#")[0].rstrip("/")
+
+                key = item_number
+
+                if key in seen:
+                    continue
+
+                seen.add(key)
+
+                rows.append({
+                    "Item Number": item_number,
+                    "Price": price,
+                    "Currency": "USD",
+                    "URL": href,
+                    "Card Text": " | ".join(
+                        line.strip()
+                        for line in text.splitlines()
+                        if line.strip()
+                    )
+                })
+
+            except Exception as e:
+                print("CARD ERROR:", e)
 
 if not price_match:
     print()
