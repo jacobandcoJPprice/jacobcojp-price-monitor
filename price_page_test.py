@@ -1,10 +1,11 @@
 import asyncio
+import csv
 import re
 from playwright.async_api import async_playwright
 
 
 URL = "https://jacobandco.com/timepiece-prices"
-
+OUTPUT = "price_page_cards.csv"
 
 ITEM_PATTERN = re.compile(
     r"\b[A-Z]{1,8}[0-9]{2,8}"
@@ -13,7 +14,7 @@ ITEM_PATTERN = re.compile(
 )
 
 PRICE_PATTERN = re.compile(
-    r"\b[0-9]{1,3}(?:,[0-9]{3})+\s*\(USD\)",
+    r"([0-9]{1,3}(?:,[0-9]{3})+)\s*\(USD\)",
     re.I
 )
 
@@ -22,20 +23,13 @@ async def main():
 
     async with async_playwright() as p:
 
-        browser = await p.chromium.launch(
-            headless=True
-        )
+        browser = await p.chromium.launch(headless=True)
 
         page = await browser.new_page(
-            viewport={
-                "width": 1440,
-                "height": 1000
-            }
+            viewport={"width": 1440, "height": 1000}
         )
 
-        print("=" * 70)
-        print("JACOB & CO. TIMEPIECE PRICE PAGE DOM TEST")
-        print("=" * 70)
+        print("Opening:", URL)
 
         await page.goto(
             URL,
@@ -45,283 +39,124 @@ async def main():
 
         await page.wait_for_timeout(5000)
 
-        # ====================================================
-        # 自动滚到底部，确保所有商品都渲染出来
-        # ====================================================
-
-        print()
-        print("Scrolling full page...")
-
+        # 自动滚到底，确保全部卡片加载
         last_height = 0
 
-        for i in range(60):
-
-            height = await page.evaluate(
-                "document.body.scrollHeight"
-            )
-
-            print(
-                f"Scroll {i + 1}: height = {height}"
-            )
+        for _ in range(80):
 
             await page.evaluate(
-                """
-                window.scrollTo(
-                    0,
-                    document.body.scrollHeight
-                )
-                """
+                "window.scrollTo(0, document.body.scrollHeight)"
             )
 
-            await page.wait_for_timeout(1000)
+            await page.wait_for_timeout(800)
 
             new_height = await page.evaluate(
                 "document.body.scrollHeight"
             )
 
-            if (
-                new_height == last_height
-                and i >= 5
-            ):
+            if new_height == last_height:
                 break
 
             last_height = new_height
 
         await page.wait_for_timeout(3000)
 
-        # ====================================================
-        # 获取页面最终可见文字
-        # ====================================================
+        # 找所有 timepieces 链接
+        anchors = page.locator('a[href*="/timepieces/"]')
 
-        body_text = await page.locator(
-            "body"
-        ).inner_text()
+        count = await anchors.count()
 
-        # ====================================================
-        # Item Number
-        # ====================================================
+        rows = []
+        seen = set()
 
-        item_numbers = sorted(
-            set(
-                ITEM_PATTERN.findall(
-                    body_text
-                )
-            )
-        )
-
-        print()
-        print("=" * 70)
-        print("ITEM NUMBERS FOUND ON FINAL PAGE")
-        print("=" * 70)
-
-        print(
-            "ITEM NUMBER COUNT:",
-            len(item_numbers)
-        )
-
-        for item in item_numbers:
-            print(item)
-
-        # ====================================================
-        # USD Price
-        # ====================================================
-
-        prices = PRICE_PATTERN.findall(
-            body_text
-        )
-
-        print()
-        print("=" * 70)
-        print("USD PRICES FOUND ON FINAL PAGE")
-        print("=" * 70)
-
-        print(
-            "USD PRICE COUNT:",
-            len(prices)
-        )
-
-        # ====================================================
-        # 商品链接
-        # ====================================================
-
-        links = await page.locator(
-            'a[href*="/timepieces/"]'
-        ).evaluate_all(
-            """
-            els => els.map(e => e.href)
-            """
-        )
-
-        product_links = sorted(
-            set(
-                link.split("#")[0].rstrip("/")
-                for link in links
-                if "/timepieces/" in link
-            )
-        )
-
-        print()
-        print("=" * 70)
-        print("PRODUCT LINKS")
-        print("=" * 70)
-
-        print(
-            "UNIQUE PRODUCT LINKS:",
-            len(product_links)
-        )
-
-        # ====================================================
-        # 图片
-        # ====================================================
-
-        images = await page.locator(
-            "img"
-        ).evaluate_all(
-            """
-            els => els
-                .map(e => e.currentSrc || e.src)
-                .filter(Boolean)
-            """
-        )
-
-        unique_images = sorted(
-            set(images)
-        )
-
-        print(
-            "UNIQUE IMAGES:",
-            len(unique_images)
-        )
-
-        # ====================================================
-        # 尝试按商品链接提取每张卡片文字
-        # ====================================================
-
-        print()
-        print("=" * 70)
-        print("PRODUCT CARD TEXT SAMPLES")
-        print("=" * 70)
-
-        anchors = page.locator(
-            'a[href*="/timepieces/"]'
-        )
-
-        anchor_count = await anchors.count()
-
-        card_texts = []
-
-        for i in range(anchor_count):
+        for i in range(count):
 
             anchor = anchors.nth(i)
 
             try:
+                text = (await anchor.inner_text()).strip()
 
-                text = (
-                    await anchor.inner_text()
-                ).strip()
+                href = await anchor.get_attribute("href")
 
-                href = await anchor.get_attribute(
-                    "href"
-                )
-
-                if not text:
+                if not text or not href:
                     continue
 
-                if not ITEM_PATTERN.search(text):
+                item_match = ITEM_PATTERN.search(text)
+                price_match = PRICE_PATTERN.search(text)
+
+                if not item_match or not price_match:
                     continue
 
-                card_texts.append(
-                    (
-                        href,
-                        text
+                item_number = item_match.group(0)
+
+                price = price_match.group(1).replace(",", "")
+
+                if href.startswith("/"):
+                    href = "https://jacobandco.com" + href
+
+                href = href.split("#")[0].rstrip("/")
+
+                key = item_number
+
+                if key in seen:
+                    continue
+
+                seen.add(key)
+
+                rows.append({
+                    "Item Number": item_number,
+                    "Price": price,
+                    "Currency": "USD",
+                    "URL": href,
+                    "Card Text": " | ".join(
+                        line.strip()
+                        for line in text.splitlines()
+                        if line.strip()
                     )
-                )
+                })
 
             except Exception:
                 pass
 
-        unique_cards = {}
+        rows.sort(key=lambda x: x["Item Number"])
 
-        for href, text in card_texts:
+        with open(
+            OUTPUT,
+            "w",
+            encoding="utf-8-sig",
+            newline=""
+        ) as f:
 
-            item_match = ITEM_PATTERN.search(
-                text
+            writer = csv.DictWriter(
+                f,
+                fieldnames=[
+                    "Item Number",
+                    "Price",
+                    "Currency",
+                    "URL",
+                    "Card Text"
+                ]
             )
 
-            if not item_match:
-                continue
-
-            item = item_match.group(0)
-
-            unique_cards[item] = {
-                "href": href,
-                "text": text
-            }
-
-        print(
-            "CARDS WITH ITEM NUMBER:",
-            len(unique_cards)
-        )
-
-        print()
-
-        for index, (
-            item,
-            card
-        ) in enumerate(
-            unique_cards.items(),
-            start=1
-        ):
-
-            if index > 20:
-                break
-
-            print("-" * 70)
-            print("ITEM:", item)
-            print("URL :", card["href"])
-            print(card["text"])
-
-        # ====================================================
-        # 最终汇总
-        # ====================================================
+            writer.writeheader()
+            writer.writerows(rows)
 
         print()
         print("=" * 70)
-        print("FINAL PAGE COUNTS")
+        print("PRICE PAGE CARD EXPORT")
         print("=" * 70)
+        print("Rows exported :", len(rows))
+        print("Output file   :", OUTPUT)
 
-        print(
-            "Item Numbers      :",
-            len(item_numbers)
-        )
-
-        print(
-            "USD Prices        :",
-            len(prices)
-        )
-
-        print(
-            "Product Links     :",
-            len(product_links)
-        )
-
-        print(
-            "Cards w/ Item No. :",
-            len(unique_cards)
-        )
-
-        print(
-            "Images            :",
-            len(unique_images)
-        )
-
-        print("=" * 70)
+        for row in rows[:10]:
+            print(
+                row["Item Number"],
+                row["Price"],
+                row["URL"]
+            )
 
         await browser.close()
 
 
 if __name__ == "__main__":
-
-    asyncio.run(
-        main()
-    )
+    asyncio.run(main())
