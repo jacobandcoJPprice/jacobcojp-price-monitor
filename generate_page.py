@@ -348,7 +348,52 @@ body {{
     margin-bottom: 5px;
 }}
 
+.monitor-status {{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    font-size: 15px;
+    font-weight: 700;
+}}
 
+.status-dot {{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #20a464;
+    box-shadow: 0 0 0 4px rgba(32,164,100,.12);
+}}
+
+.monitor-grid {{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 17px;
+}}
+
+.monitor-item {{
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 13px 15px;
+}}
+
+.monitor-label {{
+    color: #777;
+    font-size: 11px;
+    margin-bottom: 5px;
+}}
+
+.monitor-value {{
+    font-size: 14px;
+    font-weight: 700;
+}}
+
+@media(max-width: 850px) {{
+    .monitor-grid {{
+        grid-template-columns: 1fr 1fr;
+    }}
+}}
 .controls {{
     display: flex;
     gap: 12px;
@@ -595,17 +640,58 @@ tbody tr:hover {{
 
 <div class="guide">
 
-    <div class="guide-title">
-        ご利用案内
+    <div class="monitor-status">
+        <span class="status-dot"></span>
+        自動監視システム：正常稼働中
     </div>
 
-    コレクション名、モデル名、Item Numberから
-    商品を検索できます。
+    <div>
+        Jacob & Co. 米国公式サイトに掲載されている価格情報を
+        自動取得・比較する社内向けモニターです。
+        <br>
+        価格変更を検出した場合は、自動的に
+        「最近の価格変更」へ記録されます。
+    </div>
 
-    <br>
+    <div class="monitor-grid">
 
-    表示価格は Jacob & Co. 米国公式サイトの情報をもとに、
-    システムが定期的に自動確認しています。
+        <div class="monitor-item">
+            <div class="monitor-label">
+                更新頻度
+            </div>
+            <div class="monitor-value">
+                1日2回
+            </div>
+        </div>
+
+        <div class="monitor-item">
+            <div class="monitor-label">
+                監視対象
+            </div>
+            <div class="monitor-value">
+                {len(products)} バリエーション
+            </div>
+        </div>
+
+        <div class="monitor-item">
+            <div class="monitor-label">
+                価格変更
+            </div>
+            <div class="monitor-value">
+                {len(history)} 件
+            </div>
+        </div>
+
+        <div class="monitor-item">
+            <div class="monitor-label">
+                最終確認
+            </div>
+            <div class="monitor-value">
+                {esc(last_scan)}
+            </div>
+        </div>
+
+    </div>
 
 </div>
 
