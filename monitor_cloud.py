@@ -4,12 +4,11 @@ import json
 import os
 import re
 from datetime import datetime
-from urllib.parse import urlparse
 
-import requests
-from bs4 import BeautifulSoup
 from playwright.async_api import async_playwright
 
+
+PRICE_PAGE = "https://jacobandco.com/timepiece-prices"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -23,47 +22,13 @@ HISTORY_CSV = os.path.join(
     "price_history_v2.csv"
 )
 
-SITE_URL = "https://jacobandco.com/timepieces"
-
-VARIANT_SITEMAP = (
-    "https://jacobandco.com/sitemap-variants.xml"
-)
-
-REQUEST_DELAY = 1.2
-
 
 # ============================================================
 # BASIC
 # ============================================================
 
 def now():
-    return datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-
-
-def normalize_url(url):
-    if not url:
-        return ""
-
-    url = url.strip()
-    url = url.split("#")[0]
-
-    # 修复 sitemap 中可能出现的 mojibake
-    try:
-        if "Ã" in url:
-            url = (
-                url
-                .encode("latin1")
-                .decode("utf-8")
-            )
-    except Exception:
-        pass
-
-    if url.endswith("/"):
-        url = url[:-1]
-
-    return url
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def read_csv(path):
@@ -76,17 +41,10 @@ def read_csv(path):
         encoding="utf-8-sig",
         newline=""
     ) as f:
-
-        return list(
-            csv.DictReader(f)
-        )
+        return list(csv.DictReader(f))
 
 
-def write_csv(
-    path,
-    fieldnames,
-    rows
-):
+def write_csv(path, fieldnames, rows):
     with open(
         path,
         "w",
@@ -104,684 +62,222 @@ def write_csv(
 
 
 # ============================================================
-# OFFICIAL SITEMAP
+# ITEM NUMBER
 # ============================================================
 
-def get_official_variant_urls():
+ITEM_NUMBER_PATTERN = re.compile(
+    r"^[A-Z]{1,8}[0-9]{2,8}"
+    r"(?:\.[A-Z0-9]+){2,10}$",
+    re.I
+)
 
-    print()
-    print("=" * 70)
-    print("Reading official Variant Sitemap...")
-    print("=" * 70)
+
+def find_item_number(properties):
+    """
+    Jacob & Co. DatoCMS 的 properties 中可能同时包含：
+    - Item Number
+    - 尺寸
+    - 限量数量
+    - 其他属性
+
+    自动寻找类似：
+    BU300.22.AA.AA.B
+    TT800.40.BD.AB.A
+    """
+
+    if not isinstance(properties, list):
+        return ""
+
+    for prop in properties:
+
+        if not isinstance(prop, dict):
+            continue
+
+        value = str(
+            prop.get("property", "")
+        ).strip()
+
+        if ITEM_NUMBER_PATTERN.match(value):
+            return value
+
+    return ""
+
+
+# ============================================================
+# PRICE
+# ============================================================
+
+def normalize_price(value):
+
+    if value is None:
+        return ""
 
     try:
-        response = requests.get(
-            VARIANT_SITEMAP,
-            timeout=60,
-            headers={
-                "User-Agent":
-                    "Mozilla/5.0 "
-                    "(Windows NT 10.0; Win64; x64)"
-            }
-        )
+        return float(value)
 
-        response.raise_for_status()
-
-        # 强制 UTF-8，避免 pavé -> pavÃ©
-        text = response.content.decode(
-            "utf-8",
-            errors="replace"
-        )
-
-        urls = re.findall(
-            r"<loc>(.*?)</loc>",
-            text,
-            flags=re.I | re.S
-        )
-
-        cleaned = set()
-
-        for url in urls:
-
-            url = normalize_url(url)
-
-            if "/timepieces/" not in url.lower():
-                continue
-
-            cleaned.add(url)
-
-        print(
-            "Official Variant URLs:",
-            len(cleaned)
-        )
-
-        return cleaned
-
-    except Exception as e:
-
-        print(
-            "ERROR reading Variant Sitemap:",
-            e
-        )
-
-        return set()
+    except Exception:
+        return ""
 
 
 # ============================================================
-# SCHEMA DATA
+# GRAPHQL RESPONSE PARSING
 # ============================================================
 
-def get_item_number(variant):
-
-    candidates = [
-        "sku",
-        "itemNumber",
-        "item_number",
-        "mpn",
-        "productID"
-    ]
-
-    for key in candidates:
-
-        value = variant.get(key)
-
-        if value:
-            return str(value).strip()
-
-    return ""
-
-
-def get_variant_name(variant):
-
-    for key in [
-        "name",
-        "model",
-        "title"
-    ]:
-
-        value = variant.get(key)
-
-        if value:
-            return str(value).strip()
-
-    url = variant.get(
-        "url",
-        ""
-    )
-
-    if url:
-
-        slug = (
-            urlparse(url)
-            .path
-            .rstrip("/")
-            .split("/")[-1]
-        )
-
-        return (
-            slug
-            .replace("-", " ")
-            .title()
-        )
-
-    return ""
-
-
-def extract_offer(variant):
-
-    offers = variant.get(
-        "offers"
-    )
-
-    if not offers:
-        return None, "", ""
-
-    if isinstance(
-        offers,
-        list
-    ):
-
-        if not offers:
-            return None, "", ""
-
-        offers = offers[0]
-
-    if not isinstance(
-        offers,
-        dict
-    ):
-        return None, "", ""
-
-    price = offers.get(
-        "price"
-    )
-
-    currency = offers.get(
-        "priceCurrency",
-        ""
-    )
-
-    availability = offers.get(
-        "availability",
-        ""
-    )
-
-    if price is not None:
-
-        try:
-            price = float(
-                str(price).replace(
-                    ",",
-                    ""
-                )
-            )
-
-        except Exception:
-            price = None
-
-    return (
-        price,
-        currency,
-        availability
-    )
-
-
-def walk_for_schema_product(obj):
+def extract_products_from_json(data):
+    """
+    在 GraphQL JSON 中递归寻找 timepieceProducts。
+    """
 
     results = []
 
-    if isinstance(
-        obj,
-        dict
-    ):
+    if isinstance(data, dict):
 
-        if "schemaOrgProduct" in obj:
+        for key, value in data.items():
 
-            results.append(
-                obj[
-                    "schemaOrgProduct"
-                ]
-            )
+            if (
+                key == "timepieceProducts"
+                and isinstance(value, list)
+            ):
+                results.extend(value)
 
-        for value in obj.values():
-
-            results.extend(
-                walk_for_schema_product(
-                    value
+            else:
+                results.extend(
+                    extract_products_from_json(value)
                 )
-            )
 
-    elif isinstance(
-        obj,
-        list
-    ):
+    elif isinstance(data, list):
 
-        for value in obj:
-
+        for value in data:
             results.extend(
-                walk_for_schema_product(
-                    value
-                )
+                extract_products_from_json(value)
             )
 
     return results
 
 
-# ============================================================
-# EXTRACT VARIANTS FROM PAGE
-# ============================================================
+def convert_products_to_rows(products):
 
-async def extract_variants(page):
+    rows = []
 
-    scripts = await page.locator(
-        "script"
-    ).all()
+    seen_variant_ids = set()
 
-    found = []
+    for product in products:
 
-    for script in scripts:
+        if not isinstance(product, dict):
+            continue
 
-        try:
-            text = (
-                await script.text_content()
+        product_name = str(
+            product.get("name", "")
+        ).strip()
+
+        product_id = str(
+            product.get("id", "")
+        ).strip()
+
+        variants = product.get(
+            "variants",
+            []
+        )
+
+        if not isinstance(variants, list):
+            continue
+
+        for variant in variants:
+
+            if not isinstance(variant, dict):
+                continue
+
+            variant_id = str(
+                variant.get("id", "")
+            ).strip()
+
+            # 防止 GraphQL response 重复
+            if variant_id and variant_id in seen_variant_ids:
+                continue
+
+            if variant_id:
+                seen_variant_ids.add(variant_id)
+
+            variant_name = str(
+                variant.get("name", "")
+            ).strip()
+
+            usd_price = normalize_price(
+                variant.get("usdPrice")
             )
 
-            if not text:
-                continue
-
-            if (
-                "schemaOrgProduct"
-                not in text
-            ):
-                continue
-
-            try:
-                data = json.loads(text)
-
-            except Exception:
-                continue
-
-            products = (
-                walk_for_schema_product(
-                    data
-                )
+            properties = variant.get(
+                "properties",
+                []
             )
 
-            for product in products:
+            item_number = find_item_number(
+                properties
+            )
 
-                if not isinstance(
-                    product,
-                    dict
-                ):
-                    continue
+            image_url = ""
 
-                collection_name = str(
-                    product.get(
-                        "name",
-                        ""
-                    )
+            image = variant.get("image")
+
+            if isinstance(image, dict):
+                image_url = str(
+                    image.get("url", "")
                 ).strip()
 
-                variants = product.get(
-                    "hasVariant",
-                    []
+            hidden = bool(
+                variant.get(
+                    "hideFromCollectionPages",
+                    False
                 )
-
-                if isinstance(
-                    variants,
-                    dict
-                ):
-                    variants = [
-                        variants
-                    ]
-
-                if not isinstance(
-                    variants,
-                    list
-                ):
-                    continue
-
-                for variant in variants:
-
-                    if not isinstance(
-                        variant,
-                        dict
-                    ):
-                        continue
-
-                    (
-                        price,
-                        currency,
-                        availability
-                    ) = extract_offer(
-                        variant
-                    )
-
-                    variant_url = normalize_url(
-                        variant.get(
-                            "url",
-                            ""
-                        )
-                    )
-
-                    if not variant_url:
-
-                        offers = variant.get(
-                            "offers"
-                        )
-
-                        if isinstance(
-                            offers,
-                            dict
-                        ):
-
-                            variant_url = normalize_url(
-                                offers.get(
-                                    "url",
-                                    ""
-                                )
-                            )
-
-                    if not variant_url:
-                        continue
-
-                    found.append({
-
-                        "Collection":
-                            collection_name,
-
-                        "Variant":
-                            get_variant_name(
-                                variant
-                            ),
-
-                        "Item Number":
-                            get_item_number(
-                                variant
-                            ),
-
-                        "Price":
-                            (
-                                ""
-                                if price is None
-                                else price
-                            ),
-
-                        "Currency":
-                            currency,
-
-                        "Availability":
-                            availability,
-
-                        "URL":
-                            variant_url,
-
-                        "Last Seen":
-                            now()
-
-                    })
-
-        except Exception:
-            pass
-
-    unique = {}
-
-    for item in found:
-
-        unique[
-            normalize_url(
-                item["URL"]
-            )
-        ] = item
-
-    return list(
-        unique.values()
-    )
-
-
-# ============================================================
-# COLLECTION DISCOVERY
-# ============================================================
-
-async def get_collection_links(
-    page
-):
-
-    print()
-    print("=" * 70)
-    print("Scanning collection pages...")
-    print("=" * 70)
-
-    await page.goto(
-        SITE_URL,
-        wait_until="domcontentloaded",
-        timeout=90000
-    )
-
-    await page.wait_for_timeout(
-        5000
-    )
-
-    for _ in range(10):
-
-        await page.evaluate(
-            "window.scrollTo("
-            "0, document.body.scrollHeight)"
-        )
-
-        await page.wait_for_timeout(
-            1000
-        )
-
-    links = await page.locator(
-        'a[href^="/timepieces/"]'
-    ).evaluate_all(
-        """
-        els => els.map(e => e.href)
-        """
-    )
-
-    cleaned = set()
-
-    for url in links:
-
-        if not url:
-            continue
-
-        parsed = urlparse(url)
-
-        path = (
-            parsed.path
-            .rstrip("/")
-        )
-
-        parts = [
-            p
-            for p
-            in path.split("/")
-            if p
-        ]
-
-        # Collection 页面：
-        # /timepieces/collection-name
-
-        if len(parts) != 2:
-            continue
-
-        if parts[0] != "timepieces":
-            continue
-
-        cleaned.add(
-            normalize_url(url)
-        )
-
-    links = sorted(
-        cleaned
-    )
-
-    print(
-        "Collection pages:",
-        len(links)
-    )
-
-    return links
-
-
-# ============================================================
-# FALLBACK DIRECT VARIANT PAGE
-# ============================================================
-
-async def scrape_missing_variant(
-    page,
-    target_url
-):
-
-    print()
-    print(
-        "Fallback Variant:",
-        target_url
-    )
-
-    try:
-
-        await page.goto(
-            target_url,
-            wait_until="networkidle",
-            timeout=90000
-        )
-
-        await page.wait_for_timeout(
-            1800
-        )
-
-        variants = await extract_variants(
-            page
-        )
-
-        # 优先精确 URL 匹配
-        for item in variants:
-
-            if (
-                normalize_url(
-                    item["URL"]
-                )
-                ==
-                normalize_url(
-                    target_url
-                )
-            ):
-
-                print(
-                    "  MATCH:",
-                    item["Variant"],
-                    item["Price"]
-                )
-
-                return item
-
-        # 如果 schema 没有返回自己，
-        # 至少创建一条无价格监控记录
-
-        html = await page.content()
-
-        soup = BeautifulSoup(
-            html,
-            "html.parser"
-        )
-
-        page_text = " ".join(
-            soup.stripped_strings
-        )
-
-        # 名称
-        name = ""
-
-        h1 = soup.find("h1")
-
-        if h1:
-            name = h1.get_text(
-                " ",
-                strip=True
             )
 
-        if not name:
-
-            slug = (
-                urlparse(
-                    target_url
-                )
-                .path
-                .rstrip("/")
-                .split("/")[-1]
+            availability = (
+                "PRICE AVAILABLE"
+                if usd_price != ""
+                else "INQUIRE"
             )
 
-            name = (
-                slug
-                .replace("-", " ")
-                .title()
-            )
+            rows.append({
 
-        # Item Number
-        item_number = ""
+                "Collection":
+                    product_name,
 
-        patterns = [
-            (
-                r"ITEM\s*NUMBER"
-                r"\s*[:#]?\s*"
-                r"([A-Za-z0-9.\-]+)"
-            ),
-            (
-                r"ITEM\s*NO\.?"
-                r"\s*[:#]?\s*"
-                r"([A-Za-z0-9.\-]+)"
-            ),
-            (
-                r"SKU"
-                r"\s*[:#]?\s*"
-                r"([A-Za-z0-9.\-]+)"
-            )
-        ]
+                "Variant":
+                    variant_name,
 
-        for pattern in patterns:
+                "Item Number":
+                    item_number,
 
-            match = re.search(
-                pattern,
-                page_text,
-                flags=re.I
-            )
+                "Price":
+                    usd_price,
 
-            if match:
+                "Currency":
+                    "USD",
 
-                item_number = (
-                    match
-                    .group(1)
-                    .strip()
-                )
+                "Availability":
+                    availability,
 
-                break
+                "Image URL":
+                    image_url,
 
-        # Collection 从 URL 提取
-        parts = [
-            p
-            for p in
-            urlparse(
-                target_url
-            ).path.split("/")
-            if p
-        ]
+                "Product ID":
+                    product_id,
 
-        collection = ""
+                "Variant ID":
+                    variant_id,
 
-        if len(parts) >= 2:
+                "Hidden":
+                    "YES" if hidden else "NO",
 
-            collection = (
-                parts[1]
-                .replace("-", " ")
-                .title()
-            )
+                "Source":
+                    PRICE_PAGE,
 
-        print(
-            "  NO PUBLIC PRICE / FALLBACK"
-        )
+                "Last Seen":
+                    now()
 
-        return {
+            })
 
-            "Collection":
-                collection,
-
-            "Variant":
-                name,
-
-            "Item Number":
-                item_number,
-
-            "Price":
-                "",
-
-            "Currency":
-                "USD",
-
-            "Availability":
-                "INQUIRE",
-
-            "URL":
-                normalize_url(
-                    target_url
-                ),
-
-            "Last Seen":
-                now()
-
-        }
-
-    except Exception as e:
-
-        print(
-            "Fallback ERROR:",
-            e
-        )
-
-        return None
+    return rows
 
 
 # ============================================================
@@ -794,15 +290,28 @@ def build_old_map(rows):
 
     for row in rows:
 
-        url = normalize_url(
+        # Item Number 优先作为唯一识别码
+        item_number = str(
             row.get(
-                "URL",
+                "Item Number",
                 ""
             )
+        ).strip()
+
+        variant_id = str(
+            row.get(
+                "Variant ID",
+                ""
+            )
+        ).strip()
+
+        key = (
+            item_number
+            or variant_id
         )
 
-        if url:
-            result[url] = row
+        if key:
+            result[key] = row
 
     return result
 
@@ -813,19 +322,35 @@ def update_history(
     history
 ):
 
+    changes = 0
+
     for item in new_rows:
 
-        url = normalize_url(
+        item_number = str(
             item.get(
-                "URL",
+                "Item Number",
                 ""
             )
+        ).strip()
+
+        variant_id = str(
+            item.get(
+                "Variant ID",
+                ""
+            )
+        ).strip()
+
+        key = (
+            item_number
+            or variant_id
         )
 
-        old = old_map.get(
-            url
-        )
+        if not key:
+            continue
 
+        old = old_map.get(key)
+
+        # 第一次进入数据库，不算价格变化
         if not old:
             continue
 
@@ -843,139 +368,56 @@ def update_history(
             )
         ).strip()
 
-        # ======================================
-        # 普通价格变化
-        # ======================================
+        if old_price == new_price:
+            continue
 
-        if (
-            old_price
-            and new_price
-            and old_price != new_price
-        ):
+        history.append({
 
-            history.append({
+            "Changed At":
+                now(),
 
-                "Changed At":
-                    now(),
+            "Collection":
+                item.get(
+                    "Collection",
+                    ""
+                ),
 
-                "Collection":
-                    item.get(
-                        "Collection",
-                        ""
-                    ),
-
-                "Variant":
-                    item.get(
-                        "Variant",
-                        ""
-                    ),
-
-                "Item Number":
-                    item.get(
-                        "Item Number",
-                        ""
-                    ),
-
-                "Old Price":
-                    old_price,
-
-                "New Price":
-                    new_price,
-
-                "Currency":
-                    item.get(
-                        "Currency",
-                        ""
-                    ),
-
-                "URL":
-                    url
-
-            })
-
-            print()
-            print(
-                "PRICE CHANGE:"
-            )
-
-            print(
+            "Variant":
                 item.get(
                     "Variant",
                     ""
-                )
-            )
+                ),
 
-            print(
+            "Item Number":
+                item_number,
+
+            "Old Price":
                 old_price,
-                "->",
-                new_price
-            )
 
-        # ======================================
-        # INQUIRE -> PRICE
-        # ======================================
+            "New Price":
+                new_price,
 
-        elif (
-            not old_price
-            and new_price
-        ):
+            "Currency":
+                "USD",
 
-            history.append({
+            "Source":
+                PRICE_PAGE
 
-                "Changed At":
-                    now(),
+        })
 
-                "Collection":
-                    item.get(
-                        "Collection",
-                        ""
-                    ),
+        changes += 1
 
-                "Variant":
-                    item.get(
-                        "Variant",
-                        ""
-                    ),
+        print()
+        print("=" * 70)
+        print("PRICE CHANGE DETECTED")
+        print("=" * 70)
+        print("Product     :", item.get("Collection", ""))
+        print("Variant     :", item.get("Variant", ""))
+        print("Item Number :", item_number)
+        print("Old Price   :", old_price or "INQUIRE")
+        print("New Price   :", new_price or "INQUIRE")
 
-                "Item Number":
-                    item.get(
-                        "Item Number",
-                        ""
-                    ),
-
-                "Old Price":
-                    "",
-
-                "New Price":
-                    new_price,
-
-                "Currency":
-                    item.get(
-                        "Currency",
-                        ""
-                    ),
-
-                "URL":
-                    url
-
-            })
-
-            print()
-            print(
-                "NEW PRICE PUBLISHED:"
-            )
-
-            print(
-                item.get(
-                    "Variant",
-                    ""
-                )
-            )
-
-            print(
-                "INQUIRE ->",
-                new_price
-            )
+    return changes
 
 
 # ============================================================
@@ -986,48 +428,11 @@ async def main():
 
     print()
     print("=" * 70)
-    print(
-        "JACOB & CO. USA "
-        "FULL VARIANT PRICE MONITOR"
-    )
+    print("JACOB & CO. OFFICIAL PRICE LIST MONITOR")
     print("=" * 70)
+    print("Source:", PRICE_PAGE)
 
-    # --------------------------------------------------------
-    # 1. 官方 Variant 基准
-    # --------------------------------------------------------
-
-    official_variant_urls = (
-        get_official_variant_urls()
-    )
-
-    if not official_variant_urls:
-
-        raise RuntimeError(
-            "Official Variant Sitemap "
-            "could not be loaded."
-        )
-
-    # --------------------------------------------------------
-    # 2. 旧数据
-    # --------------------------------------------------------
-
-    old_rows = read_csv(
-        CURRENT_CSV
-    )
-
-    history = read_csv(
-        HISTORY_CSV
-    )
-
-    old_map = build_old_map(
-        old_rows
-    )
-
-    all_rows = []
-
-    # --------------------------------------------------------
-    # 3. 浏览器扫描
-    # --------------------------------------------------------
+    graphql_data = []
 
     async with async_playwright() as p:
 
@@ -1041,319 +446,266 @@ async def main():
 
         page = await context.new_page()
 
-        collection_links = (
-            await get_collection_links(
-                page
-            )
-        )
+        async def capture_response(response):
 
-        total = len(
-            collection_links
-        )
-
-        print()
-        print(
-            "Scanning collections:",
-            total
-        )
-
-        for index, url in enumerate(
-            collection_links,
-            start=1
-        ):
-
-            print(
-                f"[{index}/{total}] {url}"
-            )
+            if "graphql.datocms.com" not in response.url:
+                return
 
             try:
 
-                await page.goto(
-                    url,
-                    wait_until="networkidle",
-                    timeout=90000
-                )
+                body = await response.text()
 
-                await page.wait_for_timeout(
-                    1800
-                )
+                data = json.loads(body)
 
-                variants = (
-                    await extract_variants(
-                        page
-                    )
-                )
+                graphql_data.append(data)
 
                 print(
-                    "Variants:",
-                    len(variants)
-                )
-
-                all_rows.extend(
-                    variants
+                    "Captured DatoCMS GraphQL:",
+                    len(body),
+                    "bytes"
                 )
 
             except Exception as e:
 
                 print(
-                    "Collection ERROR:",
+                    "GraphQL capture error:",
                     e
                 )
 
-            await asyncio.sleep(
-                REQUEST_DELAY
-            )
-
-        # ----------------------------------------------------
-        # 4. 去重
-        # ----------------------------------------------------
-
-        unique = {}
-
-        for row in all_rows:
-
-            url = normalize_url(
-                row["URL"]
-            )
-
-            row["URL"] = url
-
-            unique[url] = row
-
-        # ----------------------------------------------------
-        # 5. 只保留官方 Sitemap Variant
-        # ----------------------------------------------------
-
-        unique = {
-
-            url: row
-
-            for url, row
-            in unique.items()
-
-            if url
-            in official_variant_urls
-        }
+        page.on(
+            "response",
+            capture_response
+        )
 
         print()
-        print("=" * 70)
-        print("PRIMARY SCAN RESULT")
-        print("=" * 70)
+        print("Opening official price page...")
 
-        print(
-            "Official Variants:",
-            len(
-                official_variant_urls
-            )
+        await page.goto(
+            PRICE_PAGE,
+            wait_until="networkidle",
+            timeout=120000
         )
 
-        print(
-            "Primary matched:",
-            len(unique)
+        # 给页面一点时间完成所有 GraphQL 请求
+        await page.wait_for_timeout(
+            5000
         )
-
-        # ----------------------------------------------------
-        # 6. 找遗漏
-        # ----------------------------------------------------
-
-        missing_urls = (
-            official_variant_urls
-            -
-            set(
-                unique.keys()
-            )
-        )
-
-        print(
-            "Need fallback:",
-            len(
-                missing_urls
-            )
-        )
-
-        # ----------------------------------------------------
-        # 7. 补抓遗漏
-        # ----------------------------------------------------
-
-        for index, url in enumerate(
-            sorted(missing_urls),
-            start=1
-        ):
-
-            print()
-            print(
-                f"[Fallback "
-                f"{index}/"
-                f"{len(missing_urls)}]"
-            )
-
-            item = (
-                await scrape_missing_variant(
-                    page,
-                    url
-                )
-            )
-
-            if item:
-
-                unique[
-                    normalize_url(
-                        item["URL"]
-                    )
-                ] = item
-
-            await asyncio.sleep(
-                REQUEST_DELAY
-            )
 
         await browser.close()
 
-    # --------------------------------------------------------
-    # 8. 最终结果
-    # --------------------------------------------------------
-
-    all_rows = list(
-        unique.values()
+    print()
+    print(
+        "GraphQL responses captured:",
+        len(graphql_data)
     )
 
-    all_rows.sort(
-        key=lambda x: (
-            x.get(
-                "Collection",
-                ""
-            ),
-            x.get(
-                "Variant",
-                ""
+    if not graphql_data:
+
+        raise RuntimeError(
+            "No DatoCMS GraphQL data captured."
+        )
+
+    # ========================================================
+    # FIND PRODUCTS
+    # ========================================================
+
+    products = []
+
+    for data in graphql_data:
+
+        products.extend(
+            extract_products_from_json(
+                data
             )
         )
-    )
 
-    final_urls = {
-        normalize_url(
-            row["URL"]
+    # Product ID 去重
+    unique_products = {}
+
+    for product in products:
+
+        if not isinstance(product, dict):
+            continue
+
+        product_id = str(
+            product.get("id", "")
         )
-        for row
-        in all_rows
-    }
 
-    remaining_missing = (
-        official_variant_urls
-        -
-        final_urls
-    )
+        if product_id:
+            unique_products[
+                product_id
+            ] = product
 
-    priced_count = sum(
-        1
-        for row in all_rows
-        if str(
-            row.get(
-                "Price",
-                ""
-            )
-        ).strip()
-    )
-
-    no_price_count = (
-        len(all_rows)
-        -
-        priced_count
+    products = list(
+        unique_products.values()
     )
 
     print()
     print("=" * 70)
-    print("FINAL COVERAGE")
+    print("OFFICIAL PRICE PAGE DATA")
     print("=" * 70)
 
     print(
-        "Official Variant URLs:",
-        len(
-            official_variant_urls
+        "Products:",
+        len(products)
+    )
+
+    # ========================================================
+    # CONVERT VARIANTS
+    # ========================================================
+
+    rows = convert_products_to_rows(
+        products
+    )
+
+    if not rows:
+
+        raise RuntimeError(
+            "No variants found in official price page data."
         )
+
+    with_price = sum(
+        1
+        for row in rows
+        if row["Price"] != ""
+    )
+
+    without_price = (
+        len(rows)
+        -
+        with_price
+    )
+
+    with_item_number = sum(
+        1
+        for row in rows
+        if row["Item Number"]
+    )
+
+    without_item_number = (
+        len(rows)
+        -
+        with_item_number
+    )
+
+    hidden_count = sum(
+        1
+        for row in rows
+        if row["Hidden"] == "YES"
     )
 
     print(
-        "Monitored Variant URLs:",
-        len(
-            final_urls
-        )
+        "Variants:",
+        len(rows)
     )
 
     print(
-        "With Price:",
-        priced_count
+        "With USD Price:",
+        with_price
     )
 
     print(
-        "No Price / INQUIRE:",
-        no_price_count
+        "Without USD Price:",
+        without_price
     )
 
     print(
-        "Still Missing:",
-        len(
-            remaining_missing
-        )
+        "With Item Number:",
+        with_item_number
     )
 
-    if official_variant_urls:
+    print(
+        "Without Item Number:",
+        without_item_number
+    )
 
-        coverage = (
-            len(
-                official_variant_urls
-                &
-                final_urls
-            )
-            /
-            len(
-                official_variant_urls
-            )
-            *
-            100
+    print(
+        "Hidden Variants:",
+        hidden_count
+    )
+
+    # ========================================================
+    # SAFETY CHECK
+    # ========================================================
+
+    # 防止网站/API异常导致突然写入一个明显不完整的数据库
+    if len(rows) < 50:
+
+        raise RuntimeError(
+            f"Safety stop: only {len(rows)} variants found."
         )
 
-        print(
-            f"Coverage: "
-            f"{coverage:.2f}%"
-        )
+    # ========================================================
+    # OLD DATA + HISTORY
+    # ========================================================
 
-    if remaining_missing:
+    old_rows = read_csv(
+        CURRENT_CSV
+    )
 
-        print()
-        print(
-            "STILL MISSING:"
-        )
+    history = read_csv(
+        HISTORY_CSV
+    )
 
-        for url in sorted(
-            remaining_missing
-        ):
+    old_map = build_old_map(
+        old_rows
+    )
 
-            print(url)
-
-    # --------------------------------------------------------
-    # 9. PRICE HISTORY
-    # --------------------------------------------------------
-
-    update_history(
+    changes = update_history(
         old_map,
-        all_rows,
+        rows,
         history
     )
 
-    # --------------------------------------------------------
-    # 10. 保存
-    # --------------------------------------------------------
+    # ========================================================
+    # SORT
+    # ========================================================
 
-    product_fields = [
+    rows.sort(
+        key=lambda x: (
+            x.get(
+                "Collection",
+                ""
+            ).lower(),
+            x.get(
+                "Variant",
+                ""
+            ).lower(),
+            x.get(
+                "Item Number",
+                ""
+            ).lower()
+        )
+    )
+
+    # ========================================================
+    # SAVE CURRENT
+    # ========================================================
+
+    current_fields = [
         "Collection",
         "Variant",
         "Item Number",
         "Price",
         "Currency",
         "Availability",
-        "URL",
+        "Image URL",
+        "Product ID",
+        "Variant ID",
+        "Hidden",
+        "Source",
         "Last Seen"
     ]
+
+    write_csv(
+        CURRENT_CSV,
+        current_fields,
+        rows
+    )
+
+    # ========================================================
+    # SAVE HISTORY
+    # ========================================================
 
     history_fields = [
         "Changed At",
@@ -1363,14 +715,8 @@ async def main():
         "Old Price",
         "New Price",
         "Currency",
-        "URL"
+        "Source"
     ]
-
-    write_csv(
-        CURRENT_CSV,
-        product_fields,
-        all_rows
-    )
 
     write_csv(
         HISTORY_CSV,
@@ -1380,18 +726,51 @@ async def main():
 
     print()
     print("=" * 70)
-    print(
-        "FULL VARIANT SCAN COMPLETED"
-    )
+    print("MONITOR COMPLETED")
     print("=" * 70)
 
     print(
-        "Current rows:",
-        len(all_rows)
+        "Official Products    :",
+        len(products)
     )
 
     print(
-        "History rows:",
+        "Official Variants    :",
+        len(rows)
+    )
+
+    print(
+        "With USD Price       :",
+        with_price
+    )
+
+    print(
+        "Without USD Price    :",
+        without_price
+    )
+
+    print(
+        "With Item Number     :",
+        with_item_number
+    )
+
+    print(
+        "Without Item Number  :",
+        without_item_number
+    )
+
+    print(
+        "Price Changes        :",
+        changes
+    )
+
+    print(
+        "Current CSV rows     :",
+        len(rows)
+    )
+
+    print(
+        "History CSV rows     :",
         len(history)
     )
 
