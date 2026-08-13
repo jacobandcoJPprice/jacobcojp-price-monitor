@@ -1,0 +1,48 @@
+name: Jacob & Co. USA Price Monitor
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "15 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python packages
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Chromium
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Scan Jacob & Co. USA prices
+        run: |
+          python monitor_cloud.py
+
+      - name: Generate Japanese dashboard
+        run: |
+          python generate_page.py
+
+      - name: Save updated prices
+        run: |
+          git config user.name "JacobCo Price Monitor"
+          git config user.email "actions@github.com"
+          git add current_prices.csv price_history_v2.csv index.html
+          git diff --cached --quiet || git commit -m "Auto update Jacob & Co. prices"
+          git push
