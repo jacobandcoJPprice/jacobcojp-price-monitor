@@ -1,11 +1,21 @@
 import asyncio
-import json
 import re
-
 from playwright.async_api import async_playwright
 
 
 URL = "https://jacobandco.com/timepiece-prices"
+
+
+ITEM_PATTERN = re.compile(
+    r"\b[A-Z]{1,8}[0-9]{2,8}"
+    r"(?:\.[A-Z0-9]+){2,10}\b",
+    re.I
+)
+
+PRICE_PATTERN = re.compile(
+    r"\b[0-9]{1,3}(?:,[0-9]{3})+\s*\(USD\)",
+    re.I
+)
 
 
 async def main():
@@ -16,38 +26,15 @@ async def main():
             headless=True
         )
 
-        page = await browser.new_page()
-
-        graphql_responses = []
-
-        async def capture_response(response):
-
-            if "graphql.datocms.com" not in response.url:
-                return
-
-            try:
-                body = await response.text()
-
-                graphql_responses.append({
-                    "url": response.url,
-                    "status": response.status,
-                    "body": body
-                })
-
-            except Exception as e:
-
-                print(
-                    "Could not read GraphQL response:",
-                    e
-                )
-
-        page.on(
-            "response",
-            capture_response
+        page = await browser.new_page(
+            viewport={
+                "width": 1440,
+                "height": 1000
+            }
         )
 
         print("=" * 70)
-        print("OPENING TIMEPIECE PRICE PAGE")
+        print("JACOB & CO. TIMEPIECE PRICE PAGE DOM TEST")
         print("=" * 70)
 
         await page.goto(
@@ -58,31 +45,65 @@ async def main():
 
         await page.wait_for_timeout(5000)
 
-        # ==================================================
-        # BODY TEXT
-        # ==================================================
+        # ====================================================
+        # 自动滚到底部，确保所有商品都渲染出来
+        # ====================================================
+
+        print()
+        print("Scrolling full page...")
+
+        last_height = 0
+
+        for i in range(60):
+
+            height = await page.evaluate(
+                "document.body.scrollHeight"
+            )
+
+            print(
+                f"Scroll {i + 1}: height = {height}"
+            )
+
+            await page.evaluate(
+                """
+                window.scrollTo(
+                    0,
+                    document.body.scrollHeight
+                )
+                """
+            )
+
+            await page.wait_for_timeout(1000)
+
+            new_height = await page.evaluate(
+                "document.body.scrollHeight"
+            )
+
+            if (
+                new_height == last_height
+                and i >= 5
+            ):
+                break
+
+            last_height = new_height
+
+        await page.wait_for_timeout(3000)
+
+        # ====================================================
+        # 获取页面最终可见文字
+        # ====================================================
 
         body_text = await page.locator(
             "body"
         ).inner_text()
 
-        print()
-        print("=" * 70)
-        print("VISIBLE PAGE TEXT")
-        print("=" * 70)
-
-        print(body_text[:30000])
-
-        # ==================================================
-        # ITEM NUMBERS
-        # ==================================================
+        # ====================================================
+        # Item Number
+        # ====================================================
 
         item_numbers = sorted(
             set(
-                re.findall(
-                    r"\b[A-Z]{1,6}"
-                    r"[0-9]{2,6}"
-                    r"(?:\.[A-Z0-9]+){2,10}\b",
+                ITEM_PATTERN.findall(
                     body_text
                 )
             )
@@ -90,131 +111,210 @@ async def main():
 
         print()
         print("=" * 70)
-        print("VISIBLE ITEM NUMBERS")
+        print("ITEM NUMBERS FOUND ON FINAL PAGE")
         print("=" * 70)
 
-        print("COUNT:", len(item_numbers))
+        print(
+            "ITEM NUMBER COUNT:",
+            len(item_numbers)
+        )
 
         for item in item_numbers:
             print(item)
 
-        # ==================================================
-        # NEXT DATA
-        # ==================================================
+        # ====================================================
+        # USD Price
+        # ====================================================
+
+        prices = PRICE_PATTERN.findall(
+            body_text
+        )
 
         print()
         print("=" * 70)
-        print("__NEXT_DATA__")
-        print("=" * 70)
-
-        next_data = await page.locator(
-            "#__NEXT_DATA__"
-        ).text_content()
-
-        if next_data:
-
-            print(
-                "NEXT DATA SIZE:",
-                len(next_data)
-            )
-
-            try:
-
-                parsed = json.loads(
-                    next_data
-                )
-
-                pretty = json.dumps(
-                    parsed,
-                    indent=2,
-                    ensure_ascii=False
-                )
-
-                print(
-                    pretty[:30000]
-                )
-
-            except Exception as e:
-
-                print(
-                    "NEXT DATA JSON ERROR:",
-                    e
-                )
-
-                print(
-                    next_data[:30000]
-                )
-
-        else:
-
-            print(
-                "NO __NEXT_DATA__ CONTENT"
-            )
-
-        # ==================================================
-        # GRAPHQL RESPONSES
-        # ==================================================
-
-        print()
-        print("=" * 70)
-        print("DATOCMS GRAPHQL RESPONSES")
+        print("USD PRICES FOUND ON FINAL PAGE")
         print("=" * 70)
 
         print(
-            "GRAPHQL RESPONSE COUNT:",
-            len(graphql_responses)
+            "USD PRICE COUNT:",
+            len(prices)
         )
 
-        for index, result in enumerate(
-            graphql_responses,
-            start=1
-        ):
+        # ====================================================
+        # 商品链接
+        # ====================================================
 
-            print()
-            print(
-                f"--- GRAPHQL RESPONSE {index} ---"
+        links = await page.locator(
+            'a[href*="/timepieces/"]'
+        ).evaluate_all(
+            """
+            els => els.map(e => e.href)
+            """
+        )
+
+        product_links = sorted(
+            set(
+                link.split("#")[0].rstrip("/")
+                for link in links
+                if "/timepieces/" in link
             )
-
-            print(
-                "STATUS:",
-                result["status"]
-            )
-
-            print(
-                "URL:",
-                result["url"]
-            )
-
-            body = result["body"]
-
-            print(
-                "BODY SIZE:",
-                len(body)
-            )
-
-            try:
-
-                data = json.loads(body)
-
-                pretty = json.dumps(
-                    data,
-                    indent=2,
-                    ensure_ascii=False
-                )
-
-                print(
-                    pretty[:50000]
-                )
-
-            except Exception:
-
-                print(
-                    body[:50000]
-                )
+        )
 
         print()
         print("=" * 70)
-        print("TEST COMPLETE")
+        print("PRODUCT LINKS")
+        print("=" * 70)
+
+        print(
+            "UNIQUE PRODUCT LINKS:",
+            len(product_links)
+        )
+
+        # ====================================================
+        # 图片
+        # ====================================================
+
+        images = await page.locator(
+            "img"
+        ).evaluate_all(
+            """
+            els => els
+                .map(e => e.currentSrc || e.src)
+                .filter(Boolean)
+            """
+        )
+
+        unique_images = sorted(
+            set(images)
+        )
+
+        print(
+            "UNIQUE IMAGES:",
+            len(unique_images)
+        )
+
+        # ====================================================
+        # 尝试按商品链接提取每张卡片文字
+        # ====================================================
+
+        print()
+        print("=" * 70)
+        print("PRODUCT CARD TEXT SAMPLES")
+        print("=" * 70)
+
+        anchors = page.locator(
+            'a[href*="/timepieces/"]'
+        )
+
+        anchor_count = await anchors.count()
+
+        card_texts = []
+
+        for i in range(anchor_count):
+
+            anchor = anchors.nth(i)
+
+            try:
+
+                text = (
+                    await anchor.inner_text()
+                ).strip()
+
+                href = await anchor.get_attribute(
+                    "href"
+                )
+
+                if not text:
+                    continue
+
+                if not ITEM_PATTERN.search(text):
+                    continue
+
+                card_texts.append(
+                    (
+                        href,
+                        text
+                    )
+                )
+
+            except Exception:
+                pass
+
+        unique_cards = {}
+
+        for href, text in card_texts:
+
+            item_match = ITEM_PATTERN.search(
+                text
+            )
+
+            if not item_match:
+                continue
+
+            item = item_match.group(0)
+
+            unique_cards[item] = {
+                "href": href,
+                "text": text
+            }
+
+        print(
+            "CARDS WITH ITEM NUMBER:",
+            len(unique_cards)
+        )
+
+        print()
+
+        for index, (
+            item,
+            card
+        ) in enumerate(
+            unique_cards.items(),
+            start=1
+        ):
+
+            if index > 20:
+                break
+
+            print("-" * 70)
+            print("ITEM:", item)
+            print("URL :", card["href"])
+            print(card["text"])
+
+        # ====================================================
+        # 最终汇总
+        # ====================================================
+
+        print()
+        print("=" * 70)
+        print("FINAL PAGE COUNTS")
+        print("=" * 70)
+
+        print(
+            "Item Numbers      :",
+            len(item_numbers)
+        )
+
+        print(
+            "USD Prices        :",
+            len(prices)
+        )
+
+        print(
+            "Product Links     :",
+            len(product_links)
+        )
+
+        print(
+            "Cards w/ Item No. :",
+            len(unique_cards)
+        )
+
+        print(
+            "Images            :",
+            len(unique_images)
+        )
+
         print("=" * 70)
 
         await browser.close()
