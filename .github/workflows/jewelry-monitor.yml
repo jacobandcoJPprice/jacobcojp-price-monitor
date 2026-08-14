@@ -2,6 +2,7 @@ name: Jacob & Co. USA Jewelry Monitor
 
 permissions:
   contents: write
+
 on:
   workflow_dispatch:
 
@@ -28,7 +29,11 @@ jobs:
         run: |
           python jewelry_monitor.py
 
-      - name: Commit jewelry data
+      - name: Generate jewelry dashboard
+        run: |
+          python generate_jewelry_page.py
+
+      - name: Commit jewelry data and dashboard
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -37,10 +42,11 @@ jobs:
           git add jewelry_price_history.csv
           git add jewelry_change_history.csv
           git add jewelry_missing_candidates.csv
+          git add jewelry.html
 
           if git diff --cached --quiet; then
-            echo "No jewelry data changes to commit."
+            echo "No jewelry changes to commit."
           else
-            git commit -m "Update jewelry monitor data"
+            git commit -m "Update jewelry monitor data and dashboard"
             git push
           fi
