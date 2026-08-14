@@ -2,13 +2,40 @@ import asyncio
 import csv
 import os
 from datetime import datetime
-from urllib.parse import urljoin, urlparse
 
 from playwright.async_api import async_playwright
 
 
 BASE_URL = "https://jacobandco.shop"
-START_URL = "https://jacobandco.shop/pages/collections"
+
+# ONLY the collections visibly listed on:
+# https://jacobandco.shop/pages/collections
+COLLECTIONS = [
+    ("Jacob & Co. X PEACEMINUSONE", "g-dragon-peaceminusone-collection"),
+    ("Love Lockdown", "love-lockdown"),
+    ("Evil Eye", "evil-eye"),
+    ("Lucky You", "lucky-you"),
+    ("Infinia", "the-infinia-collection"),
+    ("Jezebel", "jezebel"),
+    ("Rare Touch", "rare-touch"),
+    ("Securus", "securus"),
+    ("Office Supplies By Virgil Abloh", "office-supplies"),
+    ("Match Collection", "matchstick-collection"),
+    ("Estribo", "estribo"),
+    ("Cuban Link", "cuban-link"),
+    ("Carabin", "carabin"),
+    ("Cufflinks", "cufflinks"),
+    ("Espada", "espada"),
+    ("Super Arrow", "super-arrow"),
+    ("Papillon", "papillon"),
+    ("Hematite", "hematite"),
+    ("Jacob's Code", "jacobs-code"),
+    ("Sharq", "sharq"),
+    ("Spread The Love", "the-spread-the-love-collection"),
+    ("You Are You", "you-are-you"),
+    ("Taken", "taken"),
+    ("Zodiac", "zodiac-sign"),
+]
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,8 +44,12 @@ PRICE_HISTORY_CSV = os.path.join(BASE_DIR, "jewelry_price_history.csv")
 CHANGE_HISTORY_CSV = os.path.join(BASE_DIR, "jewelry_change_history.csv")
 MISSING_CANDIDATES_CSV = os.path.join(BASE_DIR, "jewelry_missing_candidates.csv")
 
-MIN_COLLECTIONS = 30
-MIN_VARIANTS = 620
+# Validated baseline from the audit:
+# 24 collections / 298 unique products / 519 variants.
+MIN_COLLECTIONS = 24
+MIN_PRODUCTS = 280
+MIN_VARIANTS = 490
+
 REMOVED_CONFIRM_RUNS = 2
 
 
@@ -39,31 +70,10 @@ def write_csv(path, fieldnames, rows):
         writer = csv.DictWriter(
             f,
             fieldnames=fieldnames,
-            extrasaction="ignore"
+            extrasaction="ignore",
         )
         writer.writeheader()
         writer.writerows(rows)
-
-
-def normalize_collection_url(url):
-    if not url:
-        return ""
-
-    url = urljoin(BASE_URL, url)
-    parsed = urlparse(url)
-
-    if parsed.netloc != "jacobandco.shop":
-        return ""
-
-    path = parsed.path.rstrip("/")
-
-    if not path.startswith("/collections/"):
-        return ""
-
-    if path == "/collections/all":
-        return ""
-
-    return BASE_URL + path
 
 
 def normalize_price(value):
@@ -112,84 +122,20 @@ def build_current_map(rows):
     return result
 
 
-async def discover_collections(page):
-    print()
-    print("=" * 70)
-    print("DISCOVERING SHOP COLLECTIONS")
-    print("=" * 70)
-
-    response = await page.goto(
-        START_URL,
-        wait_until="domcontentloaded",
-        timeout=120000
-    )
-
-    if response:
-        print("HTTP status:", response.status)
-
-    await page.wait_for_timeout(3000)
-
-    links = await page.locator("a").evaluate_all(
-        """
-        els => els.map(a => ({
-            href: a.href || "",
-            text: (a.innerText || "").trim()
-        }))
-        """
-    )
-
-    collections = {}
-
-    for link in links:
-        url = normalize_collection_url(
-            link.get("href", "")
-        )
-
-        if not url:
-            continue
-
-        name = (
-            link.get("text", "")
-            .replace("\\n", " ")
-            .strip()
-        )
-
-        if url not in collections:
-            collections[url] = name
-
-    print("Collections found:", len(collections))
-    return collections
-
-
-async def fetch_collection_products(
-    request_context,
-    collection_url,
-    collection_name
-):
-    parsed = urlparse(collection_url)
-
-    handle = (
-        parsed.path
-        .rstrip("/")
-        .split("/")[-1]
-    )
-
+async def fetch_collection_products(request_context, collection_name, handle):
     api_url = (
-        BASE_URL
-        + "/collections/"
-        + handle
-        + "/products.json?limit=250"
+        f"{BASE_URL}/collections/{handle}"
+        "/products.json?limit=250"
     )
 
     response = await request_context.get(
         api_url,
-        timeout=60000
+        timeout=60000,
     )
 
     if not response.ok:
         raise RuntimeError(
-            f"{collection_name or handle}: "
-            f"HTTP {response.status}"
+            f"{collection_name}: HTTP {response.status}"
         )
 
     data = await response.json()
@@ -202,55 +148,53 @@ async def fetch_collection_products(
 
 
 async def scrape_current_state():
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+    print()
+    print("=" * 70)
+    print("READING VISIBLE JEWELRY COLLECTIONS")
+    print("=" * 70)
 
-        context = await browser.new_context(
-            locale="en-US"
+    product_map = {}
+    success_count = 0
+    failed_count = 0
+
+    async with async_playwright() as p:
+        request = await p.request.new_context(
+            extra_http_headers={
+                "User-Agent": (
+                    "Mozilla/5.0 "
+                    "(Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) "
+                    "Chrome/151 Safari/537.36"
+                )
+            }
         )
 
-        page = await context.new_page()
-
-        collections = await discover_collections(page)
-
-        if len(collections) < MIN_COLLECTIONS:
-            await browser.close()
-            raise RuntimeError(
-                "SAFETY STOP: "
-                f"only {len(collections)} collections found."
-            )
-
-        product_map = {}
-        failed_count = 0
-
-        print()
-        print("=" * 70)
-        print("READING SHOPIFY COLLECTION DATA")
-        print("=" * 70)
-
-        for collection_url, collection_name in sorted(
-            collections.items()
-        ):
+        for index, (name, handle) in enumerate(COLLECTIONS, start=1):
             try:
                 products = await fetch_collection_products(
-                    context.request,
-                    collection_url,
-                    collection_name
+                    request,
+                    name,
+                    handle,
                 )
 
+                success_count += 1
+
                 print(
-                    collection_name or collection_url,
-                    ":",
-                    len(products)
+                    f"{index:02d}. "
+                    f"{name:<34} "
+                    f"{len(products):>3} products"
                 )
 
             except Exception as e:
                 failed_count += 1
+
                 print(
-                    "COLLECTION ERROR:",
-                    collection_name,
-                    repr(e)
+                    f"{index:02d}. "
+                    f"{name:<34} "
+                    f"ERROR {e!r}"
                 )
+
                 continue
 
             for product in products:
@@ -264,19 +208,34 @@ async def scrape_current_state():
                 if product_id not in product_map:
                     product_map[product_id] = {
                         "product": product,
-                        "collections": set()
+                        "collections": set(),
                     }
 
-                product_map[product_id]["collections"].add(
-                    collection_name or collection_url
-                )
+                product_map[
+                    product_id
+                ][
+                    "collections"
+                ].add(name)
 
-        await browser.close()
+        await request.dispose()
+
+    if success_count < MIN_COLLECTIONS:
+        raise RuntimeError(
+            "SAFETY STOP: "
+            f"only {success_count}/{MIN_COLLECTIONS} "
+            "collections succeeded."
+        )
 
     if failed_count > 0:
         raise RuntimeError(
             "SAFETY STOP: "
-            f"{failed_count} collection API calls failed."
+            f"{failed_count} collection calls failed."
+        )
+
+    if len(product_map) < MIN_PRODUCTS:
+        raise RuntimeError(
+            "SAFETY STOP: "
+            f"only {len(product_map)} unique products found."
         )
 
     rows = []
@@ -284,14 +243,22 @@ async def scrape_current_state():
     for product_id, info in product_map.items():
         product = info["product"]
 
-        title = str(product.get("title", "")).strip()
-        handle = str(product.get("handle", "")).strip()
-        vendor = str(product.get("vendor", "")).strip()
+        title = str(
+            product.get("title", "")
+        ).strip()
+
+        handle = str(
+            product.get("handle", "")
+        ).strip()
+
+        vendor = str(
+            product.get("vendor", "")
+        ).strip()
 
         product_type = str(
             product.get(
                 "product_type",
-                product.get("type", "")
+                product.get("type", ""),
             )
         ).strip()
 
@@ -386,7 +353,7 @@ async def scrape_current_state():
                 "Option 3": option3,
                 "Handle": handle,
                 "URL": product_url,
-                "Last Seen": now()
+                "Last Seen": now(),
             })
 
     unique_rows = {}
@@ -403,7 +370,7 @@ async def scrape_current_state():
         key=lambda row: (
             row.get("Product", "").lower(),
             row.get("Variant", "").lower(),
-            row.get("Unique Key", "").lower()
+            row.get("Unique Key", "").lower(),
         )
     )
 
@@ -413,14 +380,10 @@ async def scrape_current_state():
             f"only {len(rows)} variants found."
         )
 
-    return collections, product_map, rows
+    return product_map, rows
 
 
-def detect_price_changes(
-    old_rows,
-    new_rows,
-    history
-):
+def detect_price_changes(old_rows, new_rows, history):
     changes = []
 
     if not old_rows:
@@ -430,6 +393,7 @@ def detect_price_changes(
 
     for row in new_rows:
         key = row["Unique Key"]
+
         old = old_map.get(key)
 
         if not old:
@@ -459,7 +423,7 @@ def detect_price_changes(
             "Old Price": clean_price(old_price),
             "New Price": clean_price(new_price),
             "Currency": "USD",
-            "URL": row.get("URL", "")
+            "URL": row.get("URL", ""),
         }
 
         history.append(event)
@@ -472,10 +436,11 @@ def detect_structure_changes(
     old_rows,
     new_rows,
     change_history,
-    missing_candidates
+    missing_candidates,
 ):
     events = []
 
+    # First successful run only establishes baseline.
     if not old_rows:
         return events, []
 
@@ -497,7 +462,10 @@ def detect_structure_changes(
 
         try:
             misses = int(
-                row.get("Consecutive Misses", 0)
+                row.get(
+                    "Consecutive Misses",
+                    0,
+                )
                 or 0
             )
         except Exception:
@@ -507,13 +475,20 @@ def detect_structure_changes(
             "Unique Key": key,
             "Consecutive Misses": misses,
             "First Missing At": str(
-                row.get("First Missing At", "")
+                row.get(
+                    "First Missing At",
+                    "",
+                )
             ).strip(),
             "Last Missing At": str(
-                row.get("Last Missing At", "")
-            ).strip()
+                row.get(
+                    "Last Missing At",
+                    "",
+                )
+            ).strip(),
         }
 
+    # New variant
     for key in sorted(new_keys - old_keys):
         row = new_map[key]
 
@@ -528,12 +503,13 @@ def detect_structure_changes(
             "Old Status": "",
             "New Status": row.get("Available", ""),
             "Price": row.get("Price", ""),
-            "URL": row.get("URL", "")
+            "URL": row.get("URL", ""),
         }
 
         change_history.append(event)
         events.append(event)
 
+    # Availability change
     for key in sorted(old_keys & new_keys):
         old = old_map[key]
         new = new_map[key]
@@ -560,12 +536,13 @@ def detect_structure_changes(
             "Old Status": old_status,
             "New Status": new_status,
             "Price": new.get("Price", ""),
-            "URL": new.get("URL", "")
+            "URL": new.get("URL", ""),
         }
 
         change_history.append(event)
         events.append(event)
 
+    # Removed variant requires two consecutive successful scans.
     current_time = now()
     missing_now = old_keys - new_keys
 
@@ -590,7 +567,7 @@ def detect_structure_changes(
             "Unique Key": key,
             "Consecutive Misses": miss_count,
             "First Missing At": first_missing,
-            "Last Missing At": current_time
+            "Last Missing At": current_time,
         }
 
         if miss_count != REMOVED_CONFIRM_RUNS:
@@ -609,19 +586,20 @@ def detect_structure_changes(
             "Old Status": old.get("Available", ""),
             "New Status": "NOT FOUND (2 RUNS)",
             "Price": old.get("Price", ""),
-            "URL": old.get("URL", "")
+            "URL": old.get("URL", ""),
         }
 
         change_history.append(event)
         events.append(event)
 
+    # If item comes back, cancel pending removal state.
     for key in list(missing_map.keys()):
         if key in new_keys:
             del missing_map[key]
 
     updated_missing = sorted(
         missing_map.values(),
-        key=lambda row: row["Unique Key"]
+        key=lambda row: row["Unique Key"],
     )
 
     return events, updated_missing
@@ -630,61 +608,58 @@ def detect_structure_changes(
 async def main():
     print()
     print("=" * 70)
-    print("JACOB & CO. USA JEWELRY MONITOR")
+    print(
+        "JACOB & CO. USA "
+        "VISIBLE COLLECTIONS MONITOR"
+    )
     print("=" * 70)
 
     old_rows = read_csv(CURRENT_CSV)
-
-    price_history = read_csv(
-        PRICE_HISTORY_CSV
-    )
-
-    change_history = read_csv(
-        CHANGE_HISTORY_CSV
-    )
-
-    missing_candidates = read_csv(
-        MISSING_CANDIDATES_CSV
-    )
+    price_history = read_csv(PRICE_HISTORY_CSV)
+    change_history = read_csv(CHANGE_HISTORY_CSV)
+    missing_candidates = read_csv(MISSING_CANDIDATES_CSV)
 
     print()
     print(
+        "Expected collections:",
+        len(COLLECTIONS),
+    )
+
+    print(
         "Previous variants:",
-        len(old_rows)
+        len(old_rows),
     )
 
     print(
         "Previous price history:",
-        len(price_history)
+        len(price_history),
     )
 
     print(
         "Previous change history:",
-        len(change_history)
+        len(change_history),
     )
 
-    collections, product_map, new_rows = (
-        await scrape_current_state()
-    )
+    product_map, new_rows = await scrape_current_state()
 
     print()
     print("=" * 70)
-    print("CURRENT SHOP STATE")
+    print("CURRENT COLLECTION STATE")
     print("=" * 70)
 
     print(
         "Collections:",
-        len(collections)
+        len(COLLECTIONS),
     )
 
     print(
         "Unique products:",
-        len(product_map)
+        len(product_map),
     )
 
     print(
         "Variants:",
-        len(new_rows)
+        len(new_rows),
     )
 
     print(
@@ -693,7 +668,7 @@ async def main():
             1
             for row in new_rows
             if row.get("SKU", "")
-        )
+        ),
     )
 
     print(
@@ -702,23 +677,23 @@ async def main():
             1
             for row in new_rows
             if row.get("Price", "")
-        )
+        ),
     )
 
     price_changes = detect_price_changes(
         old_rows,
         new_rows,
-        price_history
+        price_history,
     )
 
     (
         structure_changes,
-        missing_candidates
+        missing_candidates,
     ) = detect_structure_changes(
         old_rows,
         new_rows,
         change_history,
-        missing_candidates
+        missing_candidates,
     )
 
     current_fields = [
@@ -740,7 +715,7 @@ async def main():
         "Option 3",
         "Handle",
         "URL",
-        "Last Seen"
+        "Last Seen",
     ]
 
     price_history_fields = [
@@ -753,7 +728,7 @@ async def main():
         "Old Price",
         "New Price",
         "Currency",
-        "URL"
+        "URL",
     ]
 
     change_history_fields = [
@@ -767,38 +742,38 @@ async def main():
         "Old Status",
         "New Status",
         "Price",
-        "URL"
+        "URL",
     ]
 
     missing_fields = [
         "Unique Key",
         "Consecutive Misses",
         "First Missing At",
-        "Last Missing At"
+        "Last Missing At",
     ]
 
     write_csv(
         CURRENT_CSV,
         current_fields,
-        new_rows
+        new_rows,
     )
 
     write_csv(
         PRICE_HISTORY_CSV,
         price_history_fields,
-        price_history
+        price_history,
     )
 
     write_csv(
         CHANGE_HISTORY_CSV,
         change_history_fields,
-        change_history
+        change_history,
     )
 
     write_csv(
         MISSING_CANDIDATES_CSV,
         missing_fields,
-        missing_candidates
+        missing_candidates,
     )
 
     print()
@@ -807,33 +782,38 @@ async def main():
     print("=" * 70)
 
     print(
+        "Current products       :",
+        len(product_map),
+    )
+
+    print(
         "Current variants       :",
-        len(new_rows)
+        len(new_rows),
     )
 
     print(
         "Price changes          :",
-        len(price_changes)
+        len(price_changes),
     )
 
     print(
         "Structure changes      :",
-        len(structure_changes)
+        len(structure_changes),
     )
 
     print(
         "Price history rows     :",
-        len(price_history)
+        len(price_history),
     )
 
     print(
         "Change history rows    :",
-        len(change_history)
+        len(change_history),
     )
 
     print(
         "Pending missing items  :",
-        len(missing_candidates)
+        len(missing_candidates),
     )
 
     print("=" * 70)
@@ -842,8 +822,8 @@ async def main():
         print()
         print("BASELINE CREATED.")
         print(
-            "First run does NOT count "
-            "all current products as NEW ITEM."
+            "Existing products are NOT "
+            "counted as NEW ITEM."
         )
 
 
