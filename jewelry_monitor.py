@@ -322,10 +322,10 @@ async def scrape_current_state():
                 or ""
             ).strip()
 
-            if sku:
-                unique_key = "SKU:" + sku
-            elif variant_id:
+            if variant_id:
                 unique_key = "VARIANT:" + variant_id
+            elif sku:
+                unique_key = "SKU:" + sku
             else:
                 unique_key = (
                     "PRODUCT:"
