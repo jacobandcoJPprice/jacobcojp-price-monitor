@@ -1224,6 +1224,16 @@ h1 {{
             Jacob &amp; Co. 米国公式価格ページ監視
         </div>
 
+
+        <div style="margin-top:22px; display:flex; gap:10px;">
+            <a href="index.html" style="color:#fff; text-decoration:none; border:1px solid #777; background:#111; padding:10px 16px; font-size:12px;">
+                WATCHES
+            </a>
+            <a href="jewelry.html" style="color:#aaa; text-decoration:none; border:1px solid #333; padding:10px 16px; font-size:12px;">
+                JEWELRY
+            </a>
+        </div>
+
         <div class="stats">
 
             <div class="stat">
