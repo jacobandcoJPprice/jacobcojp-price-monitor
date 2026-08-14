@@ -1489,6 +1489,83 @@ function refreshUnconfirmedEmpty() {{
 }}
 
 
+function formatJapanTime(value) {{
+    const raw =
+        String(value || "").trim();
+
+    if (!raw) {{
+        return "";
+    }}
+
+    const date =
+        new Date(raw);
+
+    if (
+        raw.includes("T")
+        &&
+        !Number.isNaN(
+            date.getTime()
+        )
+    ) {{
+        const parts =
+            new Intl.DateTimeFormat(
+                "ja-JP",
+                {{
+                    timeZone:
+                        "Asia/Tokyo",
+                    year:
+                        "numeric",
+                    month:
+                        "2-digit",
+                    day:
+                        "2-digit",
+                    hour:
+                        "2-digit",
+                    minute:
+                        "2-digit",
+                    second:
+                        "2-digit",
+                    hour12:
+                        false
+                }}
+            ).formatToParts(
+                date
+            );
+
+        const values = {{}};
+
+        parts.forEach(part => {{
+            if (
+                part.type !== "literal"
+            ) {{
+                values[part.type] =
+                    part.value;
+            }}
+        }});
+
+        return (
+            values.year
+            + "-"
+            + values.month
+            + "-"
+            + values.day
+            + " "
+            + values.hour
+            + ":"
+            + values.minute
+            + ":"
+            + values.second
+        );
+    }}
+
+    return raw
+        .replace(
+            /\s+JST$/i,
+            ""
+        );
+}}
+
+
 function renderConfirmedHistory() {{
     const list =
         document.getElementById(
@@ -1576,7 +1653,7 @@ function renderConfirmedHistory() {{
                     &nbsp;&nbsp;
                     確認者：${{escapeHtml(record.confirmedBy)}}
                     &nbsp;/&nbsp;
-                    ${{escapeHtml(record.confirmedAt)}} JST
+                    ${{escapeHtml(formatJapanTime(record.confirmedAt))}} JST
                 </div>
             </div>
         `).join("");
