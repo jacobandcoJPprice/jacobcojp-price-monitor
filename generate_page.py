@@ -21,7 +21,7 @@ OUTPUT_HTML = os.path.join(
     "index.html"
 )
 
-CONFIRM_API_URL = "https://script.google.com/macros/s/AKfycby3Rpfg2P0WGHPEJY2FyZb_CHuXgjv7DHSVMtHz-MQg7PpJsxWVT1zGlipja1xC4J4s/exec"
+CONFIRM_API_URL = "https://script.google.com/macros/s/AKfycbzSYIw5g1YSVdh6-pAgrKoCf0MFh4TwWjwNIJzudhnZuYyTFwx6QYwXM19gUOQs28-q-A/exec"
 
 
 # ============================================================
