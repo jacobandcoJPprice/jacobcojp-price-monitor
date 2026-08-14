@@ -21,6 +21,16 @@ HISTORY_CSV = os.path.join(
     "price_history_v2.csv"
 )
 
+PRODUCT_HISTORY_CSV = os.path.join(
+    BASE_DIR,
+    "product_change_history.csv"
+)
+
+MISSING_CANDIDATES_CSV = os.path.join(
+    BASE_DIR,
+    "missing_item_candidates.csv"
+)
+
 
 ITEM_PATTERN = re.compile(
     r"\b[A-Z]{1,8}[0-9]{2,8}"
@@ -236,12 +246,6 @@ async def scrape_prices():
                 if not text or not href:
                     continue
 
-                # ============================================
-                # IMPORTANT:
-                # Item Number always comes from the
-                # individual product link itself.
-                # ============================================
-
                 item_match = (
                     ITEM_PATTERN.search(
                         text
@@ -258,22 +262,11 @@ async def scrape_prices():
                     .upper()
                 )
 
-                # ============================================
-                # Price first from link text
-                # ============================================
-
                 price_match = (
                     PRICE_PATTERN.search(
                         text
                     )
                 )
-
-                # ============================================
-                # If price is outside the <a>,
-                # walk up parent elements.
-                #
-                # Do NOT replace Item Number here.
-                # ============================================
 
                 if not price_match:
 
@@ -343,10 +336,6 @@ async def scrape_prices():
                     price
                 )
 
-                # ============================================
-                # URL
-                # ============================================
-
                 if href.startswith("/"):
 
                     href = (
@@ -361,20 +350,12 @@ async def scrape_prices():
                     .rstrip("/")
                 )
 
-                # ============================================
-                # Unique Item Number
-                # ============================================
-
                 if item_number in seen:
                     continue
 
                 seen.add(
                     item_number
                 )
-
-                # ============================================
-                # Collection + Variant from URL
-                # ============================================
 
                 collection = ""
                 variant = ""
@@ -481,7 +462,7 @@ async def scrape_prices():
     return rows
 
 
-def detect_changes(
+def detect_price_changes(
     old_rows,
     new_rows,
     history
@@ -508,7 +489,6 @@ def detect_changes(
             item_number
         )
 
-        # 新加入的型号不算涨价/降价
         if not old:
             continue
 
@@ -532,7 +512,6 @@ def detect_changes(
         ):
             continue
 
-        # 418000.0 == 418000
         if old_price == new_price:
             continue
 
@@ -588,6 +567,332 @@ def detect_changes(
     return changes
 
 
+def detect_product_changes(
+    old_rows,
+    new_rows,
+    product_history,
+    missing_candidates
+):
+
+    old_map = build_old_map(
+        old_rows
+    )
+
+    new_map = build_old_map(
+        new_rows
+    )
+
+    events = []
+
+    if not old_rows:
+        return events, []
+
+    old_items = set(
+        old_map.keys()
+    )
+
+    new_items = set(
+        new_map.keys()
+    )
+
+    # Existing missing-candidate state
+    candidate_map = {}
+
+    for row in missing_candidates:
+
+        item_number = str(
+            row.get(
+                "Item Number",
+                ""
+            )
+        ).strip().upper()
+
+        if not item_number:
+            continue
+
+        try:
+            miss_count = int(
+                row.get(
+                    "Consecutive Misses",
+                    0
+                )
+                or 0
+            )
+        except Exception:
+            miss_count = 0
+
+        candidate_map[
+            item_number
+        ] = {
+            "Item Number":
+                item_number,
+            "Consecutive Misses":
+                miss_count,
+            "First Missing At":
+                str(
+                    row.get(
+                        "First Missing At",
+                        ""
+                    )
+                ).strip(),
+            "Last Missing At":
+                str(
+                    row.get(
+                        "Last Missing At",
+                        ""
+                    )
+                ).strip()
+        }
+
+    # NEW ITEM: record immediately
+    for item_number in sorted(
+        new_items - old_items
+    ):
+
+        row = new_map[
+            item_number
+        ]
+
+        event = {
+            "Changed At":
+                now(),
+            "Change Type":
+                "NEW ITEM",
+            "Item Number":
+                item_number,
+            "Collection":
+                row.get(
+                    "Collection",
+                    ""
+                ),
+            "Variant":
+                row.get(
+                    "Variant",
+                    ""
+                ),
+            "Old Status":
+                "",
+            "New Status":
+                row.get(
+                    "Availability",
+                    ""
+                ),
+            "Price":
+                row.get(
+                    "Price",
+                    ""
+                ),
+            "URL":
+                row.get(
+                    "URL",
+                    ""
+                )
+        }
+
+        product_history.append(
+            event
+        )
+
+        events.append(
+            event
+        )
+
+    # STATUS CHANGE: record immediately
+    for item_number in sorted(
+        old_items & new_items
+    ):
+
+        old = old_map[
+            item_number
+        ]
+
+        new = new_map[
+            item_number
+        ]
+
+        old_status = str(
+            old.get(
+                "Availability",
+                ""
+            )
+        ).strip()
+
+        new_status = str(
+            new.get(
+                "Availability",
+                ""
+            )
+        ).strip()
+
+        if old_status == new_status:
+            continue
+
+        event = {
+            "Changed At":
+                now(),
+            "Change Type":
+                "STATUS CHANGE",
+            "Item Number":
+                item_number,
+            "Collection":
+                new.get(
+                    "Collection",
+                    ""
+                ),
+            "Variant":
+                new.get(
+                    "Variant",
+                    ""
+                ),
+            "Old Status":
+                old_status,
+            "New Status":
+                new_status,
+            "Price":
+                new.get(
+                    "Price",
+                    ""
+                ),
+            "URL":
+                new.get(
+                    "URL",
+                    ""
+                )
+        }
+
+        product_history.append(
+            event
+        )
+
+        events.append(
+            event
+        )
+
+    # REMOVED ITEM:
+    # Do NOT declare it removed on the first missing scan.
+    # Require 2 consecutive successful monitor runs where the item is absent.
+    missing_now = (
+        old_items - new_items
+    )
+
+    current_time = now()
+
+    for item_number in sorted(
+        missing_now
+    ):
+
+        previous = candidate_map.get(
+            item_number
+        )
+
+        if previous:
+
+            miss_count = (
+                previous[
+                    "Consecutive Misses"
+                ]
+                + 1
+            )
+
+            first_missing_at = (
+                previous[
+                    "First Missing At"
+                ]
+                or current_time
+            )
+
+        else:
+
+            miss_count = 1
+            first_missing_at = (
+                current_time
+            )
+
+        candidate_map[
+            item_number
+        ] = {
+            "Item Number":
+                item_number,
+            "Consecutive Misses":
+                miss_count,
+            "First Missing At":
+                first_missing_at,
+            "Last Missing At":
+                current_time
+        }
+
+        if miss_count != 2:
+            continue
+
+        row = old_map[
+            item_number
+        ]
+
+        event = {
+            "Changed At":
+                current_time,
+            "Change Type":
+                "REMOVED ITEM",
+            "Item Number":
+                item_number,
+            "Collection":
+                row.get(
+                    "Collection",
+                    ""
+                ),
+            "Variant":
+                row.get(
+                    "Variant",
+                    ""
+                ),
+            "Old Status":
+                row.get(
+                    "Availability",
+                    ""
+                ),
+            "New Status":
+                "NOT FOUND (2 RUNS)",
+            "Price":
+                row.get(
+                    "Price",
+                    ""
+                ),
+            "URL":
+                row.get(
+                    "URL",
+                    ""
+                )
+        }
+
+        product_history.append(
+            event
+        )
+
+        events.append(
+            event
+        )
+
+    # Any item that exists again is no longer a missing candidate.
+    for item_number in list(
+        candidate_map.keys()
+    ):
+
+        if item_number in new_items:
+            del candidate_map[
+                item_number
+            ]
+
+    updated_candidates = sorted(
+        candidate_map.values(),
+        key=lambda row:
+            row[
+                "Item Number"
+            ]
+    )
+
+    return events, updated_candidates
+
+
 async def main():
 
     print("=" * 70)
@@ -605,6 +910,14 @@ async def main():
         HISTORY_CSV
     )
 
+    product_history = read_csv(
+        PRODUCT_HISTORY_CSV
+    )
+
+    missing_candidates = read_csv(
+        MISSING_CANDIDATES_CSV
+    )
+
     print()
     print(
         "Previous current rows:",
@@ -612,8 +925,13 @@ async def main():
     )
 
     print(
-        "Previous history rows:",
+        "Previous price history rows:",
         len(history)
+    )
+
+    print(
+        "Previous product-change rows:",
+        len(product_history)
     )
 
     new_rows = (
@@ -630,8 +948,9 @@ async def main():
         len(new_rows)
     )
 
-    # 我们已经独立验证过 582 条。
-    # 如果突然远低于正常值，停止覆盖数据。
+    # Hard safety stop:
+    # never overwrite healthy data if the scraper only found
+    # an obviously incomplete subset.
     if len(new_rows) < 570:
 
         raise RuntimeError(
@@ -640,20 +959,30 @@ async def main():
             "Existing CSV will NOT be overwritten."
         )
 
-    changes = detect_changes(
+    price_changes = detect_price_changes(
         old_rows,
         new_rows,
         history
     )
 
-    if changes:
+    (
+        product_changes,
+        missing_candidates
+    ) = detect_product_changes(
+        old_rows,
+        new_rows,
+        product_history,
+        missing_candidates
+    )
+
+    if price_changes:
 
         print()
         print("=" * 70)
         print("PRICE CHANGES")
         print("=" * 70)
 
-        for change in changes:
+        for change in price_changes:
 
             print()
             print(
@@ -669,6 +998,36 @@ async def main():
             print(
                 "New:",
                 change["New Price"]
+            )
+
+    if product_changes:
+
+        print()
+        print("=" * 70)
+        print("PRODUCT STRUCTURE CHANGES")
+        print("=" * 70)
+
+        for event in product_changes:
+
+            print()
+            print(
+                "Type:",
+                event["Change Type"]
+            )
+
+            print(
+                "Item Number:",
+                event["Item Number"]
+            )
+
+            print(
+                "Old Status:",
+                event["Old Status"]
+            )
+
+            print(
+                "New Status:",
+                event["New Status"]
             )
 
     current_fields = [
@@ -694,6 +1053,26 @@ async def main():
         "URL"
     ]
 
+    product_history_fields = [
+        "Changed At",
+        "Change Type",
+        "Item Number",
+        "Collection",
+        "Variant",
+        "Old Status",
+        "New Status",
+        "Price",
+        "URL"
+    ]
+
+
+    missing_candidate_fields = [
+        "Item Number",
+        "Consecutive Misses",
+        "First Missing At",
+        "Last Missing At"
+    ]
+
     write_csv(
         CURRENT_CSV,
         current_fields,
@@ -704,6 +1083,19 @@ async def main():
         HISTORY_CSV,
         history_fields,
         history
+    )
+
+    write_csv(
+        PRODUCT_HISTORY_CSV,
+        product_history_fields,
+        product_history
+    )
+
+
+    write_csv(
+        MISSING_CANDIDATES_CSV,
+        missing_candidate_fields,
+        missing_candidates
     )
 
     print()
@@ -718,12 +1110,28 @@ async def main():
 
     print(
         "Price changes:",
-        len(changes)
+        len(price_changes)
     )
 
     print(
-        "History rows :",
+        "Product changes:",
+        len(product_changes)
+    )
+
+    print(
+        "Price history rows:",
         len(history)
+    )
+
+    print(
+        "Product history rows:",
+        len(product_history)
+    )
+
+
+    print(
+        "Pending missing items:",
+        len(missing_candidates)
     )
 
     print("=" * 70)
