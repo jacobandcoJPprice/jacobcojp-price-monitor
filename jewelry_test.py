@@ -1,762 +1,319 @@
 import asyncio
-import csv
-from urllib.parse import urljoin, urlparse
-
+from collections import defaultdict
 from playwright.async_api import async_playwright
 
 
 BASE_URL = "https://jacobandco.shop"
-START_URL = "https://jacobandco.shop/pages/collections"
 
-OUTPUT_CSV = "shop_variant_test_results.csv"
-
-
-def normalize_collection_url(url):
-
-    if not url:
-        return ""
-
-    url = urljoin(
-        BASE_URL,
-        url
-    )
-
-    parsed = urlparse(url)
-
-    if parsed.netloc != "jacobandco.shop":
-        return ""
-
-    path = parsed.path.rstrip("/")
-
-    if not path.startswith("/collections/"):
-        return ""
-
-    if path == "/collections/all":
-        return ""
-
-    return BASE_URL + path
-
-
-async def discover_collections(page):
-
-    await page.goto(
-        START_URL,
-        wait_until="domcontentloaded",
-        timeout=120000
-    )
-
-    await page.wait_for_timeout(
-        3000
-    )
-
-    links = await page.locator(
-        "a"
-    ).evaluate_all(
-        """
-        els => els.map(a => ({
-            href: a.href || "",
-            text: (a.innerText || "").trim()
-        }))
-        """
-    )
-
-    collections = {}
-
-    for link in links:
-
-        url = normalize_collection_url(
-            link.get(
-                "href",
-                ""
-            )
-        )
-
-        if not url:
-            continue
-
-        name = (
-            link.get(
-                "text",
-                ""
-            )
-            .replace("\n", " ")
-            .strip()
-        )
-
-        if url not in collections:
-            collections[url] = name
-
-    return collections
-
-
-async def fetch_collection_products(
-    request_context,
-    collection_url,
-    collection_name
-):
-
-    parsed = urlparse(
-        collection_url
-    )
-
-    handle = (
-        parsed.path
-        .rstrip("/")
-        .split("/")[-1]
-    )
-
-    api_url = (
-        BASE_URL
-        + "/collections/"
-        + handle
-        + "/products.json?limit=250"
-    )
-
-    response = await request_context.get(
-        api_url,
-        timeout=60000
-    )
-
-    if not response.ok:
-
-        print(
-            "FAILED:",
-            response.status,
-            collection_name,
-            api_url
-        )
-
-        return []
-
-    data = await response.json()
-
-    products = data.get(
-        "products",
-        []
-    )
-
-    if not isinstance(
-        products,
-        list
-    ):
-        return []
-
-    return products
-
-
-def normalize_price(value):
-
-    if value is None:
-        return ""
-
-    value = str(
-        value
-    ).strip()
-
-    if not value:
-        return ""
-
-    try:
-        return round(
-            float(value),
-            2
-        )
-
-    except Exception:
-        return value
+# 只监控 /pages/collections 页面
+# All Collections 区域里实际列出的 Collection
+COLLECTIONS = [
+    ("Jacob & Co. X PEACEMINUSONE", "g-dragon-peaceminusone-collection"),
+    ("Love Lockdown", "love-lockdown"),
+    ("Evil Eye", "evil-eye"),
+    ("Lucky You", "lucky-you"),
+    ("Infinia", "the-infinia-collection"),
+    ("Jezebel", "jezebel"),
+    ("Rare Touch", "rare-touch"),
+    ("Securus", "securus"),
+    ("Office Supplies By Virgil Abloh", "office-supplies"),
+    ("Match Collection", "matchstick-collection"),
+    ("Estribo", "estribo"),
+    ("Cuban Link", "cuban-link"),
+    ("Carabin", "carabin"),
+    ("Cufflinks", "cufflinks"),
+    ("Espada", "espada"),
+    ("Super Arrow", "super-arrow"),
+    ("Papillon", "papillon"),
+    ("Hematite", "hematite"),
+    ("Jacob's Code", "jacobs-code"),
+    ("Sharq", "sharq"),
+    ("Spread The Love", "the-spread-the-love-collection"),
+    ("You Are You", "you-are-you"),
+    ("Taken", "taken"),
+    ("Zodiac", "zodiac-sign"),
+]
 
 
 async def main():
 
-    print("=" * 70)
-    print("JACOB & CO. SHOP VARIANT FINAL TEST")
-    print("=" * 70)
+    print("=" * 78)
+    print("JACOB & CO. ALL COLLECTIONS AUDIT")
+    print("=" * 78)
+    print(
+        "Scope: ONLY collections visibly listed "
+        "on /pages/collections"
+    )
+    print()
+
+    product_to_collections = defaultdict(set)
+    product_titles = {}
+    product_variant_counts = {}
+
+    collection_counts = []
+    failed = []
 
     async with async_playwright() as p:
 
-        browser = await p.chromium.launch(
-            headless=True
+        request = await p.request.new_context(
+            extra_http_headers={
+                "User-Agent": (
+                    "Mozilla/5.0 "
+                    "(Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 "
+                    "(KHTML, like Gecko) "
+                    "Chrome/151 Safari/537.36"
+                )
+            }
         )
 
-        context = await browser.new_context(
-            locale="en-US"
-        )
-
-        page = await context.new_page()
-
-        collections = await discover_collections(
-            page
-        )
-
-        print()
-        print(
-            "Collections found:",
-            len(collections)
-        )
-
-        # ----------------------------------------------------
-        # Product ID -> product data + collections
-        # ----------------------------------------------------
-
-        product_map = {}
-
-        successful_collections = 0
-        failed_collections = 0
-
-        for collection_url, collection_name in sorted(
-            collections.items()
+        for index, (name, handle) in enumerate(
+            COLLECTIONS,
+            start=1
         ):
+
+            api_url = (
+                f"{BASE_URL}/collections/{handle}"
+                "/products.json?limit=250"
+            )
 
             try:
 
-                products = await fetch_collection_products(
-                    context.request,
-                    collection_url,
-                    collection_name
+                response = await request.get(
+                    api_url,
+                    timeout=60000
                 )
 
-                successful_collections += 1
+                if not response.ok:
+
+                    failed.append(
+                        (
+                            name,
+                            handle,
+                            response.status
+                        )
+                    )
+
+                    print(
+                        f"{index:02d}. "
+                        f"{name:<34} "
+                        f"FAILED HTTP "
+                        f"{response.status}"
+                    )
+
+                    continue
+
+                data = await response.json()
+
+                products = data.get(
+                    "products",
+                    []
+                )
+
+                if not isinstance(
+                    products,
+                    list
+                ):
+                    products = []
+
+                collection_counts.append(
+                    (
+                        name,
+                        handle,
+                        len(products)
+                    )
+                )
+
+                print(
+                    f"{index:02d}. "
+                    f"{name:<34} "
+                    f"{len(products):>3} products"
+                )
+
+                for product in products:
+
+                    product_id = str(
+                        product.get(
+                            "id",
+                            ""
+                        )
+                    ).strip()
+
+                    if not product_id:
+                        continue
+
+                    product_to_collections[
+                        product_id
+                    ].add(
+                        name
+                    )
+
+                    product_titles[
+                        product_id
+                    ] = str(
+                        product.get(
+                            "title",
+                            ""
+                        )
+                    ).strip()
+
+                    variants = product.get(
+                        "variants",
+                        []
+                    )
+
+                    if not isinstance(
+                        variants,
+                        list
+                    ):
+                        variants = []
+
+                    product_variant_counts[
+                        product_id
+                    ] = len(
+                        variants
+                    )
 
             except Exception as e:
 
-                print(
-                    "COLLECTION ERROR:",
-                    collection_name,
-                    repr(e)
-                )
-
-                failed_collections += 1
-                continue
-
-            print(
-                collection_name or collection_url,
-                ":",
-                len(products)
-            )
-
-            for product in products:
-
-                product_id = str(
-                    product.get(
-                        "id",
-                        ""
-                    )
-                ).strip()
-
-                if not product_id:
-                    continue
-
-                if product_id not in product_map:
-
-                    product_map[
-                        product_id
-                    ] = {
-                        "product":
-                            product,
-                        "collections":
-                            set()
-                    }
-
-                product_map[
-                    product_id
-                ][
-                    "collections"
-                ].add(
-                    collection_name
-                    or collection_url
-                )
-
-        await browser.close()
-
-    # ========================================================
-    # BUILD VARIANT ROWS
-    # ========================================================
-
-    rows = []
-
-    for product_id, info in product_map.items():
-
-        product = info[
-            "product"
-        ]
-
-        collections_text = " | ".join(
-            sorted(
-                info[
-                    "collections"
-                ]
-            )
-        )
-
-        title = str(
-            product.get(
-                "title",
-                ""
-            )
-        ).strip()
-
-        handle = str(
-            product.get(
-                "handle",
-                ""
-            )
-        ).strip()
-
-        vendor = str(
-            product.get(
-                "vendor",
-                ""
-            )
-        ).strip()
-
-        product_type = str(
-            product.get(
-                "product_type",
-                product.get(
-                    "type",
-                    ""
-                )
-            )
-        ).strip()
-
-        product_url = (
-            BASE_URL
-            + "/products/"
-            + handle
-        )
-
-        variants = product.get(
-            "variants",
-            []
-        )
-
-        if not isinstance(
-            variants,
-            list
-        ):
-            variants = []
-
-        for variant in variants:
-
-            if not isinstance(
-                variant,
-                dict
-            ):
-                continue
-
-            variant_id = str(
-                variant.get(
-                    "id",
-                    ""
-                )
-            ).strip()
-
-            sku = str(
-                variant.get(
-                    "sku",
-                    ""
-                )
-                or ""
-            ).strip()
-
-            variant_title = str(
-                variant.get(
-                    "title",
-                    ""
-                )
-                or ""
-            ).strip()
-
-            price = normalize_price(
-                variant.get(
-                    "price"
-                )
-            )
-
-            compare_at_price = normalize_price(
-                variant.get(
-                    "compare_at_price"
-                )
-            )
-
-            available = variant.get(
-                "available",
-                False
-            )
-
-            option1 = str(
-                variant.get(
-                    "option1",
-                    ""
-                )
-                or ""
-            ).strip()
-
-            option2 = str(
-                variant.get(
-                    "option2",
-                    ""
-                )
-                or ""
-            ).strip()
-
-            option3 = str(
-                variant.get(
-                    "option3",
-                    ""
-                )
-                or ""
-            ).strip()
-
-            if sku:
-
-                unique_key = (
-                    "SKU:"
-                    + sku
-                )
-
-            elif variant_id:
-
-                unique_key = (
-                    "VARIANT:"
-                    + variant_id
-                )
-
-            else:
-
-                unique_key = (
-                    "PRODUCT:"
-                    + product_id
-                    + ":"
-                    + variant_title
-                )
-
-            rows.append({
-
-                "Unique Key":
-                    unique_key,
-
-                "Product ID":
-                    product_id,
-
-                "Variant ID":
-                    variant_id,
-
-                "SKU":
-                    sku,
-
-                "Product":
-                    title,
-
-                "Variant":
-                    variant_title,
-
-                "Product Type":
-                    product_type,
-
-                "Vendor":
-                    vendor,
-
-                "Collections":
-                    collections_text,
-
-                "Price":
-                    price,
-
-                "Compare At Price":
-                    compare_at_price,
-
-                "Currency":
-                    "USD",
-
-                "Available":
+                failed.append(
                     (
-                        "YES"
-                        if available
-                        else "NO"
-                    ),
+                        name,
+                        handle,
+                        repr(e)
+                    )
+                )
 
-                "Option 1":
-                    option1,
+                print(
+                    f"{index:02d}. "
+                    f"{name:<34} "
+                    f"ERROR {e!r}"
+                )
 
-                "Option 2":
-                    option2,
-
-                "Option 3":
-                    option3,
-
-                "Handle":
-                    handle,
-
-                "URL":
-                    product_url
-
-            })
+        await request.dispose()
 
     # ========================================================
-    # DEDUPE BY UNIQUE KEY
+    # RESULTS
     # ========================================================
 
-    unique_rows = {}
-
-    for row in rows:
-
-        key = row.get(
-            "Unique Key",
-            ""
-        )
-
-        if not key:
-            continue
-
-        unique_rows[
-            key
-        ] = row
-
-    rows = list(
-        unique_rows.values()
+    total_before_dedupe = sum(
+        count
+        for _, _, count
+        in collection_counts
     )
-
-    rows.sort(
-        key=lambda row: (
-            row.get(
-                "Product",
-                ""
-            ).lower(),
-            row.get(
-                "Variant",
-                ""
-            ).lower()
-        )
-    )
-
-    # ========================================================
-    # STATISTICS
-    # ========================================================
 
     unique_products = len(
-        product_map
+        product_to_collections
     )
 
-    total_variants = len(
-        rows
+    total_variants = sum(
+        product_variant_counts.values()
     )
 
-    with_sku = sum(
-        1
-        for row in rows
-        if row[
-            "SKU"
-        ]
-    )
-
-    without_sku = (
-        total_variants
-        - with_sku
-    )
-
-    with_price = sum(
-        1
-        for row in rows
-        if row[
-            "Price"
-        ] != ""
-    )
-
-    without_price = (
-        total_variants
-        - with_price
-    )
-
-    available = sum(
-        1
-        for row in rows
-        if row[
-            "Available"
-        ] == "YES"
-    )
-
-    sold_out = (
-        total_variants
-        - available
-    )
-
-    sku_list = [
-        row[
-            "SKU"
-        ]
-        for row in rows
-        if row[
-            "SKU"
-        ]
+    multi_collection_products = [
+        product_id
+        for product_id, names
+        in product_to_collections.items()
+        if len(names) > 1
     ]
-
-    duplicate_skus = (
-        len(sku_list)
-        - len(
-            set(
-                sku_list
-            )
-        )
-    )
-
-    # ========================================================
-    # CSV
-    # ========================================================
-
-    fields = [
-        "Unique Key",
-        "Product ID",
-        "Variant ID",
-        "SKU",
-        "Product",
-        "Variant",
-        "Product Type",
-        "Vendor",
-        "Collections",
-        "Price",
-        "Compare At Price",
-        "Currency",
-        "Available",
-        "Option 1",
-        "Option 2",
-        "Option 3",
-        "Handle",
-        "URL"
-    ]
-
-    with open(
-        OUTPUT_CSV,
-        "w",
-        encoding="utf-8-sig",
-        newline=""
-    ) as f:
-
-        writer = csv.DictWriter(
-            f,
-            fieldnames=fields,
-            extrasaction="ignore"
-        )
-
-        writer.writeheader()
-
-        writer.writerows(
-            rows
-        )
-
-    # ========================================================
-    # FINAL REPORT
-    # ========================================================
 
     print()
-    print("=" * 70)
-    print("FINAL VARIANT RESULT")
-    print("=" * 70)
+    print("=" * 78)
+    print("AUDIT RESULT")
+    print("=" * 78)
 
     print(
-        "Collections found       :",
-        len(collections)
+        "Collections expected       :",
+        len(COLLECTIONS)
     )
 
     print(
-        "Collections success     :",
-        successful_collections
+        "Collections successful     :",
+        len(collection_counts)
     )
 
     print(
-        "Collections failed      :",
-        failed_collections
+        "Collections failed         :",
+        len(failed)
     )
 
     print(
-        "Unique Products         :",
+        "Products before dedupe     :",
+        total_before_dedupe
+    )
+
+    print(
+        "Unique Product IDs         :",
         unique_products
     )
 
     print(
-        "Total Variants          :",
+        "Total variants             :",
         total_variants
     )
 
     print(
-        "With SKU                :",
-        with_sku
+        "Products in >1 collection  :",
+        len(multi_collection_products)
     )
 
-    print(
-        "Without SKU             :",
-        without_sku
-    )
+    # ========================================================
+    # FAILED COLLECTIONS
+    # ========================================================
 
-    print(
-        "Duplicate SKU count     :",
-        duplicate_skus
-    )
+    if failed:
 
-    print(
-        "With USD Price          :",
-        with_price
-    )
+        print()
+        print("FAILED COLLECTIONS")
+        print("-" * 78)
 
-    print(
-        "Without Price           :",
-        without_price
-    )
+        for item in failed:
+            print(item)
 
-    print(
-        "Available               :",
-        available
-    )
-
-    print(
-        "Sold Out / Unavailable  :",
-        sold_out
-    )
-
-    print(
-        "Output CSV              :",
-        OUTPUT_CSV
-    )
-
-    print("=" * 70)
+    # ========================================================
+    # DUPLICATED PRODUCTS
+    # ========================================================
 
     print()
-    print("FIRST 20 VARIANTS")
-    print("-" * 70)
+    print(
+        "TOP DUPLICATED PRODUCTS "
+        "ACROSS COLLECTIONS"
+    )
 
-    for row in rows[:20]:
+    print("-" * 78)
+
+    duplicates = sorted(
+        (
+            (
+                len(
+                    product_to_collections[
+                        product_id
+                    ]
+                ),
+                product_titles.get(
+                    product_id,
+                    ""
+                ),
+                sorted(
+                    product_to_collections[
+                        product_id
+                    ]
+                )
+            )
+            for product_id
+            in multi_collection_products
+        ),
+        reverse=True
+    )
+
+    for count, title, names in duplicates[:25]:
 
         print(
-            row[
-                "SKU"
-            ]
-            or (
-                "VariantID:"
-                + row[
-                    "Variant ID"
-                ]
-            ),
-            "|",
-            row[
-                "Product"
-            ],
-            "|",
-            row[
-                "Variant"
-            ],
-            "| $",
-            row[
-                "Price"
-            ],
-            "|",
-            row[
-                "Available"
-            ]
+            f"{count} collections | "
+            f"{title} | "
+            + " / ".join(names)
         )
 
 
 if __name__ == "__main__":
-
-    asyncio.run(
-        main()
-    )
+    asyncio.run(main())
