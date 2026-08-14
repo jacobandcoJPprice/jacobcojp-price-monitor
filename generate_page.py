@@ -672,6 +672,12 @@ h1 {{
     display: none;
 }}
 
+/* Prevent confirmed price changes from flashing during page refresh.
+   Cards stay hidden only while shared confirmation status is loading. */
+.confirmations-loading .change-card {{
+    visibility: hidden;
+}}
+
 .confirm-modal {{
     position: fixed;
     inset: 0;
@@ -1205,7 +1211,7 @@ h1 {{
 </head>
 
 
-<body>
+<body class="confirmations-loading">
 
 
 <header class="header">
@@ -2022,6 +2028,9 @@ async function loadConfirmations() {{
     if (
         changeCards.length === 0
     ) {{
+        document.body.classList.remove(
+            "confirmations-loading"
+        );
         return;
     }}
 
@@ -2108,6 +2117,10 @@ async function loadConfirmations() {{
         console.error(
             "Confirmation load failed:",
             error
+        );
+    }} finally {{
+        document.body.classList.remove(
+            "confirmations-loading"
         );
     }}
 }}
