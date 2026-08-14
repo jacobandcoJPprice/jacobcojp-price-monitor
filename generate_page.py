@@ -1534,7 +1534,7 @@ changeCards.forEach(card => {{
             }}
         }}
     );
-});
+}});
 
 
 loadConfirmations();
