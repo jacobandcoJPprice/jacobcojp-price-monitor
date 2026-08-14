@@ -21,6 +21,8 @@ OUTPUT_HTML = os.path.join(
     "index.html"
 )
 
+CONFIRM_API_URL = "https://script.google.com/macros/s/AKfycby3Rpfg2P0WGHPEJY2FyZb_CHuXgjv7DHSVMtHz-MQg7PpJsxWVT1zGlipja1xC4J4s/exec"
+
 
 # ============================================================
 # BASIC
@@ -248,25 +250,37 @@ for row in history_rows[:50]:
         )
     )
 
-    item_number = esc(
+    item_number_raw = str(
         row.get(
             "Item Number",
             ""
         )
-    )
+    ).strip()
 
-    old_price = format_price(
+    old_price_raw = str(
         row.get(
             "Old Price",
             ""
         )
-    )
+    ).strip()
 
-    new_price = format_price(
+    new_price_raw = str(
         row.get(
             "New Price",
             ""
         )
+    ).strip()
+
+    item_number = esc(
+        item_number_raw
+    )
+
+    old_price = format_price(
+        old_price_raw
+    )
+
+    new_price = format_price(
+        new_price_raw
     )
 
     changed_at = esc(
@@ -285,50 +299,74 @@ for row in history_rows[:50]:
 
     history_cards.append(
         f"""
-        <a
+        <div
             class="change-card"
-            href="{url}"
-            target="_blank"
-            rel="noopener noreferrer"
+            data-item-number="{esc(item_number_raw)}"
+            data-old-price="{esc(old_price_raw)}"
+            data-new-price="{esc(new_price_raw)}"
         >
 
-            <div class="change-info">
+            <a
+                class="change-main-link"
+                href="{url}"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
 
-                <div class="change-collection">
-                    {collection}
+                <div class="change-info">
+
+                    <div class="change-collection">
+                        {collection}
+                    </div>
+
+                    <div class="change-variant">
+                        {variant}
+                    </div>
+
+                    <div class="change-item">
+                        {item_number}
+                    </div>
+
+                    <div class="change-date">
+                        {changed_at}
+                    </div>
+
                 </div>
 
-                <div class="change-variant">
-                    {variant}
+                <div class="change-prices">
+
+                    <span class="old-price">
+                        {old_price}
+                    </span>
+
+                    <span class="arrow">
+                        →
+                    </span>
+
+                    <span class="new-price">
+                        {new_price}
+                    </span>
+
                 </div>
 
-                <div class="change-item">
-                    {item_number}
-                </div>
+            </a>
 
-                <div class="change-date">
-                    {changed_at}
+            <div class="confirm-area">
+
+                <button
+                    type="button"
+                    class="confirm-button"
+                >
+                    確認済みにする
+                </button>
+
+                <div class="confirm-status">
+                    未確認
                 </div>
 
             </div>
 
-            <div class="change-prices">
-
-                <span class="old-price">
-                    {old_price}
-                </span>
-
-                <span class="arrow">
-                    →
-                </span>
-
-                <span class="new-price">
-                    {new_price}
-                </span>
-
-            </div>
-
-        </a>
+        </div>
         """
     )
 
@@ -349,6 +387,7 @@ else:
 
 
 # ============================================================
+
 # UPDATED TIME
 # ============================================================
 
@@ -483,15 +522,12 @@ h1 {{
 .change-card {{
     background: #fff;
     color: inherit;
-    text-decoration: none;
     border: 1px solid #ddd;
     padding: 20px 22px;
 
     display: flex;
     align-items: center;
-    justify-content: space-between;
-
-    gap: 25px;
+    gap: 22px;
 
     transition:
         transform .15s ease,
@@ -501,6 +537,63 @@ h1 {{
 .change-card:hover {{
     transform: translateY(-1px);
     border-color: #888;
+}}
+
+.change-main-link {{
+    color: inherit;
+    text-decoration: none;
+
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}}
+
+.confirm-area {{
+    width: 210px;
+    flex: 0 0 210px;
+    text-align: right;
+}}
+
+.confirm-button {{
+    border: 1px solid #111;
+    background: #111;
+    color: #fff;
+
+    padding: 10px 14px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+}}
+
+.confirm-button:hover {{
+    opacity: .82;
+}}
+
+.confirm-button:disabled {{
+    cursor: default;
+}}
+
+.confirm-status {{
+    margin-top: 7px;
+    color: #888;
+    font-size: 11px;
+    line-height: 1.5;
+}}
+
+.confirm-area.is-confirmed .confirm-button {{
+    background: #fff;
+    color: #111;
+    border-color: #111;
+}}
+
+.confirm-area.is-confirmed .confirm-status {{
+    color: #111;
 }}
 
 .change-collection {{
@@ -740,6 +833,16 @@ h1 {{
 
     .change-prices {{
         margin-top: 16px;
+    }}
+
+    .change-main-link {{
+        display: block;
+    }}
+
+    .confirm-area {{
+        width: 100%;
+        margin-top: 18px;
+        text-align: left;
     }}
 
     .grid {{
@@ -989,6 +1092,452 @@ search.addEventListener(
     "input",
     filterCards
 );
+
+
+// ============================================================
+// SHARED CONFIRMATION STATUS
+// Google Apps Script / Google Sheet
+// ============================================================
+
+const CONFIRM_API_URL =
+    "{CONFIRM_API_URL}";
+
+const changeCards =
+    Array.from(
+        document.querySelectorAll(
+            ".change-card"
+        )
+    );
+
+
+function confirmationKey(
+    itemNumber,
+    oldPrice,
+    newPrice
+) {{
+
+    return [
+        String(
+            itemNumber || ""
+        ).trim(),
+
+        String(
+            oldPrice || ""
+        ).trim(),
+
+        String(
+            newPrice || ""
+        ).trim()
+
+    ].join("||");
+}}
+
+
+function jsonpRequest(params) {{
+
+    return new Promise(
+        (resolve, reject) => {{
+
+            const callbackName =
+                "__jacobConfirm_"
+                + Date.now()
+                + "_"
+                + Math.random()
+                    .toString(36)
+                    .slice(2);
+
+            const timeout =
+                setTimeout(
+                    () => {{
+
+                        cleanup();
+
+                        reject(
+                            new Error(
+                                "Request timeout"
+                            )
+                        );
+
+                    }},
+                    15000
+                );
+
+            const script =
+                document.createElement(
+                    "script"
+                );
+
+
+            function cleanup() {{
+
+                clearTimeout(
+                    timeout
+                );
+
+                if (
+                    script.parentNode
+                ) {{
+                    script.parentNode
+                        .removeChild(
+                            script
+                        );
+                }}
+
+                try {{
+                    delete window[
+                        callbackName
+                    ];
+                }} catch (e) {{
+                    window[
+                        callbackName
+                    ] = undefined;
+                }}
+            }}
+
+
+            window[
+                callbackName
+            ] = data => {{
+
+                cleanup();
+
+                resolve(
+                    data
+                );
+            }};
+
+
+            const url =
+                new URL(
+                    CONFIRM_API_URL
+                );
+
+            Object.entries(
+                params || {{}}
+            ).forEach(
+                ([key, value]) => {{
+
+                    url.searchParams.set(
+                        key,
+                        String(
+                            value ?? ""
+                        )
+                    );
+                }}
+            );
+
+            url.searchParams.set(
+                "callback",
+                callbackName
+            );
+
+            url.searchParams.set(
+                "_",
+                Date.now()
+            );
+
+            script.src =
+                url.toString();
+
+            script.onerror =
+                () => {{
+
+                    cleanup();
+
+                    reject(
+                        new Error(
+                            "Request failed"
+                        )
+                    );
+                }};
+
+            document.body
+                .appendChild(
+                    script
+                );
+        }}
+    );
+}}
+
+
+function showConfirmed(
+    card,
+    confirmedBy,
+    confirmedAt
+) {{
+
+    const area =
+        card.querySelector(
+            ".confirm-area"
+        );
+
+    const button =
+        card.querySelector(
+            ".confirm-button"
+        );
+
+    const status =
+        card.querySelector(
+            ".confirm-status"
+        );
+
+    area.classList.add(
+        "is-confirmed"
+    );
+
+    button.textContent =
+        "✓ 確認済み";
+
+    button.disabled =
+        true;
+
+    const by =
+        String(
+            confirmedBy || ""
+        ).trim();
+
+    const at =
+        String(
+            confirmedAt || ""
+        ).trim();
+
+    if (by && at) {{
+
+        status.textContent =
+            "確認者："
+            + by
+            + " / "
+            + at
+            + " JST";
+
+    }} else if (by) {{
+
+        status.textContent =
+            "確認者："
+            + by;
+
+    }} else {{
+
+        status.textContent =
+            "確認済み";
+    }}
+}}
+
+
+async function loadConfirmations() {{
+
+    if (
+        changeCards.length === 0
+    ) {{
+        return;
+    }}
+
+    try {{
+
+        const result =
+            await jsonpRequest({{
+                action: "list"
+            }});
+
+        const rows =
+            Array.isArray(
+                result
+            )
+            ? result
+            : (
+                result.rows
+                || []
+            );
+
+        const confirmedMap =
+            new Map();
+
+
+        rows.forEach(row => {{
+
+            const confirmed =
+                row.confirmed === true
+                ||
+                String(
+                    row.confirmed
+                )
+                .toLowerCase()
+                === "true";
+
+
+            if (!confirmed) {{
+                return;
+            }}
+
+
+            const key =
+                confirmationKey(
+                    row.itemNumber,
+                    row.oldPrice,
+                    row.newPrice
+                );
+
+
+            confirmedMap.set(
+                key,
+                row
+            );
+        }});
+
+
+        changeCards.forEach(card => {{
+
+            const key =
+                confirmationKey(
+                    card.dataset.itemNumber,
+                    card.dataset.oldPrice,
+                    card.dataset.newPrice
+                );
+
+            const row =
+                confirmedMap.get(
+                    key
+                );
+
+            if (row) {{
+
+                showConfirmed(
+                    card,
+                    row.confirmedBy,
+                    row.confirmedAt
+                );
+            }}
+        }});
+
+
+    }} catch (error) {{
+
+        console.error(
+            "Confirmation load failed:",
+            error
+        );
+    }}
+}}
+
+
+changeCards.forEach(card => {{
+
+    const button =
+        card.querySelector(
+            ".confirm-button"
+        );
+
+
+    button.addEventListener(
+        "click",
+        async event => {{
+
+            event.preventDefault();
+            event.stopPropagation();
+
+
+            const name =
+                window.prompt(
+                    "確認者の名前を入力してください"
+                );
+
+
+            if (
+                name === null
+                ||
+                !name.trim()
+            ) {{
+                return;
+            }}
+
+
+            const originalText =
+                button.textContent;
+
+
+            button.disabled =
+                true;
+
+            button.textContent =
+                "登録中...";
+
+
+            try {{
+
+                const result =
+                    await jsonpRequest({{
+
+                        action:
+                            "confirm",
+
+                        itemNumber:
+                            card.dataset.itemNumber,
+
+                        oldPrice:
+                            card.dataset.oldPrice,
+
+                        newPrice:
+                            card.dataset.newPrice,
+
+                        confirmedBy:
+                            name.trim()
+                    }});
+
+
+                if (
+                    !result
+                    ||
+                    result.ok !== true
+                ) {{
+
+                    throw new Error(
+                        (
+                            result
+                            &&
+                            result.error
+                        )
+                        ||
+                        "Save failed"
+                    );
+                }}
+
+
+                showConfirmed(
+                    card,
+                    result.confirmedBy
+                        || name.trim(),
+                    result.confirmedAt
+                        || ""
+                );
+
+
+            }} catch (error) {{
+
+                console.error(
+                    "Confirmation save failed:",
+                    error
+                );
+
+
+                alert(
+                    "確認状態を保存できませんでした。"
+                    + "\\n"
+                    + "もう一度お試しください。"
+                );
+
+
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    originalText;
+            }}
+        }}
+    );
+});
+
+
+loadConfirmations();
 
 </script>
 
