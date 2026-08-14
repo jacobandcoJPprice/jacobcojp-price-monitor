@@ -1,5 +1,7 @@
 name: Jacob & Co. USA Jewelry Monitor
 
+permissions:
+  contents: write
 on:
   workflow_dispatch:
 
