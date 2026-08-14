@@ -678,6 +678,19 @@ h1 {{
     visibility: hidden;
 }}
 
+.confirmation-loading-message {{
+    display: none;
+    padding: 24px;
+    border: 1px solid #ddd;
+    background: #fff;
+    color: #777;
+    font-size: 14px;
+}}
+
+.confirmations-loading .confirmation-loading-message {{
+    display: block;
+}}
+
 .confirm-modal {{
     position: fixed;
     inset: 0;
