@@ -16,6 +16,11 @@ HISTORY_CSV = os.path.join(
     "price_history_v2.csv"
 )
 
+PRODUCT_HISTORY_CSV = os.path.join(
+    BASE_DIR,
+    "product_change_history.csv"
+)
+
 OUTPUT_HTML = os.path.join(
     BASE_DIR,
     "index.html"
@@ -90,6 +95,10 @@ history_rows = read_csv(
     HISTORY_CSV
 )
 
+product_history_rows = read_csv(
+    PRODUCT_HISTORY_CSV
+)
+
 
 # Sort current prices
 current_rows.sort(
@@ -108,6 +117,13 @@ current_rows.sort(
 history_rows = list(
     reversed(
         history_rows
+    )
+)
+
+
+product_history_rows = list(
+    reversed(
+        product_history_rows
     )
 )
 
@@ -387,12 +403,167 @@ else:
 
 
 # ============================================================
+# PRODUCT STRUCTURE CHANGES
+# ============================================================
+
+product_change_cards = []
+
+for row in product_history_rows[:50]:
+
+    change_type = esc(
+        row.get(
+            "Change Type",
+            ""
+        )
+    )
+
+    item_number = esc(
+        row.get(
+            "Item Number",
+            ""
+        )
+    )
+
+    collection = esc(
+        row.get(
+            "Collection",
+            ""
+        )
+    )
+
+    variant = esc(
+        row.get(
+            "Variant",
+            ""
+        )
+    )
+
+    old_status = esc(
+        row.get(
+            "Old Status",
+            ""
+        )
+    )
+
+    new_status = esc(
+        row.get(
+            "New Status",
+            ""
+        )
+    )
+
+    price = format_price(
+        row.get(
+            "Price",
+            ""
+        )
+    )
+
+    changed_at = esc(
+        row.get(
+            "Changed At",
+            ""
+        )
+    )
+
+    url = esc(
+        row.get(
+            "URL",
+            ""
+        )
+    )
+
+    product_change_cards.append(
+        f"""
+        <a
+            class="product-change-card"
+            href="{url}"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            <div class="product-change-type">
+                {change_type}
+            </div>
+
+            <div class="product-change-info">
+                <div class="change-collection">
+                    {collection}
+                </div>
+
+                <div class="change-variant">
+                    {variant}
+                </div>
+
+                <div class="change-item">
+                    {item_number}
+                </div>
+
+                <div class="change-date">
+                    {changed_at}
+                </div>
+            </div>
+
+            <div class="product-change-status">
+                <div>
+                    {old_status or "—"}
+                    →
+                    {new_status or "—"}
+                </div>
+
+                <strong>
+                    {price}
+                </strong>
+            </div>
+        </a>
+        """
+    )
+
+
+if product_change_cards:
+
+    product_changes_html = "\n".join(
+        product_change_cards
+    )
+
+else:
+
+    product_changes_html = """
+        <div class="no-changes">
+            商品構成の変更履歴はありません。
+        </div>
+    """
+
+
+# ============================================================
 
 # UPDATED TIME
 # ============================================================
 
 updated_at = datetime.now().strftime(
     "%Y-%m-%d %H:%M"
+)
+
+
+last_seen_values = [
+    str(
+        row.get(
+            "Last Seen",
+            ""
+        )
+    ).strip()
+    for row in current_rows
+    if str(
+        row.get(
+            "Last Seen",
+            ""
+        )
+    ).strip()
+]
+
+last_successful_scan = (
+    max(last_seen_values)
+    if last_seen_values
+    else ""
 )
 
 
@@ -753,6 +924,58 @@ h1 {{
     color: #777;
 }}
 
+.health-stat.is-ok {{
+    border-color: #2b7a3d;
+}}
+
+.health-stat.is-warning {{
+    border-color: #b77a00;
+}}
+
+.health-stat.is-error {{
+    border-color: #b83333;
+}}
+
+.product-change-list {{
+    display: grid;
+    gap: 10px;
+}}
+
+.product-change-card {{
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 150px 1fr auto;
+    gap: 20px;
+    align-items: center;
+}}
+
+.product-change-card:hover {{
+    border-color: #888;
+}}
+
+.product-change-type {{
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}}
+
+.product-change-status {{
+    text-align: right;
+    color: #555;
+    font-size: 12px;
+}}
+
+.product-change-status strong {{
+    display: block;
+    margin-top: 5px;
+    color: #111;
+    font-size: 15px;
+}}
+
 .search-wrap {{
     position: sticky;
     top: 0;
@@ -967,6 +1190,14 @@ h1 {{
             1fr;
     }}
 
+    .product-change-card {{
+        grid-template-columns: 1fr;
+    }}
+
+    .product-change-status {{
+        text-align: left;
+    }}
+
 }}
 
 </style>
@@ -1002,6 +1233,18 @@ h1 {{
                 </strong>
             </div>
 
+            <div
+                class="stat health-stat"
+                id="healthStat"
+                data-current-rows="{len(current_rows)}"
+                data-last-seen="{esc(last_successful_scan)}"
+            >
+                監視状態：
+                <strong id="healthStatus">
+                    確認中…
+                </strong>
+            </div>
+
             <div class="stat">
                 価格変更履歴：
                 <strong>
@@ -1019,6 +1262,13 @@ h1 {{
                     0
                 </strong>
             </button>
+
+            <div class="stat">
+                商品構成変更：
+                <strong>
+                    {len(product_history_rows)}
+                </strong>
+            </div>
 
             <div class="stat">
                 最終更新：
@@ -1075,6 +1325,35 @@ h1 {{
             style="display:none;"
         >
             未確認の価格変更はありません。
+        </div>
+
+    </section>
+
+
+    <!-- ================================================ -->
+    <!-- PRODUCT STRUCTURE CHANGES -->
+    <!-- ================================================ -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div>
+
+                <h2 class="section-title">
+                    商品構成の変更
+                </h2>
+
+                <div class="section-description">
+                    NEW ITEM / REMOVED ITEM / STATUS CHANGE
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="product-change-list">
+            {product_changes_html}
         </div>
 
     </section>
@@ -2030,6 +2309,113 @@ renderConfirmedHistory();
 refreshUnconfirmedEmpty();
 loadConfirmations();
 
+
+function updateHealthStatus() {{
+    const stat =
+        document.getElementById(
+            "healthStat"
+        );
+
+    const label =
+        document.getElementById(
+            "healthStatus"
+        );
+
+    if (!stat || !label) {{
+        return;
+    }}
+
+    const rowCount =
+        Number(
+            stat.dataset.currentRows || 0
+        );
+
+    const lastSeenRaw =
+        String(
+            stat.dataset.lastSeen || ""
+        ).trim();
+
+    let ageHours = null;
+
+    if (lastSeenRaw) {{
+        const parsed =
+            new Date(
+                lastSeenRaw.replace(
+                    " ",
+                    "T"
+                ) + "Z"
+            );
+
+        if (
+            !Number.isNaN(
+                parsed.getTime()
+            )
+        ) {{
+            ageHours =
+                (
+                    Date.now()
+                    - parsed.getTime()
+                )
+                / 3600000;
+        }}
+    }}
+
+    stat.classList.remove(
+        "is-ok",
+        "is-warning",
+        "is-error"
+    );
+
+    if (
+        rowCount < 570
+        ||
+        !lastSeenRaw
+        ||
+        ageHours === null
+        ||
+        ageHours > 30
+    ) {{
+        stat.classList.add(
+            "is-error"
+        );
+
+        label.textContent =
+            "要確認 ⚠";
+
+        return;
+    }}
+
+    if (
+        rowCount < 580
+        ||
+        ageHours > 18
+    ) {{
+        stat.classList.add(
+            "is-warning"
+        );
+
+        label.textContent =
+            "注意 △";
+
+        return;
+    }}
+
+    stat.classList.add(
+        "is-ok"
+    );
+
+    label.textContent =
+        "正常 ✓";
+}}
+
+
+updateHealthStatus();
+
+setInterval(
+    updateHealthStatus,
+    60000
+);
+
 </script>
 
 
@@ -2064,6 +2450,12 @@ print(
 print(
     "Price history:",
     len(history_rows)
+)
+
+
+print(
+    "Product history:",
+    len(product_history_rows)
 )
 
 print(
