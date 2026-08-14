@@ -1244,11 +1244,11 @@ h1 {{
         </div>
 
 
-        <div style="margin-top:22px; display:flex; gap:10px;">
-            <a href="index.html" style="color:#fff; text-decoration:none; border:1px solid #777; background:#111; padding:10px 16px; font-size:12px;">
+        <div style="margin-top:24px; display:flex; gap:12px;">
+            <a href="index.html" style="color:#fff; text-decoration:none; border:1px solid #777; background:#111; padding:14px 26px; font-size:14px; font-weight:600; letter-spacing:0.5px;">
                 WATCHES
             </a>
-            <a href="jewelry.html" style="color:#aaa; text-decoration:none; border:1px solid #333; padding:10px 16px; font-size:12px;">
+            <a href="jewelry.html" style="color:#aaa; text-decoration:none; border:1px solid #444; padding:14px 26px; font-size:14px; font-weight:600; letter-spacing:0.5px;">
                 JEWELRY
             </a>
         </div>
