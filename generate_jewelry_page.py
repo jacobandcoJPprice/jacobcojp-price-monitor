@@ -27,6 +27,7 @@ OUTPUT_HTML = os.path.join(
 )
 
 CONFIRM_API_URL = "https://script.google.com/macros/s/AKfycbzSYIw5g1YSVdh6-pAgrKoCf0MFh4TwWjwNIJzudhnZuYyTFwx6QYwXM19gUOQs28-q-A/exec"
+STRUCTURE_CONFIRM_API_URL = "https://script.google.com/macros/s/AKfycby_kPhxICq5kzM-5FnoXQ7pn83bXshujxw8M-egP3r88G2wNbN6o_BdIgY4_Lg_GTG9OQ/exec"
 
 
 # ============================================================
@@ -414,99 +415,172 @@ else:
 
 product_change_cards = []
 
-for row in product_history_rows[:50]:
+for row in product_history_rows[:100]:
 
-    change_type = esc(
+    change_type_raw = str(
         row.get(
             "Change Type",
             ""
         )
-    )
+    ).strip()
 
-    item_number = esc(
+    unique_key_raw = str(
+        row.get(
+            "Unique Key",
+            ""
+        )
+    ).strip()
+
+    item_number_raw = str(
         row.get(
             "SKU",
             ""
         )
-    )
+    ).strip()
 
-    collection = esc(
+    product_raw = str(
+        row.get(
+            "Product",
+            ""
+        )
+    ).strip()
+
+    collection_raw = str(
         row.get(
             "Collections",
             ""
         )
-    )
+    ).strip()
 
-    variant = esc(
+    variant_raw = str(
         row.get(
             "Variant",
             ""
         )
-    )
+    ).strip()
 
-    old_status = esc(
+    old_status_raw = str(
         row.get(
             "Old Status",
             ""
         )
-    )
+    ).strip()
 
-    new_status = esc(
+    new_status_raw = str(
         row.get(
             "New Status",
             ""
         )
-    )
+    ).strip()
 
-    price = format_price(
+    price_raw = str(
         row.get(
             "Price",
             ""
         )
-    )
+    ).strip()
 
-    changed_at = esc(
+    changed_at_raw = str(
         row.get(
             "Changed At",
             ""
         )
-    )
+    ).strip()
 
-    url = esc(
+    url_raw = str(
         row.get(
             "URL",
             ""
         )
+    ).strip()
+
+    event_key_raw = "||".join([
+        change_type_raw,
+        unique_key_raw,
+        changed_at_raw
+    ])
+
+    display_title_raw = (
+        product_raw
+        or (
+            variant_raw
+            if variant_raw.lower() != "default title"
+            else ""
+        )
+        or collection_raw
+        or item_number_raw
+        or "名称未取得"
     )
+
+    variant_detail_raw = (
+        variant_raw
+        if (
+            variant_raw
+            and variant_raw.lower() != "default title"
+            and variant_raw != display_title_raw
+        )
+        else ""
+    )
+
+    change_type = esc(change_type_raw)
+    item_number = esc(item_number_raw)
+    collection = esc(collection_raw)
+    old_status = esc(old_status_raw)
+    new_status = esc(new_status_raw)
+    price = format_price(price_raw)
+    changed_at = esc(changed_at_raw)
+    url = esc(url_raw)
+    display_title = esc(display_title_raw)
+    variant_detail = esc(variant_detail_raw)
 
     product_change_cards.append(
         f"""
-        <a
-            class="product-change-card"
-            href="{url}"
-            target="_blank"
-            rel="noopener noreferrer"
+        <div
+            class="product-change-card structure-change-card"
+            data-event-key="{esc(event_key_raw)}"
+            data-change-type="{esc(change_type_raw)}"
+            data-sku="{esc(item_number_raw)}"
+            data-product="{esc(product_raw)}"
+            data-variant="{esc(variant_raw)}"
+            data-changed-at="{esc(changed_at_raw)}"
+            data-url="{esc(url_raw)}"
+            data-old-status="{esc(old_status_raw)}"
+            data-new-status="{esc(new_status_raw)}"
+            data-price="{esc(price_raw)}"
         >
             <div class="product-change-type">
                 {change_type}
             </div>
 
             <div class="product-change-info">
-                <div class="change-collection">
-                    {collection}
-                </div>
+                <a
+                    class="product-change-main-link"
+                    href="{url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <div class="change-collection">
+                        {collection}
+                    </div>
 
-                <div class="change-variant">
-                    {variant}
-                </div>
+                    <div class="change-variant">
+                        {display_title}
+                    </div>
 
-                <div class="change-item">
-                    {item_number}
-                </div>
+                    {
+                        f'<div class="product-variant-detail">{variant_detail}</div>'
+                        if variant_detail
+                        else ''
+                    }
 
-                <div class="change-date">
-                    {changed_at}
-                </div>
+                    <div class="change-item">
+                        {item_number}
+                    </div>
+
+                    <div class="change-date">
+                        {changed_at}
+                    </div>
+                </a>
             </div>
 
             <div class="product-change-status">
@@ -520,7 +594,22 @@ for row in product_history_rows[:50]:
                     {price}
                 </strong>
             </div>
-        </a>
+
+            <div class="confirm-area structure-confirm-area">
+
+                <button
+                    type="button"
+                    class="confirm-button structure-confirm-button"
+                >
+                    確認済みにする
+                </button>
+
+                <div class="confirm-status">
+                    未確認
+                </div>
+
+            </div>
+        </div>
         """
     )
 
@@ -950,17 +1039,32 @@ h1 {{
 .product-change-card {{
     background: #fff;
     color: inherit;
-    text-decoration: none;
     border: 1px solid #ddd;
     padding: 18px 20px;
     display: grid;
-    grid-template-columns: 150px 1fr auto;
+    grid-template-columns: 150px minmax(0, 1fr) auto 210px;
     gap: 20px;
     align-items: center;
 }}
 
 .product-change-card:hover {{
     border-color: #888;
+}}
+
+.product-change-card.is-confirmed {{
+    display: none;
+}}
+
+.product-change-main-link {{
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}}
+
+.product-variant-detail {{
+    margin-top: 4px;
+    color: #777;
+    font-size: 12px;
 }}
 
 .product-change-type {{
@@ -1200,6 +1304,11 @@ h1 {{
         grid-template-columns: 1fr;
     }}
 
+    .structure-confirm-area {{
+        width: 100%;
+        text-align: left;
+    }}
+
     .product-change-status {{
         text-align: left;
     }}
@@ -1368,8 +1477,19 @@ h1 {{
 
         </div>
 
-        <div class="product-change-list">
+        <div
+            class="product-change-list"
+            id="unconfirmedProductChangeList"
+        >
             {product_changes_html}
+        </div>
+
+        <div
+            class="no-changes"
+            id="unconfirmedProductEmpty"
+            style="display:none;"
+        >
+            未確認の商品構成変更はありません。
         </div>
 
     </section>
@@ -1589,6 +1709,9 @@ search.addEventListener(
 
 const CONFIRM_API_URL =
     "{CONFIRM_API_URL}";
+
+const STRUCTURE_CONFIRM_API_URL =
+    "{STRUCTURE_CONFIRM_API_URL}";
 
 const changeCards =
     Array.from(
@@ -2234,6 +2357,407 @@ changeCards.forEach(card => {{
         }}
     );
 }});
+
+
+
+// ============================================================
+// JEWELRY STRUCTURE CONFIRMATION
+// Separate Apps Script endpoint; WATCHES is untouched.
+// ============================================================
+
+const structureCards =
+    Array.from(
+        document.querySelectorAll(
+            ".structure-change-card"
+        )
+    );
+
+const confirmedStructureRecords =
+    new Map();
+
+
+function structureConfirmationKey(
+    eventKey
+) {{
+    return String(
+        eventKey || ""
+    ).trim();
+}}
+
+
+function structureJsonpRequest(params) {{
+
+    return new Promise(
+        (resolve, reject) => {{
+
+            const callbackName =
+                "__jacobJewelryStructure_"
+                + Date.now()
+                + "_"
+                + Math.random()
+                    .toString(36)
+                    .slice(2);
+
+            const timeout =
+                setTimeout(
+                    () => {{
+                        cleanup();
+                        reject(
+                            new Error(
+                                "Request timeout"
+                            )
+                        );
+                    }},
+                    15000
+                );
+
+            const script =
+                document.createElement(
+                    "script"
+                );
+
+            function cleanup() {{
+                clearTimeout(
+                    timeout
+                );
+
+                if (
+                    script.parentNode
+                ) {{
+                    script.parentNode
+                        .removeChild(
+                            script
+                        );
+                }}
+
+                try {{
+                    delete window[
+                        callbackName
+                    ];
+                }} catch (e) {{
+                    window[
+                        callbackName
+                    ] = undefined;
+                }}
+            }}
+
+            window[
+                callbackName
+            ] = data => {{
+                cleanup();
+                resolve(
+                    data
+                );
+            }};
+
+            const url =
+                new URL(
+                    STRUCTURE_CONFIRM_API_URL
+                );
+
+            Object.entries(
+                params || {{}}
+            ).forEach(
+                ([key, value]) => {{
+                    url.searchParams.set(
+                        key,
+                        String(
+                            value ?? ""
+                        )
+                    );
+                }}
+            );
+
+            url.searchParams.set(
+                "callback",
+                callbackName
+            );
+
+            url.searchParams.set(
+                "_",
+                Date.now()
+            );
+
+            script.src =
+                url.toString();
+
+            script.onerror =
+                () => {{
+                    cleanup();
+                    reject(
+                        new Error(
+                            "Request failed"
+                        )
+                    );
+                }};
+
+            document.body
+                .appendChild(
+                    script
+                );
+        }}
+    );
+}}
+
+
+function refreshStructureEmpty() {{
+    const visible =
+        structureCards.filter(
+            card =>
+                !card.classList.contains(
+                    "is-confirmed"
+                )
+        );
+
+    const empty =
+        document.getElementById(
+            "unconfirmedProductEmpty"
+        );
+
+    if (empty) {{
+        empty.style.display =
+            visible.length === 0
+            ? "block"
+            : "none";
+    }}
+}}
+
+
+function showStructureConfirmed(
+    card,
+    confirmedBy,
+    confirmedAt
+) {{
+    const key =
+        structureConfirmationKey(
+            card.dataset.eventKey
+        );
+
+    confirmedStructureRecords.set(
+        key,
+        {{
+            confirmedBy:
+                String(
+                    confirmedBy || ""
+                ).trim(),
+            confirmedAt:
+                String(
+                    confirmedAt || ""
+                ).trim()
+        }}
+    );
+
+    card.classList.add(
+        "is-confirmed"
+    );
+
+    refreshStructureEmpty();
+}}
+
+
+async function loadStructureConfirmations() {{
+
+    if (
+        structureCards.length === 0
+    ) {{
+        refreshStructureEmpty();
+        return;
+    }}
+
+    try {{
+        const result =
+            await structureJsonpRequest({{
+                action: "list"
+            }});
+
+        const rows =
+            Array.isArray(
+                result
+            )
+            ? result
+            : (
+                result.rows
+                || []
+            );
+
+        const confirmedMap =
+            new Map();
+
+        rows.forEach(row => {{
+            const confirmed =
+                row.confirmed === true
+                ||
+                String(
+                    row.confirmed
+                )
+                .toLowerCase()
+                === "true";
+
+            if (!confirmed) {{
+                return;
+            }}
+
+            const key =
+                structureConfirmationKey(
+                    row.eventKey
+                );
+
+            if (key) {{
+                confirmedMap.set(
+                    key,
+                    row
+                );
+            }}
+        }});
+
+        structureCards.forEach(card => {{
+            const key =
+                structureConfirmationKey(
+                    card.dataset.eventKey
+                );
+
+            const row =
+                confirmedMap.get(
+                    key
+                );
+
+            if (row) {{
+                showStructureConfirmed(
+                    card,
+                    row.confirmedBy,
+                    row.confirmedAt
+                );
+            }}
+        }});
+
+    }} catch (error) {{
+        console.error(
+            "Jewelry structure confirmation load failed:",
+            error
+        );
+    }} finally {{
+        refreshStructureEmpty();
+    }}
+}}
+
+
+structureCards.forEach(card => {{
+
+    const button =
+        card.querySelector(
+            ".structure-confirm-button"
+        );
+
+    if (!button) {{
+        return;
+    }}
+
+    button.addEventListener(
+        "click",
+        async event => {{
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const name =
+                window.prompt(
+                    "確認者の名前を入力してください"
+                );
+
+            if (
+                name === null
+                ||
+                !name.trim()
+            ) {{
+                return;
+            }}
+
+            const originalText =
+                button.textContent;
+
+            button.disabled =
+                true;
+
+            button.textContent =
+                "登録中...";
+
+            try {{
+                const result =
+                    await structureJsonpRequest({{
+                        action:
+                            "confirm",
+                        eventKey:
+                            card.dataset.eventKey,
+                        changeType:
+                            card.dataset.changeType,
+                        sku:
+                            card.dataset.sku,
+                        product:
+                            card.dataset.product,
+                        variant:
+                            card.dataset.variant,
+                        changedAt:
+                            card.dataset.changedAt,
+                        url:
+                            card.dataset.url,
+                        oldStatus:
+                            card.dataset.oldStatus,
+                        newStatus:
+                            card.dataset.newStatus,
+                        price:
+                            card.dataset.price,
+                        confirmedBy:
+                            name.trim()
+                    }});
+
+                if (
+                    !result
+                    ||
+                    result.ok !== true
+                ) {{
+                    throw new Error(
+                        (
+                            result
+                            &&
+                            result.error
+                        )
+                        ||
+                        "Save failed"
+                    );
+                }}
+
+                showStructureConfirmed(
+                    card,
+                    result.confirmedBy
+                        || name.trim(),
+                    result.confirmedAt
+                        || ""
+                );
+
+            }} catch (error) {{
+                console.error(
+                    "Jewelry structure confirmation save failed:",
+                    error
+                );
+
+                alert(
+                    "確認状態を保存できませんでした。"
+                    + "\\n"
+                    + "もう一度お試しください。"
+                );
+
+                button.disabled =
+                    false;
+
+                button.textContent =
+                    originalText;
+            }}
+        }}
+    );
+}});
+
+
+loadStructureConfirmations();
 
 
 const confirmedHistoryButton =
