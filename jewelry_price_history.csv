@@ -1,1 +1,520 @@
 ﻿Changed At,Unique Key,SKU,Variant ID,Product,Variant,Old Price,New Price,Currency,URL
+2026-08-19 04:40:25,VARIANT:41913034932360,92355158,41913034932360,Carabin Lock Bracelet,15,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913047023752,92355158,41913047023752,Carabin Lock Bracelet,15,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913063604360,,41913063604360,Carabin Lock Bracelet,15,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41913034965128,92354977,41913034965128,Carabin Lock Bracelet,16,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913047056520,92354977,41913047056520,Carabin Lock Bracelet,16,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913063637128,,41913063637128,Carabin Lock Bracelet,16,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41913034997896,92354978,41913034997896,Carabin Lock Bracelet,17,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913047089288,92354978,41913047089288,Carabin Lock Bracelet,17,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913063669896,,41913063669896,Carabin Lock Bracelet,17,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41913035030664,92354979,41913035030664,Carabin Lock Bracelet,18,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913047122056,92354979,41913047122056,Carabin Lock Bracelet,18,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913063702664,,41913063702664,Carabin Lock Bracelet,18,15700,22123,USD,https://jacobandco.shop/products/carabin-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41913035063432,92356677,41913035063432,Carabin Lock Bracelet,19,23800,33536,USD,https://jacobandco.shop/products/carabin-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913047154824,92354980,41913047154824,Carabin Lock Bracelet,19,23800,33536,USD,https://jacobandco.shop/products/carabin-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913063735432,,41913063735432,Carabin Lock Bracelet,19,23800,33536,USD,https://jacobandco.shop/products/carabin-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41913035096200,92354981,41913035096200,Carabin Lock Bracelet,20,23800,33536,USD,https://jacobandco.shop/products/carabin-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913047187592,92354981,41913047187592,Carabin Lock Bracelet,20,23800,33536,USD,https://jacobandco.shop/products/carabin-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913063768200,,41913063768200,Carabin Lock Bracelet,20,23800,33536,USD,https://jacobandco.shop/products/carabin-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41912966480008,,41912966480008,Carabin Lock Diamond Bracelet,15,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913013239944,,41913013239944,Carabin Lock Diamond Bracelet,15,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913025855624,,41913025855624,Carabin Lock Diamond Bracelet,15,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41912966512776,92355159,41912966512776,Carabin Lock Diamond Bracelet,16,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913013272712,,41913013272712,Carabin Lock Diamond Bracelet,16,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913025888392,,41913025888392,Carabin Lock Diamond Bracelet,16,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41912966545544,,41912966545544,Carabin Lock Diamond Bracelet,17,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913013305480,,41913013305480,Carabin Lock Diamond Bracelet,17,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913025921160,,41913025921160,Carabin Lock Diamond Bracelet,17,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41912966578312,92458146,41912966578312,Carabin Lock Diamond Bracelet,18,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913013338248,,41913013338248,Carabin Lock Diamond Bracelet,18,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913025953928,92458158,41913025953928,Carabin Lock Diamond Bracelet,18,17800,25082,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41912986796168,92458156,41912986796168,Carabin Lock Diamond Bracelet,19,25600,36073,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913013371016,,41913013371016,Carabin Lock Diamond Bracelet,19,25600,36073,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913025986696,92458159,41913025986696,Carabin Lock Diamond Bracelet,19,25600,36073,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:41912986828936,,41912986828936,Carabin Lock Diamond Bracelet,20,25600,36073,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41913013403784,,41913013403784,Carabin Lock Diamond Bracelet,20,25600,36073,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:41913026019464,,41913026019464,Carabin Lock Diamond Bracelet,20,25600,36073,USD,https://jacobandco.shop/products/carabin-diamond-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:42868856619144,92457151,42868856619144,Celestial Necklace,Default Title,17600,24800,USD,https://jacobandco.shop/products/celestial-pendant
+2026-08-19 04:40:25,VARIANT:42304776798344,92457272,42304776798344,Cuban Link Bracelet,18cm,30500,42977,USD,https://jacobandco.shop/products/cuban-link-bracelet-3
+2026-08-19 04:40:25,VARIANT:42304778666120,91945249,42304778666120,Cuban Link Bracelet,21cm,43600,61436,USD,https://jacobandco.shop/products/cuban-link-bracelet-1
+2026-08-19 04:40:25,VARIANT:42304779518088,91843266,42304779518088,Cuban Link Bracelet,21cm,45800,64536,USD,https://jacobandco.shop/products/cuban-link-bracelet-2
+2026-08-19 04:40:25,VARIANT:42304780173448,92150008,42304780173448,Cuban Link Bracelet,21cm,45800,64536,USD,https://jacobandco.shop/products/cuban-link-bracelet-5
+2026-08-19 04:40:25,VARIANT:42304781549704,92148427,42304781549704,Cuban Link Bracelet,21cm,65500,92294,USD,https://jacobandco.shop/products/cuban-link-bracelet-4
+2026-08-19 04:40:25,VARIANT:42304783089800,92150010,42304783089800,Cuban Link Bracelet,21cm,65500,92294,USD,https://jacobandco.shop/products/cuban-link-bracelet-6
+2026-08-19 04:40:25,VARIANT:42080272744584,92457340,42080272744584,Cuban Link Necklace,Default Title,63800,89899,USD,https://jacobandco.shop/products/cuban-link-necklace
+2026-08-19 04:40:25,VARIANT:40123532378248,91638244,40123532378248,Espada Bangle,Default Title,20500,28886,USD,https://jacobandco.shop/products/espada-bracelet-1
+2026-08-19 04:40:25,VARIANT:40216440373384,91638243-3,40216440373384,Espada Ring,3,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40216446271624,91637478-3,40216446271624,Espada Ring,3,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40216440406152,91638243-4,40216440406152,Espada Ring,4,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40216446304392,91637479-4,40216446304392,Espada Ring,4,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40331205804168,91638243-4.5,40331205804168,Espada Ring,4.5,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40331242242184,91637478-4.5,40331242242184,Espada Ring,4.5,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40216440438920,91638243-5,40216440438920,Espada Ring,5,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40216446337160,91637480-5,40216446337160,Espada Ring,5,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40331205902472,91638243-5.5,40331205902472,Espada Ring,5.5,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40331242635400,91637478-5.5,40331242635400,Espada Ring,5.5,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40216440471688,91638243-6,40216440471688,Espada Ring,6,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40216446369928,91637481-6,40216446369928,Espada Ring,6,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40317889872008,91638243-6.5,40317889872008,Espada Ring,6.5,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40331242963080,91637478-6.5,40331242963080,Espada Ring,6.5,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40216440504456,91638243-7,40216440504456,Espada Ring,7,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40216446402696,91637482-7,40216446402696,Espada Ring,7,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40331206393992,91638243-7.5,40331206393992,Espada Ring,7.5,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40331243061384,91637478-7.5,40331243061384,Espada Ring,7.5,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40216440537224,91638243-8,40216440537224,Espada Ring,8,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40216446435464,91637483-8,40216446435464,Espada Ring,8,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:40331206721672,91638243-8.5,40331206721672,Espada Ring,8.5,5900,8314,USD,https://jacobandco.shop/products/espada-ring
+2026-08-19 04:40:25,VARIANT:40331243421832,91637478-8.5,40331243421832,Espada Ring,8.5,14200,20009,USD,https://jacobandco.shop/products/espada-ring-1
+2026-08-19 04:40:25,VARIANT:41236021772424,92355919,41236021772424,Estribo Bangle,15,23000,32409,USD,https://jacobandco.shop/products/estribo-bangle-4
+2026-08-19 04:40:25,VARIANT:41444734369928,92354718,41444734369928,Estribo Bangle,15,14000,19727,USD,https://jacobandco.shop/products/estribo-bracelet-2
+2026-08-19 04:40:25,VARIANT:41444749574280,92353885,41444749574280,Estribo Bangle,15,23000,32409,USD,https://jacobandco.shop/products/estribo-bracelet-1
+2026-08-19 04:40:25,VARIANT:41444752064648,92354226,41444752064648,Estribo Bangle,15,36000,50727,USD,https://jacobandco.shop/products/estribo-bracelet-3
+2026-08-19 04:40:25,VARIANT:43076853170312,92353887,43076853170312,Estribo Bangle,15,36000,50727,USD,https://jacobandco.shop/products/estribo-bangle-white-gold-pave
+2026-08-19 04:40:25,VARIANT:41444734402696,92354718,41444734402696,Estribo Bangle,16,14000,19727,USD,https://jacobandco.shop/products/estribo-bracelet-2
+2026-08-19 04:40:25,VARIANT:41444744396936,92355919,41444744396936,Estribo Bangle,16,23000,32409,USD,https://jacobandco.shop/products/estribo-bangle-4
+2026-08-19 04:40:25,VARIANT:41444749607048,92353885,41444749607048,Estribo Bangle,16,23000,32409,USD,https://jacobandco.shop/products/estribo-bracelet-1
+2026-08-19 04:40:25,VARIANT:41444752097416,92354226,41444752097416,Estribo Bangle,16,36000,50727,USD,https://jacobandco.shop/products/estribo-bracelet-3
+2026-08-19 04:40:25,VARIANT:43076853203080,92353887,43076853203080,Estribo Bangle,16,36000,50727,USD,https://jacobandco.shop/products/estribo-bangle-white-gold-pave
+2026-08-19 04:40:25,VARIANT:41444734435464,92354718,41444734435464,Estribo Bangle,17,14000,19727,USD,https://jacobandco.shop/products/estribo-bracelet-2
+2026-08-19 04:40:25,VARIANT:41444744429704,92355919,41444744429704,Estribo Bangle,17,23000,32409,USD,https://jacobandco.shop/products/estribo-bangle-4
+2026-08-19 04:40:25,VARIANT:41444749639816,92353885,41444749639816,Estribo Bangle,17,23000,32409,USD,https://jacobandco.shop/products/estribo-bracelet-1
+2026-08-19 04:40:25,VARIANT:41444752130184,92354226,41444752130184,Estribo Bangle,17,36000,50727,USD,https://jacobandco.shop/products/estribo-bracelet-3
+2026-08-19 04:40:25,VARIANT:43076853235848,92353887,43076853235848,Estribo Bangle,17,36000,50727,USD,https://jacobandco.shop/products/estribo-bangle-white-gold-pave
+2026-08-19 04:40:25,VARIANT:41444734468232,92354718,41444734468232,Estribo Bangle,18,16000,22546,USD,https://jacobandco.shop/products/estribo-bracelet-2
+2026-08-19 04:40:25,VARIANT:41444744462472,92355919,41444744462472,Estribo Bangle,18,25000,35227,USD,https://jacobandco.shop/products/estribo-bangle-4
+2026-08-19 04:40:25,VARIANT:41444749672584,92353885,41444749672584,Estribo Bangle,18,25000,35227,USD,https://jacobandco.shop/products/estribo-bracelet-1
+2026-08-19 04:40:25,VARIANT:41444752162952,92354226,41444752162952,Estribo Bangle,18,38000,53545,USD,https://jacobandco.shop/products/estribo-bracelet-3
+2026-08-19 04:40:25,VARIANT:43076853268616,92353887,43076853268616,Estribo Bangle,18,38000,53545,USD,https://jacobandco.shop/products/estribo-bangle-white-gold-pave
+2026-08-19 04:40:25,VARIANT:41444734501000,92354718,41444734501000,Estribo Bangle,19,16000,22546,USD,https://jacobandco.shop/products/estribo-bracelet-2
+2026-08-19 04:40:25,VARIANT:41444744495240,92355919,41444744495240,Estribo Bangle,19,25000,35227,USD,https://jacobandco.shop/products/estribo-bangle-4
+2026-08-19 04:40:25,VARIANT:41444749705352,92353885,41444749705352,Estribo Bangle,19,25000,35227,USD,https://jacobandco.shop/products/estribo-bracelet-1
+2026-08-19 04:40:25,VARIANT:41444752195720,92354226,41444752195720,Estribo Bangle,19,38000,53545,USD,https://jacobandco.shop/products/estribo-bracelet-3
+2026-08-19 04:40:25,VARIANT:43076853301384,92353887,43076853301384,Estribo Bangle,19,38000,53545,USD,https://jacobandco.shop/products/estribo-bangle-white-gold-pave
+2026-08-19 04:40:25,VARIANT:41444734533768,92354718,41444734533768,Estribo Bangle,20,16000,22546,USD,https://jacobandco.shop/products/estribo-bracelet-2
+2026-08-19 04:40:25,VARIANT:41444744528008,92355919,41444744528008,Estribo Bangle,20,25000,35227,USD,https://jacobandco.shop/products/estribo-bangle-4
+2026-08-19 04:40:25,VARIANT:41444749738120,92353885,41444749738120,Estribo Bangle,20,25000,35227,USD,https://jacobandco.shop/products/estribo-bracelet-1
+2026-08-19 04:40:25,VARIANT:41444752228488,92354226,41444752228488,Estribo Bangle,20,38000,53545,USD,https://jacobandco.shop/products/estribo-bracelet-3
+2026-08-19 04:40:25,VARIANT:43076853334152,92353887,43076853334152,Estribo Bangle,20,38000,53545,USD,https://jacobandco.shop/products/estribo-bangle-white-gold-pave
+2026-08-19 04:40:25,VARIANT:41938991710344,92457655,41938991710344,Estribo Earrings,Default Title,17500,24659,USD,https://jacobandco.shop/products/estribo-earrings
+2026-08-19 04:40:25,VARIANT:41939233013896,92457656,41939233013896,Estribo Earrings,Default Title,17500,24659,USD,https://jacobandco.shop/products/estribo-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:41939644645512,92457655,41939644645512,Estribo Earrings,Default Title,17500,24659,USD,https://jacobandco.shop/products/estribo-earrings-yellow-gold
+2026-08-19 04:40:25,VARIANT:40490915233928,92355442-5,40490915233928,Estribo Ring,5,7000,9864,USD,https://jacobandco.shop/products/estribo-ring-1
+2026-08-19 04:40:25,VARIANT:41304772509832,92355444,41304772509832,Estribo Ring,5,8700,12259,USD,https://jacobandco.shop/products/estribo-ring-3
+2026-08-19 04:40:25,VARIANT:41304776671368,,41304776671368,Estribo Ring,5,11200,15782,USD,https://jacobandco.shop/products/estribo-ring-full-pave
+2026-08-19 04:40:25,VARIANT:41320177205384,92355442-5,41320177205384,Estribo Ring,5,7000,9864,USD,https://jacobandco.shop/products/estribo-ring-8
+2026-08-19 04:40:25,VARIANT:41320268005512,,41320268005512,Estribo Ring,5,11200,15782,USD,https://jacobandco.shop/products/estribo-ring-9
+2026-08-19 04:40:25,VARIANT:41320290877576,92355001,41320290877576,Estribo Ring,5,8700,12259,USD,https://jacobandco.shop/products/estribo-ring-10
+2026-08-19 04:40:25,VARIANT:40490915299464,92355442-6,40490915299464,Estribo Ring,6,7000,9864,USD,https://jacobandco.shop/products/estribo-ring-1
+2026-08-19 04:40:25,VARIANT:41304772575368,92355444,41304772575368,Estribo Ring,6,8700,12259,USD,https://jacobandco.shop/products/estribo-ring-3
+2026-08-19 04:40:25,VARIANT:41304776736904,,41304776736904,Estribo Ring,6,11200,15782,USD,https://jacobandco.shop/products/estribo-ring-full-pave
+2026-08-19 04:40:25,VARIANT:41320177270920,92355442-6,41320177270920,Estribo Ring,6,7000,9864,USD,https://jacobandco.shop/products/estribo-ring-8
+2026-08-19 04:40:25,VARIANT:41320268071048,,41320268071048,Estribo Ring,6,11200,15782,USD,https://jacobandco.shop/products/estribo-ring-9
+2026-08-19 04:40:25,VARIANT:41320290943112,92355001,41320290943112,Estribo Ring,6,8700,12259,USD,https://jacobandco.shop/products/estribo-ring-10
+2026-08-19 04:40:25,VARIANT:40490915365000,92355442-7,40490915365000,Estribo Ring,7,7000,9864,USD,https://jacobandco.shop/products/estribo-ring-1
+2026-08-19 04:40:25,VARIANT:41304772640904,92355444,41304772640904,Estribo Ring,7,8700,12259,USD,https://jacobandco.shop/products/estribo-ring-3
+2026-08-19 04:40:25,VARIANT:41304776802440,,41304776802440,Estribo Ring,7,11200,15782,USD,https://jacobandco.shop/products/estribo-ring-full-pave
+2026-08-19 04:40:25,VARIANT:41320177336456,92355442-7,41320177336456,Estribo Ring,7,7000,9864,USD,https://jacobandco.shop/products/estribo-ring-8
+2026-08-19 04:40:25,VARIANT:41320268136584,,41320268136584,Estribo Ring,7,11200,15782,USD,https://jacobandco.shop/products/estribo-ring-9
+2026-08-19 04:40:25,VARIANT:41320291008648,92355001,41320291008648,Estribo Ring,7,8700,12259,USD,https://jacobandco.shop/products/estribo-ring-10
+2026-08-19 04:40:25,VARIANT:40490915430536,92355442-8,40490915430536,Estribo Ring,8,7000,9864,USD,https://jacobandco.shop/products/estribo-ring-1
+2026-08-19 04:40:25,VARIANT:41304772706440,92355444,41304772706440,Estribo Ring,8,8700,12259,USD,https://jacobandco.shop/products/estribo-ring-3
+2026-08-19 04:40:25,VARIANT:41304776867976,,41304776867976,Estribo Ring,8,11200,15782,USD,https://jacobandco.shop/products/estribo-ring-full-pave
+2026-08-19 04:40:25,VARIANT:41320177401992,92355442-8,41320177401992,Estribo Ring,8,7000,9864,USD,https://jacobandco.shop/products/estribo-ring-8
+2026-08-19 04:40:25,VARIANT:41320268202120,,41320268202120,Estribo Ring,8,11200,15782,USD,https://jacobandco.shop/products/estribo-ring-9
+2026-08-19 04:40:25,VARIANT:41320291074184,92355001,41320291074184,Estribo Ring,8,8700,12259,USD,https://jacobandco.shop/products/estribo-ring-10
+2026-08-19 04:40:25,VARIANT:42299310473352,92252267,42299310473352,Evil Eye Diamond Bracelet,18cm,3800,5355,USD,https://jacobandco.shop/products/evil-eye-bracelet-3
+2026-08-19 04:40:25,VARIANT:42299333935240,92252263,42299333935240,Evil Eye Diamond Bracelet,18cm,3800,5355,USD,https://jacobandco.shop/products/evil-eye-bracelet-6
+2026-08-19 04:40:25,VARIANT:42299336163464,92252269,42299336163464,Evil Eye Diamond Bracelet,18cm,3800,5355,USD,https://jacobandco.shop/products/evil-eye-bracelet-8
+2026-08-19 04:40:25,VARIANT:42299338489992,92252260,42299338489992,Evil Eye Diamond Bracelet,18cm,3800,5355,USD,https://jacobandco.shop/products/evil-eye-bracelet
+2026-08-19 04:40:25,VARIANT:42304712507528,92561990,42304712507528,Evil Eye Diamond Bracelet,18cm,2800,3946,USD,https://jacobandco.shop/products/evil-eye-bracelet-1
+2026-08-19 04:40:25,VARIANT:42304713621640,92353778,42304713621640,Evil Eye Diamond Bracelet,18cm,2800,3946,USD,https://jacobandco.shop/products/evil-eye-bracelet-7
+2026-08-19 04:40:25,VARIANT:42304714571912,92458120,42304714571912,Evil Eye Diamond Bracelet,18cm,2800,3946,USD,https://jacobandco.shop/products/evil-eye-bracelet-4
+2026-08-19 04:40:25,VARIANT:42923146281096,92353779,42923146281096,Evil Eye Diamond Bracelet,18cm,2800,3946,USD,https://jacobandco.shop/products/evil-eye-diamond-bracelet-green-eye
+2026-08-19 04:40:25,VARIANT:42923162042504,92353776,42923162042504,Evil Eye Diamond Bracelet,18cm,2800,3946,USD,https://jacobandco.shop/products/evil-eye-diamond-bracelet-blue-eye-in-white-gold
+2026-08-19 04:40:25,VARIANT:40138238886024,92252272,40138238886024,Evil Eye Diamond Necklace,Default Title,5000,7046,USD,https://jacobandco.shop/products/evil-eye-necklace-2
+2026-08-19 04:40:25,VARIANT:40264876785800,92560659,40264876785800,Evil Eye Diamond Necklace,Default Title,5000,7046,USD,https://jacobandco.shop/products/evil-eye-necklace-4
+2026-08-19 04:40:25,VARIANT:40264985903240,92457238,40264985903240,Evil Eye Diamond Necklace,Default Title,12600,17755,USD,https://jacobandco.shop/products/evil-eye-necklace-3
+2026-08-19 04:40:25,VARIANT:41887855181960,92252276,41887855181960,Evil Eye Diamond Necklace,Default Title,5000,7046,USD,https://jacobandco.shop/products/evil-eye-necklace
+2026-08-19 04:40:25,VARIANT:41940806664328,92252270,41940806664328,Evil Eye Diamond Necklace,Default Title,5000,7046,USD,https://jacobandco.shop/products/evil-eye-diamond-necklace-rose-gold-blue-enamel
+2026-08-19 04:40:25,VARIANT:42299342487688,92355122,42299342487688,Hamsa Diamond Bracelet,18cm,6400,9019,USD,https://jacobandco.shop/products/hamsa-bracelet
+2026-08-19 04:40:25,VARIANT:42299345633416,92458662,42299345633416,Hamsa Diamond Bracelet,18cm,6400,9019,USD,https://jacobandco.shop/products/hamsa-bracelet-black
+2026-08-19 04:40:25,VARIANT:42299399831688,92355966,42299399831688,Hamsa Diamond Bracelet,18cm,6400,9019,USD,https://jacobandco.shop/products/hamsa-bracelet-1
+2026-08-19 04:40:25,VARIANT:42299407728776,92355968,42299407728776,Hamsa Diamond Bracelet,18cm,6400,9019,USD,https://jacobandco.shop/products/hamsa-bracelet-red
+2026-08-19 04:40:25,VARIANT:41882564788360,92457168,41882564788360,Hamsa Diamond Necklace,Default Title,11200,15782,USD,https://jacobandco.shop/products/hamsa-necklace-white-gold
+2026-08-19 04:40:25,VARIANT:41882642874504,92355460,41882642874504,Hamsa Diamond Necklace,Default Title,11200,15782,USD,https://jacobandco.shop/products/hamsa-necklace-rose-gold
+2026-08-19 04:40:25,VARIANT:40109580910728,92149972,40109580910728,Happy Diamond Bracelet,Default Title,3400,4791,USD,https://jacobandco.shop/products/you-are-you-bracelet-2
+2026-08-19 04:40:25,VARIANT:40109394755720,92149968,40109394755720,Happy Diamond Necklace,Default Title,3400,4791,USD,https://jacobandco.shop/products/you-are-you-necklace-2
+2026-08-19 04:40:25,VARIANT:40109551583368,92148261,40109551583368,Happy Diamond Necklace,Default Title,3400,4791,USD,https://jacobandco.shop/products/you-are-you-necklace-4
+2026-08-19 04:40:25,VARIANT:40216499978376,92047676-3,40216499978376,Happy Diamond Ring,3,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40216500011144,92047677-4,40216500011144,Happy Diamond Ring,4,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40331430723720,92047676-4.5,40331430723720,Happy Diamond Ring,4.5,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40216500043912,92047678-5,40216500043912,Happy Diamond Ring,5,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40331430756488,92047676-5.5,40331430756488,Happy Diamond Ring,5.5,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40216500076680,92047679-6,40216500076680,Happy Diamond Ring,6,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40331430822024,92047676-6.5,40331430822024,Happy Diamond Ring,6.5,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40216500109448,92047680-7,40216500109448,Happy Diamond Ring,7,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40331430985864,92047676-7.5,40331430985864,Happy Diamond Ring,7.5,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40216500142216,92047681-8,40216500142216,Happy Diamond Ring,8,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:40331431051400,92047676-8.5,40331431051400,Happy Diamond Ring,8.5,3400,4791,USD,https://jacobandco.shop/products/you-are-you-ring-3
+2026-08-19 04:40:25,VARIANT:42360463523976,92460266,42360463523976,Hematite Bracelet,15 cm,1200,1691,USD,https://jacobandco.shop/products/hematite-bracelet-1
+2026-08-19 04:40:25,VARIANT:42543699132552,91738809,42543699132552,Hematite Bracelet,15 cm,15400,21700,USD,https://jacobandco.shop/products/hematite-bracelet-4
+2026-08-19 04:40:25,VARIANT:42543711748232,91637512,42543711748232,Hematite Bracelet,15 cm,11800,16627,USD,https://jacobandco.shop/products/hematite-bracelet-2
+2026-08-19 04:40:25,VARIANT:41112456134792,91637513,41112456134792,Hematite Bracelet,16 cm,12500,17614,USD,https://jacobandco.shop/products/hematite-bracelet-2
+2026-08-19 04:40:25,VARIANT:42543699165320,91740299,42543699165320,Hematite Bracelet,16 cm,16300,22968,USD,https://jacobandco.shop/products/hematite-bracelet-4
+2026-08-19 04:40:25,VARIANT:43106465579144,92459317,43106465579144,Hematite Bracelet,16 cm,1200,1691,USD,https://jacobandco.shop/products/hematite-bracelet-1
+2026-08-19 04:40:25,VARIANT:41112456167560,91843552,41112456167560,Hematite Bracelet,17 cm,13200,18600,USD,https://jacobandco.shop/products/hematite-bracelet-2
+2026-08-19 04:40:25,VARIANT:41123484631176,92149083,41123484631176,Hematite Bracelet,17 cm,17200,24236,USD,https://jacobandco.shop/products/hematite-bracelet-4
+2026-08-19 04:40:25,VARIANT:41221187371144,92148358,41221187371144,Hematite Bracelet,17 cm,1200,1691,USD,https://jacobandco.shop/products/hematite-bracelet-1
+2026-08-19 04:40:25,VARIANT:41112456200328,91637515,41112456200328,Hematite Bracelet,18 cm,13900,19586,USD,https://jacobandco.shop/products/hematite-bracelet-2
+2026-08-19 04:40:25,VARIANT:41118996594824,92457325,41118996594824,Hematite Bracelet,18 cm,1200,1691,USD,https://jacobandco.shop/products/hematite-bracelet-1
+2026-08-19 04:40:25,VARIANT:41123484663944,92149084,41123484663944,Hematite Bracelet,18 cm,18100,25505,USD,https://jacobandco.shop/products/hematite-bracelet-4
+2026-08-19 04:40:25,VARIANT:41112456233096,92149088,41112456233096,Hematite Bracelet,19 cm,14500,20432,USD,https://jacobandco.shop/products/hematite-bracelet-2
+2026-08-19 04:40:25,VARIANT:41118996627592,92457326,41118996627592,Hematite Bracelet,19 cm,1200,1691,USD,https://jacobandco.shop/products/hematite-bracelet-1
+2026-08-19 04:40:25,VARIANT:41123484696712,92149085,41123484696712,Hematite Bracelet,19 cm,19000,26773,USD,https://jacobandco.shop/products/hematite-bracelet-4
+2026-08-19 04:40:25,VARIANT:41112456265864,92149089,41112456265864,Hematite Bracelet,20 cm,15200,21418,USD,https://jacobandco.shop/products/hematite-bracelet-2
+2026-08-19 04:40:25,VARIANT:41118996660360,92354435,41118996660360,Hematite Bracelet,20 cm,1200,1691,USD,https://jacobandco.shop/products/hematite-bracelet-1
+2026-08-19 04:40:25,VARIANT:43108488806536,,43108488806536,Hematite Bracelet,20 cm,19000,26773,USD,https://jacobandco.shop/products/hematite-bracelet-4
+2026-08-19 04:40:25,VARIANT:43775528632456,91944022,43775528632456,Infinia Earrings,Default Title,53400,75244,USD,https://jacobandco.shop/products/infinia-earrings-turquoise-and-pearl
+2026-08-19 04:40:25,VARIANT:43775602491528,92046650,43775602491528,Infinia Earrings,Default Title,61500,86658,USD,https://jacobandco.shop/products/infinia-earrings-onxy-and-pearl
+2026-08-19 04:40:25,VARIANT:43935763660936,92046430,43935763660936,Infinia Earrings,Default Title,150000,211360,USD,https://jacobandco.shop/products/infinia-earrings-small-size-tsavorites
+2026-08-19 04:40:25,VARIANT:43937179238536,91945038,43937179238536,Infinia Earrings,Default Title,27000,38045,USD,https://jacobandco.shop/products/infinia-earrings-cabochon-emeralds
+2026-08-19 04:40:25,VARIANT:43952598679688,91945037,43952598679688,Infinia Earrings,Default Title,24500,34523,USD,https://jacobandco.shop/products/infinia-earrings-blue-cabochon-sapphires
+2026-08-19 04:40:25,VARIANT:43952715858056,91944914,43952715858056,Infinia Earrings,Default Title,117000,164861,USD,https://jacobandco.shop/products/infinia-earrings-pink-sapphires
+2026-08-19 04:40:25,VARIANT:43958361456776,91944511,43958361456776,Infinia Earrings,Default Title,180000,253632,USD,https://jacobandco.shop/products/infinia-earrings-baguette-cut-diamonds
+2026-08-19 04:40:25,VARIANT:43775618842760,92046651,43775618842760,Infinia Ring,Default Title,41500,58477,USD,https://jacobandco.shop/products/infinia-ring-onyx-and-mother-of-pearl
+2026-08-19 04:40:25,VARIANT:43933990420616,91945035,43933990420616,Infinia Ring,Default Title,23500,33113,USD,https://jacobandco.shop/products/infinia-ring-cabochon-emerald
+2026-08-19 04:40:25,VARIANT:43934001463432,91945034,43934001463432,Infinia Ring,Default Title,18500,26068,USD,https://jacobandco.shop/products/infinia-ring-cabochon-blue-sapphires
+2026-08-19 04:40:25,VARIANT:43934050025608,91944617,43934050025608,Infinia Ring,Default Title,35000,49318,USD,https://jacobandco.shop/products/infinia-ring-pink-sapphire-center
+2026-08-19 04:40:25,VARIANT:43935715164296,91842383,43935715164296,Infinia Ring,Default Title,84400,118925,USD,https://jacobandco.shop/products/infinia-ring-marquise-white-diamonds
+2026-08-19 04:40:25,VARIANT:43935751569544,91841851,43935751569544,Infinia Ring,Default Title,60000,84544,USD,https://jacobandco.shop/products/infinia-ring-marquise-cut-emeralds
+2026-08-19 04:40:25,VARIANT:43950698070152,,43950698070152,Infinia Ring,Default Title,15000,21136,USD,https://jacobandco.shop/products/infinia-ring-blue-cabochon-sapphires
+2026-08-19 04:40:25,VARIANT:44349668851848,92046468,44349668851848,Infinia Ring,Default Title,19000,26773,USD,https://jacobandco.shop/products/infinia-ruby-ring
+2026-08-19 04:40:25,VARIANT:44399188476040,,44399188476040,Jacob & Co. x PEACEMINUSONE Earrings,Default Title,1800,2537,USD,https://jacobandco.shop/products/jacob-co-x-peaceminusone-earrings
+2026-08-19 04:40:25,VARIANT:43517271081096,PD-GD-SS,43517271081096,Jacob & Co. x PEACEMINUSONE Pendant,Default Title,1200,1691,USD,https://jacobandco.shop/products/jacob-co-peaceminusone-pendant
+2026-08-19 04:40:25,VARIANT:44519840383112,,44519840383112,Jacob & Co. x PEACEMINUSONE Pink/Blue Topaz and Pavé Earrings,Default Title,18000,25364,USD,https://jacobandco.shop/products/jacob-co-x-peaceminusone-pink-blue-topaz-with-pave-earrings
+2026-08-19 04:40:25,VARIANT:44399191031944,,44399191031944,Jacob & Co. x PEACEMINUSONE Yellow Diamond and Pavé Earrings,Default Title,15000,21136,USD,https://jacobandco.shop/products/jacob-co-x-peaceminusone-yellow-diamond-with-pave-earrings
+2026-08-19 04:40:25,VARIANT:43751879639176,PD-GD-WG,43751879639176,Jacob & Co. x PEACEMINUSONE Yellow Diamond with Pavé Pendant,Default Title,11000,15500,USD,https://jacobandco.shop/products/jacob-co-x-peaceminusone-diamond-pendant
+2026-08-19 04:40:25,VARIANT:42493594697864,92355286,42493594697864,Jacob's Code Bracelet,18,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-brown-rose-gold
+2026-08-19 04:40:25,VARIANT:42493658169480,92355290,42493658169480,Jacob's Code Bracelet,18,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-red-rose-gold
+2026-08-19 04:40:25,VARIANT:42493670064264,92355293,42493670064264,Jacob's Code Bracelet,18,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-blue-rose-gold
+2026-08-19 04:40:25,VARIANT:42493721051272,92355286,42493721051272,Jacob's Code Bracelet,18,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-brown-stainless-steel
+2026-08-19 04:40:25,VARIANT:42493726851208,92355293,42493726851208,Jacob's Code Bracelet,18,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-blue-stainless-steel
+2026-08-19 04:40:25,VARIANT:42493736648840,92355290,42493736648840,Jacob's Code Bracelet,18,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-red-stainless-steel
+2026-08-19 04:40:25,VARIANT:42493594730632,92355287,42493594730632,Jacob's Code Bracelet,19,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-brown-rose-gold
+2026-08-19 04:40:25,VARIANT:42493658202248,92355291,42493658202248,Jacob's Code Bracelet,19,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-red-rose-gold
+2026-08-19 04:40:25,VARIANT:42493670097032,92355294,42493670097032,Jacob's Code Bracelet,19,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-blue-rose-gold
+2026-08-19 04:40:25,VARIANT:42493721084040,92355287,42493721084040,Jacob's Code Bracelet,19,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-brown-stainless-steel
+2026-08-19 04:40:25,VARIANT:42493726883976,92355294,42493726883976,Jacob's Code Bracelet,19,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-blue-stainless-steel
+2026-08-19 04:40:25,VARIANT:42493736681608,92355291,42493736681608,Jacob's Code Bracelet,19,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-red-stainless-steel
+2026-08-19 04:40:25,VARIANT:42493594763400,92355288,42493594763400,Jacob's Code Bracelet,20,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-brown-rose-gold
+2026-08-19 04:40:25,VARIANT:42493658235016,92355292,42493658235016,Jacob's Code Bracelet,20,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-red-rose-gold
+2026-08-19 04:40:25,VARIANT:42493670129800,92355295,42493670129800,Jacob's Code Bracelet,20,16200,22827,USD,https://jacobandco.shop/products/jacobs-code-bracelet-blue-rose-gold
+2026-08-19 04:40:25,VARIANT:42493721116808,92355288,42493721116808,Jacob's Code Bracelet,20,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-brown-stainless-steel
+2026-08-19 04:40:25,VARIANT:42493726916744,92355295,42493726916744,Jacob's Code Bracelet,20,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-blue-stainless-steel
+2026-08-19 04:40:25,VARIANT:42493736714376,92355292,42493736714376,Jacob's Code Bracelet,20,4100,5778,USD,https://jacobandco.shop/products/jacobs-code-bracelet-red-stainless-steel
+2026-08-19 04:40:25,VARIANT:43969300594824,91636868,43969300594824,Jezebel Choker,Default Title,235700,332117,USD,https://jacobandco.shop/products/jezebel-choker
+2026-08-19 04:40:25,VARIANT:43966341349512,91328341,43966341349512,Jezebel Diamond Earrings,Default Title,127000,178952,USD,https://jacobandco.shop/products/jezebel-diamond-earrings
+2026-08-19 04:40:25,VARIANT:43955217203336,91534425,43955217203336,Jezebel Head Piece,Default Title,165000,232496,USD,https://jacobandco.shop/products/jezebel-head-piece
+2026-08-19 04:40:25,VARIANT:43958328197256,91534271,43958328197256,Jezebel Mesh Bracelet,Default Title,93500,131748,USD,https://jacobandco.shop/products/jezebel-mesh-bracelet
+2026-08-19 04:40:25,VARIANT:43966310645896,92353865,43966310645896,Jezebel Mesh Bracelet,Default Title,82500,116248,USD,https://jacobandco.shop/products/jezebel-tsavorite-mesh-bracelet
+2026-08-19 04:40:25,VARIANT:43969237057672,91636867,43969237057672,Jezebel Necklace,Default Title,134000,188815,USD,https://jacobandco.shop/products/jezebel-diamond-necklace
+2026-08-19 04:40:25,VARIANT:43969235255432,91431411,43969235255432,Jezebel Pendant,Default Title,55000,77499,USD,https://jacobandco.shop/products/jezebel-tsavorite-pendant
+2026-08-19 04:40:25,VARIANT:44382720393352,92457711,44382720393352,Jezebel Tsavorite Earrings,Default Title,95000,133862,USD,https://jacobandco.shop/products/jezebel-short-tsavorite-earrings
+2026-08-19 04:40:25,VARIANT:43973042110600,92354357,43973042110600,Jezebel Tsavorite Full Finger Ring,Default Title,18500,26068,USD,https://jacobandco.shop/products/jezebel-tsavorite-full-finger-ring
+2026-08-19 04:40:25,VARIANT:40109369098376,92149971,40109369098376,Love Diamond Bracelet,Default Title,2500,3523,USD,https://jacobandco.shop/products/you-are-you-bracelet-1
+2026-08-19 04:40:25,VARIANT:40109512556680,92048019,40109512556680,Love Diamond Necklace,Default Title,2500,3523,USD,https://jacobandco.shop/products/you-are-you-necklace-3
+2026-08-19 04:40:25,VARIANT:40109610336392,91945633,40109610336392,Love Diamond Necklace,Default Title,2500,3523,USD,https://jacobandco.shop/products/you-are-you-necklace-1
+2026-08-19 04:40:25,VARIANT:40216505385096,92047669-3,40216505385096,Love Diamond Ring,3,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40216505450632,92047670-4,40216505450632,Love Diamond Ring,4,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40331444551816,92047669-4.5,40331444551816,Love Diamond Ring,4.5,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40216505483400,92047671-5,40216505483400,Love Diamond Ring,5,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40331444715656,92047669-5.5,40331444715656,Love Diamond Ring,5.5,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40216505516168,92047672-6,40216505516168,Love Diamond Ring,6,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40331445633160,92047669-6.5,40331445633160,Love Diamond Ring,6.5,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40216505548936,92047673-7,40216505548936,Love Diamond Ring,7,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40331445928072,92047669-7.5,40331445928072,Love Diamond Ring,7.5,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40216505581704,92047674-8,40216505581704,Love Diamond Ring,8,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:40331446517896,92047669-8.5,40331446517896,Love Diamond Ring,8.5,2800,3946,USD,https://jacobandco.shop/products/you-are-you-ring-1
+2026-08-19 04:40:25,VARIANT:41258952720520,92562448,41258952720520,Love Lockdown Bracelet,16cm,40000,56363,USD,https://jacobandco.shop/products/love-lockdown-bracelet-3
+2026-08-19 04:40:25,VARIANT:41297052631176,92356441,41297052631176,Love Lockdown Bracelet,16cm,40000,56363,USD,https://jacobandco.shop/products/love-lockdown-bangle-1
+2026-08-19 04:40:25,VARIANT:42304675938440,92353568,42304675938440,Love Lockdown Bracelet,16cm,75600,106526,USD,https://jacobandco.shop/products/love-lockdown-bracelet-4
+2026-08-19 04:40:25,VARIANT:42304676987016,92354037,42304676987016,Love Lockdown Bracelet,16cm,87500,123294,USD,https://jacobandco.shop/products/love-lockdown-bangle-5
+2026-08-19 04:40:25,VARIANT:42304678690952,92354043,42304678690952,Love Lockdown Bracelet,16cm,87500,123294,USD,https://jacobandco.shop/products/love-lockdown-bangle-4
+2026-08-19 04:40:25,VARIANT:42305080361096,92149627,42305080361096,Love Lockdown Bracelet,16cm,75600,106526,USD,https://jacobandco.shop/products/love-lockdown-bracelet-2
+2026-08-19 04:40:25,VARIANT:43435941757064,92252586,43435941757064,Love Lockdown Bracelet,16cm,46700,65804,USD,https://jacobandco.shop/products/love-lockdown-bracelet-with-diamonds
+2026-08-19 04:40:25,VARIANT:41049216155784,92253315,41049216155784,Love Lockdown Cuff Necklace,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-cuff-necklace-white-gold
+2026-08-19 04:40:25,VARIANT:41080198791304,92253311,41080198791304,Love Lockdown Cuff Necklace,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-cuff-necklace
+2026-08-19 04:40:25,VARIANT:41080199643272,92253313,41080199643272,Love Lockdown Cuff Necklace,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-cuff-necklace-1
+2026-08-19 04:40:25,VARIANT:42384220520584,92356556,42384220520584,Love Lockdown Diamond Choker,13,180000,253632,USD,https://jacobandco.shop/products/love-lockdown-diamond-choker-rose-gold
+2026-08-19 04:40:25,VARIANT:42384243818632,92356481,42384243818632,Love Lockdown Diamond Choker,13,180000,253632,USD,https://jacobandco.shop/products/love-lockdown-diamond-choker-white-gold
+2026-08-19 04:40:25,VARIANT:42384220553352,92457713,42384220553352,Love Lockdown Diamond Choker,14,160000,225451,USD,https://jacobandco.shop/products/love-lockdown-diamond-choker-rose-gold
+2026-08-19 04:40:25,VARIANT:42384243851400,92457714,42384243851400,Love Lockdown Diamond Choker,14,160000,225451,USD,https://jacobandco.shop/products/love-lockdown-diamond-choker-white-gold
+2026-08-19 04:40:25,VARIANT:40437352530056,92457694,40437352530056,Love Lockdown Diamond Cuff Necklace,Default Title,5700,8032,USD,https://jacobandco.shop/products/love-lockdown-pendant-2
+2026-08-19 04:40:25,VARIANT:41049179816072,92562704,41049179816072,Love Lockdown Diamond Cuff Necklace,Default Title,5700,8032,USD,https://jacobandco.shop/products/love-lockdown-cuff-necklace-rose-gold
+2026-08-19 04:40:25,VARIANT:41080200429704,92457692,41080200429704,Love Lockdown Diamond Cuff Necklace,Default Title,5700,8032,USD,https://jacobandco.shop/products/love-lockdown-diamond-cuff-necklace
+2026-08-19 04:40:25,VARIANT:40308123598984,92355990,40308123598984,Love Lockdown Diamond Earrings,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-earrings-01
+2026-08-19 04:40:25,VARIANT:41036414353544,92456924,41036414353544,Love Lockdown Diamond Earrings,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-diamond-earrings-yellow-gold
+2026-08-19 04:40:25,VARIANT:41036422545544,92560666,41036422545544,Love Lockdown Diamond Earrings,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-diamond-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:41589015249032,92356021,41589015249032,Love Lockdown Diamond Ring,5,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring
+2026-08-19 04:40:25,VARIANT:41589029830792,92356022,41589029830792,Love Lockdown Diamond Ring,5,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring-2
+2026-08-19 04:40:25,VARIANT:41589044281480,92356023,41589044281480,Love Lockdown Diamond Ring,5,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring-1
+2026-08-19 04:40:25,VARIANT:41589015281800,92457214,41589015281800,Love Lockdown Diamond Ring,6,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring
+2026-08-19 04:40:25,VARIANT:41589029863560,92457210,41589029863560,Love Lockdown Diamond Ring,6,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring-2
+2026-08-19 04:40:25,VARIANT:41589044314248,92457212,41589044314248,Love Lockdown Diamond Ring,6,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring-1
+2026-08-19 04:40:25,VARIANT:41589015314568,92457215,41589015314568,Love Lockdown Diamond Ring,7,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring
+2026-08-19 04:40:25,VARIANT:41589029896328,92561458,41589029896328,Love Lockdown Diamond Ring,7,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring-2
+2026-08-19 04:40:25,VARIANT:41589044347016,92457213,41589044347016,Love Lockdown Diamond Ring,7,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring-1
+2026-08-19 04:40:25,VARIANT:41773526319240,92356023,41773526319240,Love Lockdown Diamond Ring,8,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring-1
+2026-08-19 04:40:25,VARIANT:41773526515848,92356022,41773526515848,Love Lockdown Diamond Ring,8,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring-2
+2026-08-19 04:40:25,VARIANT:41773529989256,92356021,41773529989256,Love Lockdown Diamond Ring,8,7600,10709,USD,https://jacobandco.shop/products/love-lockdown-diamond-ring
+2026-08-19 04:40:25,VARIANT:40391832993928,92456954,40391832993928,Love Lockdown Earrings,Default Title,2800,3946,USD,https://jacobandco.shop/products/love-lockdown-earrings-2
+2026-08-19 04:40:25,VARIANT:41036442796168,92456957,41036442796168,Love Lockdown Earrings,Default Title,2800,3946,USD,https://jacobandco.shop/products/love-lockdown-earrings-yellow-gold
+2026-08-19 04:40:25,VARIANT:41036444467336,92456955,41036444467336,Love Lockdown Earrings,Default Title,2800,3946,USD,https://jacobandco.shop/products/love-lockdown-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:43522794684552,92560443,43522794684552,Love Lockdown Earrings,Default Title,500,705,USD,https://jacobandco.shop/products/love-lockdown-earrings-sterling-silver
+2026-08-19 04:40:25,VARIANT:43522850095240,92460247,43522850095240,Love Lockdown Hanging Diamond Earrings,Default Title,15000,21136,USD,https://jacobandco.shop/products/love-lockdown-hanging-diamond-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:43523071967368,92460098,43523071967368,Love Lockdown Hanging Diamond Earrings,Default Title,15000,21136,USD,https://jacobandco.shop/products/love-lockdown-hanging-diamond-earrings-rose-gold
+2026-08-19 04:40:25,VARIANT:43523101261960,92460246,43523101261960,Love Lockdown Hanging Diamond Earrings,Default Title,15000,21136,USD,https://jacobandco.shop/products/love-lockdown-hanging-diamond-earrings-yellow-gold
+2026-08-19 04:40:25,VARIANT:40437350629512,92562334,40437350629512,Love Lockdown Interlocking Diamond Necklace,Default Title,5700,8032,USD,https://jacobandco.shop/products/love-lockdown-pendant-1
+2026-08-19 04:40:25,VARIANT:41045400158344,92562335,41045400158344,Love Lockdown Interlocking Diamond Necklace,Default Title,5700,8032,USD,https://jacobandco.shop/products/love-lockdown-interlocking-diamond-necklace
+2026-08-19 04:40:25,VARIANT:41045400748168,92664221,41045400748168,Love Lockdown Interlocking Diamond Necklace,Default Title,5700,8032,USD,https://jacobandco.shop/products/love-lockdown-interlocking-diamond-necklace-1
+2026-08-19 04:40:25,VARIANT:43261840457864,92561091,43261840457864,Love Lockdown Interlocking Diamond Necklace,Default Title,5700,8032,USD,https://jacobandco.shop/products/love-lockdown-interlocking-diamond-necklace-rubies-and-white-diamonds
+2026-08-19 04:40:25,VARIANT:46146588704904,92561091,46146588704904,Love Lockdown Interlocking Diamond Necklace Brazil Edition,Default Title,6700,9441,USD,https://jacobandco.shop/products/love-lockdown-interlocking-diamond-necklace-brazil-edition
+2026-08-19 04:40:25,VARIANT:46146235072648,92561091,46146235072648,Love Lockdown Interlocking Diamond Necklace New York Edition,Default Title,6700,9441,USD,https://jacobandco.shop/products/love-lockdown-interlocking-diamond-necklace-new-york-edition
+2026-08-19 04:40:25,VARIANT:41080140103816,92560683,41080140103816,Love Lockdown Interlocking Necklace,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-interlocking-necklace
+2026-08-19 04:40:25,VARIANT:41080193613960,92456925,41080193613960,Love Lockdown Interlocking Necklace,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-interlocking-necklace-1
+2026-08-19 04:40:25,VARIANT:41080195121288,92456927,41080195121288,Love Lockdown Interlocking Necklace,Default Title,4500,6341,USD,https://jacobandco.shop/products/love-lockdown-interlocking-necklace-2
+2026-08-19 04:40:25,VARIANT:41776283713672,92562333,41776283713672,Love Lockdown Interlocking Necklace,Default Title,650,916,USD,https://jacobandco.shop/products/love-lockdown-interlocking-necklace-3
+2026-08-19 04:40:25,VARIANT:42305230635144,92354641,42305230635144,Love Lockdown Men's Bracelet,18cm,150000,211360,USD,https://jacobandco.shop/products/love-lockdown-bangle-2
+2026-08-19 04:40:25,VARIANT:42305233223816,92354257,42305233223816,Love Lockdown Men's Bracelet,18cm,150000,211360,USD,https://jacobandco.shop/products/love-lockdown-bangle-3
+2026-08-19 04:40:25,VARIANT:42305230667912,92354641,42305230667912,Love Lockdown Men's Bracelet,19cm,150000,211360,USD,https://jacobandco.shop/products/love-lockdown-bangle-2
+2026-08-19 04:40:25,VARIANT:42305233256584,92354257,42305233256584,Love Lockdown Men's Bracelet,19cm,150000,211360,USD,https://jacobandco.shop/products/love-lockdown-bangle-3
+2026-08-19 04:40:25,VARIANT:41208195252360,92353797,41208195252360,Love Lockdown Ring,5,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring
+2026-08-19 04:40:25,VARIANT:41208200953992,92353803,41208200953992,Love Lockdown Ring,5,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring-2
+2026-08-19 04:40:25,VARIANT:41208212291720,92353800,41208212291720,Love Lockdown Ring,5,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring-3
+2026-08-19 04:40:25,VARIANT:43522811330696,92560444,43522811330696,Love Lockdown Ring,5,450,635,USD,https://jacobandco.shop/products/love-lockdown-ring-sterling-silver
+2026-08-19 04:40:25,VARIANT:41208195285128,92356645,41208195285128,Love Lockdown Ring,6,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring
+2026-08-19 04:40:25,VARIANT:41208200986760,92458652,41208200986760,Love Lockdown Ring,6,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring-2
+2026-08-19 04:40:25,VARIANT:41208212324488,92356643,41208212324488,Love Lockdown Ring,6,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring-3
+2026-08-19 04:40:25,VARIANT:43522811363464,92560445,43522811363464,Love Lockdown Ring,6,450,635,USD,https://jacobandco.shop/products/love-lockdown-ring-sterling-silver
+2026-08-19 04:40:25,VARIANT:41208195317896,92356718,41208195317896,Love Lockdown Ring,7,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring
+2026-08-19 04:40:25,VARIANT:41208201019528,92353805,41208201019528,Love Lockdown Ring,7,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring-2
+2026-08-19 04:40:25,VARIANT:41208212357256,92356644,41208212357256,Love Lockdown Ring,7,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring-3
+2026-08-19 04:40:25,VARIANT:43522811396232,92560446,43522811396232,Love Lockdown Ring,7,450,635,USD,https://jacobandco.shop/products/love-lockdown-ring-sterling-silver
+2026-08-19 04:40:25,VARIANT:41773523370120,92353803,41773523370120,Love Lockdown Ring,8,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring-3
+2026-08-19 04:40:25,VARIANT:41773524877448,92353800,41773524877448,Love Lockdown Ring,8,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring
+2026-08-19 04:40:25,VARIANT:41773525696648,92353806,41773525696648,Love Lockdown Ring,8,4800,6764,USD,https://jacobandco.shop/products/love-lockdown-ring-2
+2026-08-19 04:40:25,VARIANT:43461601984648,92457232,43461601984648,Love Lockdown Two Finger Ring,6,23500,33113,USD,https://jacobandco.shop/products/love-lockdown-two-finger-ring
+2026-08-19 04:40:25,VARIANT:42298712326280,92457295,42298712326280,Love Lockdown Wristlet,16cm,50200,70735,USD,https://jacobandco.shop/products/love-lockdown-wristlet-8
+2026-08-19 04:40:25,VARIANT:42298758267016,92457296,42298758267016,Love Lockdown Wristlet,16cm,50200,70735,USD,https://jacobandco.shop/products/love-lockdown-wristlet-9
+2026-08-19 04:40:25,VARIANT:42298766688392,92356444,42298766688392,Love Lockdown Wristlet,16cm,135000,190224,USD,https://jacobandco.shop/products/love-lockdown-bangle-6
+2026-08-19 04:40:25,VARIANT:42298768490632,92149117,42298768490632,Love Lockdown Wristlet,16cm,58400,82290,USD,https://jacobandco.shop/products/love-lockdown-bangle-10
+2026-08-19 04:40:25,VARIANT:42298829504648,92253434,42298829504648,Love Lockdown Wristlet,16cm,135000,190224,USD,https://jacobandco.shop/products/love-lockdown-bangle-7
+2026-08-19 04:40:25,VARIANT:42299558887560,92456952,42299558887560,Love Lockdown Wristlet,16cm,58400,82290,USD,https://jacobandco.shop/products/love-lockdown-bracelet-1
+2026-08-19 04:40:25,VARIANT:42304768802952,92354359,42304768802952,Lucky You Bracelet,16cm,6500,9159,USD,https://jacobandco.shop/products/lucky-you-bracelet
+2026-08-19 04:40:25,VARIANT:42557430104200,92458162,42557430104200,Lucky You Bracelet,16cm,6500,9159,USD,https://jacobandco.shop/products/lucky-you-bracelet-navy-blue-string
+2026-08-19 04:40:25,VARIANT:42304772866184,92354466,42304772866184,Lucky You Bracelet,18cm,19200,27055,USD,https://jacobandco.shop/products/lucky-you-bracelet-gold-chain
+2026-08-19 04:40:25,VARIANT:42304770113672,92356478,42304770113672,Lucky You Bracelet,Default Title,7700,10850,USD,https://jacobandco.shop/products/lucky-you-bracelet-1
+2026-08-19 04:40:25,VARIANT:42863795667080,92457354,42863795667080,Lucky You Earrings,Default Title,14600,20573,USD,https://jacobandco.shop/products/lucky-you-earrings
+2026-08-19 04:40:25,VARIANT:43367075152008,92561355,43367075152008,Lucky You Earrings,Default Title,14600,20573,USD,https://jacobandco.shop/products/lucky-you-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:40437348925576,92562353,40437348925576,Lucky You Necklace,Default Title,4500,6341,USD,https://jacobandco.shop/products/lucky-you-necklace-3
+2026-08-19 04:40:25,VARIANT:41363428868232,92356759,41363428868232,Lucky You Necklace,Default Title,48900,68904,USD,https://jacobandco.shop/products/lucky-you-necklace
+2026-08-19 04:40:25,VARIANT:40123575926920,92148372,40123575926920,Lucky You Pendant,Default Title,18700,26350,USD,https://jacobandco.shop/products/lucky-you-necklace-1
+2026-08-19 04:40:25,VARIANT:42593891516552,92356804,42593891516552,Lucky You Pendant,Default Title,44500,62704,USD,https://jacobandco.shop/products/lucky-you-pendant
+2026-08-19 04:40:25,VARIANT:42863795241096,92458596,42863795241096,Lucky You Ring,6,24900,35086,USD,https://jacobandco.shop/products/lucky-you-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:41364620116104,92251523,41364620116104,Lucky You Ring,Default Title,28900,40722,USD,https://jacobandco.shop/products/lucky-you-ring
+2026-08-19 04:40:25,VARIANT:40437346107528,92354358,40437346107528,Lucky You Small Necklace,Default Title,7700,10850,USD,https://jacobandco.shop/products/lucky-you-necklace-2
+2026-08-19 04:40:25,VARIANT:40110065057928,92149969,40110065057928,Mama Diamond Necklace,Default Title,2500,3523,USD,https://jacobandco.shop/products/you-are-you-necklace-5
+2026-08-19 04:40:25,VARIANT:41799232979080,92353788,41799232979080,Match Diamond Bangle,15,15900,22405,USD,https://jacobandco.shop/products/match-white-diamond-rose-gold-bangle
+2026-08-19 04:40:25,VARIANT:41799233667208,92252412,41799233667208,Match Diamond Bangle,15,15900,22405,USD,https://jacobandco.shop/products/match-white-diamond-bangle
+2026-08-19 04:40:25,VARIANT:41803632443528,92353791,41803632443528,Match Diamond Bangle,15,19800,27900,USD,https://jacobandco.shop/products/match-diamond-bangle-full-pave
+2026-08-19 04:40:25,VARIANT:41889724563592,,41889724563592,Match Diamond Bangle,15,19800,27900,USD,https://jacobandco.shop/products/match-diamond-bangle-pave
+2026-08-19 04:40:25,VARIANT:41799233011848,92353789,41799233011848,Match Diamond Bangle,16,15900,22405,USD,https://jacobandco.shop/products/match-white-diamond-rose-gold-bangle
+2026-08-19 04:40:25,VARIANT:41799233699976,92252413,41799233699976,Match Diamond Bangle,16,15900,22405,USD,https://jacobandco.shop/products/match-white-diamond-bangle
+2026-08-19 04:40:25,VARIANT:41803632476296,92353791,41803632476296,Match Diamond Bangle,16,19800,27900,USD,https://jacobandco.shop/products/match-diamond-bangle-full-pave
+2026-08-19 04:40:25,VARIANT:41889724596360,,41889724596360,Match Diamond Bangle,16,19800,27900,USD,https://jacobandco.shop/products/match-diamond-bangle-pave
+2026-08-19 04:40:25,VARIANT:41799233044616,92353790,41799233044616,Match Diamond Bangle,17,15900,22405,USD,https://jacobandco.shop/products/match-white-diamond-rose-gold-bangle
+2026-08-19 04:40:25,VARIANT:41799233732744,92252414,41799233732744,Match Diamond Bangle,17,15900,22405,USD,https://jacobandco.shop/products/match-white-diamond-bangle
+2026-08-19 04:40:25,VARIANT:41803632509064,92353791,41803632509064,Match Diamond Bangle,17,19800,27900,USD,https://jacobandco.shop/products/match-diamond-bangle-full-pave
+2026-08-19 04:40:25,VARIANT:41889724629128,,41889724629128,Match Diamond Bangle,17,19800,27900,USD,https://jacobandco.shop/products/match-diamond-bangle-pave
+2026-08-19 04:40:25,VARIANT:41453650903176,92354646,41453650903176,Match Diamond Earrings,Default Title,21500,30295,USD,https://jacobandco.shop/products/match-earrings-pave
+2026-08-19 04:40:25,VARIANT:41453659914376,92354645,41453659914376,Match Diamond Earrings,Default Title,21500,30295,USD,https://jacobandco.shop/products/match-earrings-white-diamonds
+2026-08-19 04:40:25,VARIANT:41459973685384,92252277,41459973685384,Match Diamond Necklace,5cm,10700,15077,USD,https://jacobandco.shop/products/match-necklace-full-pave-white-gold
+2026-08-19 04:40:25,VARIANT:41459982172296,92252278,41459982172296,Match Diamond Necklace,5cm,10700,15077,USD,https://jacobandco.shop/products/match-necklace-rose-gold-full-pave
+2026-08-19 04:40:25,VARIANT:41459973718152,92251748,41459973718152,Match Diamond Necklace,7cm,11900,16768,USD,https://jacobandco.shop/products/match-necklace-full-pave-white-gold
+2026-08-19 04:40:25,VARIANT:41459982205064,92251747,41459982205064,Match Diamond Necklace,7cm,11900,16768,USD,https://jacobandco.shop/products/match-necklace-rose-gold-full-pave
+2026-08-19 04:40:25,VARIANT:41459897139336,92354693,41459897139336,Match Diamond Ring,Default Title,5800,8173,USD,https://jacobandco.shop/products/match-ring-white-diamonds-pave
+2026-08-19 04:40:25,VARIANT:41459931775112,92354687,41459931775112,Match Diamond Ring,Default Title,5800,8173,USD,https://jacobandco.shop/products/match-ring-white-gold-full-pave
+2026-08-19 04:40:25,VARIANT:41889479098504,92252415,41889479098504,Match Ruby Diamond Bangle,Default Title,19800,27900,USD,https://jacobandco.shop/products/match-ruby-diamond-bangle
+2026-08-19 04:40:25,VARIANT:41453663584392,92355336,41453663584392,Match Ruby Diamond Earrings,Default Title,21000,29591,USD,https://jacobandco.shop/products/match-earrings-ruby-pave-head
+2026-08-19 04:40:25,VARIANT:41460042596488,92252182,41460042596488,Match Ruby Diamond Necklace,5cm,9900,13950,USD,https://jacobandco.shop/products/match-necklace-rose-gold-ruby-pave
+2026-08-19 04:40:25,VARIANT:41460042629256,92252398,41460042629256,Match Ruby Diamond Necklace,7cm,11600,16346,USD,https://jacobandco.shop/products/match-necklace-rose-gold-ruby-pave
+2026-08-19 04:40:25,VARIANT:41640507244680,92354683,41640507244680,Match Ruby Diamond Ring,Default Title,5800,8173,USD,https://jacobandco.shop/products/match-ring
+2026-08-19 04:40:25,VARIANT:41640450949256,92253330,41640450949256,Match Sapphire Diamond Bangle,Default Title,19800,27900,USD,https://jacobandco.shop/products/match-bangle-bracelet
+2026-08-19 04:40:25,VARIANT:41431356768392,92355337,41431356768392,Match Sapphire Diamond Earrings,Default Title,21000,29591,USD,https://jacobandco.shop/products/match-earrings
+2026-08-19 04:40:25,VARIANT:41460013596808,92253345,41460013596808,Match Sapphire Diamond Necklace,5cm,9900,13950,USD,https://jacobandco.shop/products/match-necklace-white-gold-blue-sapphires-pave
+2026-08-19 04:40:25,VARIANT:41460013629576,92252399,41460013629576,Match Sapphire Diamond Necklace,7cm,11600,16346,USD,https://jacobandco.shop/products/match-necklace-white-gold-blue-sapphires-pave
+2026-08-19 04:40:25,VARIANT:42304848855176,92457621,42304848855176,Office Supplies Bracelet,22,14900,20996,USD,https://jacobandco.shop/products/office-supplies-bracelet-1
+2026-08-19 04:40:25,VARIANT:42304766247048,92354926,42304766247048,Office Supplies Bracelet,22cm,14900,20996,USD,https://jacobandco.shop/products/office-supplies-bracelet-3
+2026-08-19 04:40:25,VARIANT:42304766574728,92355978,42304766574728,Office Supplies Diamond Bracelet,22cm,48700,68622,USD,https://jacobandco.shop/products/office-supplies-diamond-bracelet-2
+2026-08-19 04:40:25,VARIANT:42304767131784,92255979,42304767131784,Office Supplies Diamond Bracelet,22cm,48700,68622,USD,https://jacobandco.shop/products/office-supplies-diamond-bracelet
+2026-08-19 04:40:25,VARIANT:42324940521608,92356558,42324940521608,Office Supplies Diamond Earrings,Default Title,28400,40018,USD,https://jacobandco.shop/products/office-supplies-diamond-earrings
+2026-08-19 04:40:25,VARIANT:42325149155464,92356557,42325149155464,Office Supplies Diamond Earrings,Default Title,28400,40018,USD,https://jacobandco.shop/products/office-supplies-diamond-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:40363449417864,92046929,40363449417864,Office Supplies Earrings,Default Title,8200,11555,USD,https://jacobandco.shop/products/office-supplies-earrings-1
+2026-08-19 04:40:25,VARIANT:41151068504200,,41151068504200,Office Supplies Earrings,Default Title,8200,11555,USD,https://jacobandco.shop/products/office-supplies-earrings
+2026-08-19 04:40:25,VARIANT:42304765100168,92355981,42304765100168,Office Supplies Necklace,Default Title,36200,51009,USD,https://jacobandco.shop/products/office-supplies-necklace
+2026-08-19 04:40:25,VARIANT:40123383742600,91842275,40123383742600,Papillon Bangle,Default Title,47900,67495,USD,https://jacobandco.shop/products/papillon-bracelet-1
+2026-08-19 04:40:25,VARIANT:41384136310920,92355578,41384136310920,Papillon Earrings,11cm,56700,79894,USD,https://jacobandco.shop/products/papillon-earrings-cathedral-enamel
+2026-08-19 04:40:25,VARIANT:44856257446024,92354905,44856257446024,Papillon Earrings,11cm,56700,79894,USD,https://jacobandco.shop/products/papillon-earrings-tsavorite
+2026-08-19 04:40:25,VARIANT:44856258822280,92354899,44856258822280,Papillon Earrings,11cm,56700,79894,USD,https://jacobandco.shop/products/papillon-earrings-2
+2026-08-19 04:40:25,VARIANT:44856257413256,92354904,44856257413256,Papillon Earrings,9cm,40500,57068,USD,https://jacobandco.shop/products/papillon-earrings-tsavorite
+2026-08-19 04:40:25,VARIANT:44856257970312,,44856257970312,Papillon Earrings,9cm,40500,57068,USD,https://jacobandco.shop/products/papillon-earrings-cathedral-enamel
+2026-08-19 04:40:25,VARIANT:44856258789512,92354898,44856258789512,Papillon Earrings,9cm,40500,57068,USD,https://jacobandco.shop/products/papillon-earrings-2
+2026-08-19 04:40:25,VARIANT:41318257950856,92252768,41318257950856,Papillon Earrings,Default Title,12500,17614,USD,https://jacobandco.shop/products/papillon-earrings
+2026-08-19 04:40:25,VARIANT:41347502342280,92252612,41347502342280,Papillon Earrings,Default Title,27500,38750,USD,https://jacobandco.shop/products/papillon-open-wings-earrings
+2026-08-19 04:40:25,VARIANT:41347649175688,92252679,41347649175688,Papillon Earrings,Default Title,24700,34804,USD,https://jacobandco.shop/products/papillon-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:41384373813384,92355276,41384373813384,Papillon Earrings,Default Title,23000,32409,USD,https://jacobandco.shop/products/papillon-earrings-pink
+2026-08-19 04:40:25,VARIANT:40109795311752,92355284,40109795311752,Papillon Pendant,Default Title,19600,27618,USD,https://jacobandco.shop/products/papillon-necklace-1
+2026-08-19 04:40:25,VARIANT:41347614933128,92252772,41347614933128,Papillon Pendant,Default Title,14500,20432,USD,https://jacobandco.shop/products/papillon-pendant
+2026-08-19 04:40:25,VARIANT:41384398880904,92355278,41384398880904,Papillon Pendant,Default Title,18800,26491,USD,https://jacobandco.shop/products/papillon-pendant-pink
+2026-08-19 04:40:25,VARIANT:42304519569544,92355579,42304519569544,Papillon Ring,6,16400,23109,USD,https://jacobandco.shop/products/papillon-ring-peridot
+2026-08-19 04:40:25,VARIANT:42304539656328,92252684,42304539656328,Papillon Ring,6,17800,25082,USD,https://jacobandco.shop/products/papillon-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42304539852936,92354900,42304539852936,Papillon Ring,6,15000,21136,USD,https://jacobandco.shop/products/papillon-cathedral-enamel-ring
+2026-08-19 04:40:25,VARIANT:42304581697672,92252615,42304581697672,Papillon Ring,6,16900,23814,USD,https://jacobandco.shop/products/papillon-open-wing-ring
+2026-08-19 04:40:25,VARIANT:42304582058120,92355280,42304582058120,Papillon Ring,6,15600,21982,USD,https://jacobandco.shop/products/papillon-ring-pink-sapphires
+2026-08-19 04:40:25,VARIANT:42470033424520,92354908,42470033424520,Papillon Ring,6,15000,21136,USD,https://jacobandco.shop/products/papillon-ring-tsavorite
+2026-08-19 04:40:25,VARIANT:42470025592968,92354901,42470025592968,Papillon Ring,7,15000,21136,USD,https://jacobandco.shop/products/papillon-cathedral-enamel-ring
+2026-08-19 04:40:25,VARIANT:42470033457288,92354909,42470033457288,Papillon Ring,7,15000,21136,USD,https://jacobandco.shop/products/papillon-ring-tsavorite
+2026-08-19 04:40:25,VARIANT:41318242713736,92252770,41318242713736,Papillon Ring,Default Title,11300,15923,USD,https://jacobandco.shop/products/papillon-ring
+2026-08-19 04:40:25,VARIANT:44354362835080,92047243,44354362835080,Rare Touch Belt Bag,Default Title,240000,338176,USD,https://jacobandco.shop/products/rare-belt-bag
+2026-08-19 04:40:25,VARIANT:44358460309640,92046681,44358460309640,Rare Touch Diamond Choker,Default Title,290000,408629,USD,https://jacobandco.shop/products/rare-touch-bigger-flat-diamond-choker
+2026-08-19 04:40:25,VARIANT:44358663438472,92148351,44358663438472,Rare Touch Diamond Choker,Default Title,290000,408629,USD,https://jacobandco.shop/products/rare-touch-rose-gold-diamond-choker
+2026-08-19 04:40:25,VARIANT:46204230336648,91431010,46204230336648,Rare Touch Diamond Glove,Default Title,195000,274768,USD,https://jacobandco.shop/products/rare-touch-diamond-glove
+2026-08-19 04:40:25,VARIANT:46204285124744,,46204285124744,Rare Touch Diamond Glove,Default Title,195000,274768,USD,https://jacobandco.shop/products/rare-touch-diamond-glove-1
+2026-08-19 04:40:25,VARIANT:44356891738248,91740010,44356891738248,Rare Touch Diamond Necklace,Default Title,17000,23955,USD,https://jacobandco.shop/products/rare-touch-diamond-necklace
+2026-08-19 04:40:25,VARIANT:44349446258824,91946181,44349446258824,Rare Touch Diamond Tie,Default Title,170000,239541,USD,https://jacobandco.shop/products/rare-touch-diamond-tie
+2026-08-19 04:40:25,VARIANT:44360549499016,91738877,44360549499016,Rare Touch Diamond Tie,Default Title,131300,185011,USD,https://jacobandco.shop/products/rare-touch-white-gold-diamond-tie
+2026-08-19 04:40:25,VARIANT:44361734717576,,44361734717576,Rare Touch Diamond Wristlet,Default Title,28400,40018,USD,https://jacobandco.shop/products/rare-touch-diamond-mesh-wristlet
+2026-08-19 04:40:25,VARIANT:43973843681416,91535591,43973843681416,Rare Touch Earrings,Default Title,55800,78626,USD,https://jacobandco.shop/products/rare-touch-choker-earrings
+2026-08-19 04:40:25,VARIANT:44356448157832,91637303,44356448157832,Rare Touch Earrings,Default Title,29800,41991,USD,https://jacobandco.shop/products/rare-touch-rigid-mesh-earrings
+2026-08-19 04:40:25,VARIANT:44358700597384,92150466,44358700597384,Rare Touch Mesh Choker,Default Title,782000,1101888,USD,https://jacobandco.shop/products/rare-touch-collar-mesh-choker
+2026-08-19 04:40:25,VARIANT:41889652605064,92150290,41889652605064,Rotor Diamond Cufflinks,Default Title,1600,2255,USD,https://jacobandco.shop/products/diamond-cufflinks
+2026-08-19 04:40:25,VARIANT:41889702838408,92150291,41889702838408,Rotor Diamond Cufflinks,Default Title,1600,2255,USD,https://jacobandco.shop/products/diamond-cufflinks-stainless-steel-and-rose-gold
+2026-08-19 04:40:25,VARIANT:41957656199304,91536020,41957656199304,Rotor Diamond Cufflinks,Default Title,6400,9019,USD,https://jacobandco.shop/products/rotor-mother-of-pearl-cufflinks-rg
+2026-08-19 04:40:25,VARIANT:41958654869640,91536019,41958654869640,Rotor Diamond Cufflinks,Default Title,6400,9019,USD,https://jacobandco.shop/products/rotor-diamond-cufflinks-mother-of-pearl-ss
+2026-08-19 04:40:25,VARIANT:42089583280264,92561619,42089583280264,Roulette Casino Cufflinks,Default Title,5700,8032,USD,https://jacobandco.shop/products/roulette-casino-cufflinks-ss-diamonds
+2026-08-19 04:40:25,VARIANT:42089641934984,92561618,42089641934984,Roulette Casino Cufflinks,Default Title,34500,48613,USD,https://jacobandco.shop/products/roulette-casino-cufflinks-rosegold-diamond
+2026-08-19 04:40:25,VARIANT:42089648062600,92561620,42089648062600,Roulette Casino Cufflinks,Default Title,1100,1550,USD,https://jacobandco.shop/products/roulette-casino-cufflinks-stainless-steel
+2026-08-19 04:40:25,VARIANT:41272159928456,92149130,41272159928456,Securus Bangle,16 cm,18400,25927,USD,https://jacobandco.shop/products/safety-pin-bracelet-5
+2026-08-19 04:40:25,VARIANT:41272161763464,92149131,41272161763464,Securus Bangle,16 cm,18400,25927,USD,https://jacobandco.shop/products/securus-bracelet-5
+2026-08-19 04:40:25,VARIANT:41272162058376,92355268,41272162058376,Securus Bangle,16 cm,18400,25927,USD,https://jacobandco.shop/products/securus-bracelet-4
+2026-08-19 04:40:25,VARIANT:41311923404936,92355048,41311923404936,Securus Diamond Bracelet,16,16500,23250,USD,https://jacobandco.shop/products/securus-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41347125936264,92355050,41347125936264,Securus Diamond Bracelet,16,16500,23250,USD,https://jacobandco.shop/products/securus-diamond-bracelet-2
+2026-08-19 04:40:25,VARIANT:41311923437704,92355049,41311923437704,Securus Diamond Bracelet,17,16500,23250,USD,https://jacobandco.shop/products/securus-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:41347125969032,92355051,41347125969032,Securus Diamond Bracelet,17,16500,23250,USD,https://jacobandco.shop/products/securus-diamond-bracelet-2
+2026-08-19 04:40:25,VARIANT:42304697335944,92458909,42304697335944,Securus Diamond Bracelet,18cm,4000,5637,USD,https://jacobandco.shop/products/securus-diamond-bracelet
+2026-08-19 04:40:25,VARIANT:42304698187912,92458393,42304698187912,Securus Diamond Bracelet,18cm,4000,5637,USD,https://jacobandco.shop/products/securus-diamond-bracelet-1
+2026-08-19 04:40:25,VARIANT:42557826564232,92046502,42557826564232,Securus Diamond Bracelet,18cm,12500,17614,USD,https://jacobandco.shop/products/securus-all-around-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:42557851795592,92148374,42557851795592,Securus Diamond Bracelet,18cm,12500,17614,USD,https://jacobandco.shop/products/securus-all-around-diamond-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:42557876699272,92046889,42557876699272,Securus Diamond Choker,Default Title,28500,40159,USD,https://jacobandco.shop/products/securus-all-around-diamond-choker
+2026-08-19 04:40:25,VARIANT:42557946134664,92251551,42557946134664,Securus Diamond Choker,Default Title,28500,40159,USD,https://jacobandco.shop/products/securus-all-around-diamond-choker-white-gold
+2026-08-19 04:40:25,VARIANT:40138226761864,92149937,40138226761864,Securus Diamond Earrings,Default Title,16900,23814,USD,https://jacobandco.shop/products/safety-pin-earrings-4
+2026-08-19 04:40:25,VARIANT:40138309763208,92148369,40138309763208,Securus Diamond Earrings,Default Title,16900,23814,USD,https://jacobandco.shop/products/safety-pin-earrings-3
+2026-08-19 04:40:25,VARIANT:40079555068040,92355272,40079555068040,Securus Diamond Necklace,Default Title,5300,7469,USD,https://jacobandco.shop/products/securus-necklace-2
+2026-08-19 04:40:25,VARIANT:41133427425416,92353782,41133427425416,Securus Diamond Necklace,Default Title,5300,7469,USD,https://jacobandco.shop/products/securus-necklace-3
+2026-08-19 04:40:25,VARIANT:42557719314568,92354078,42557719314568,Securus Diamond Pin,Default Title,3300,4650,USD,https://jacobandco.shop/products/securus-diamond-pin
+2026-08-19 04:40:25,VARIANT:42557739335816,92148846,42557739335816,Securus Diamond Pin,Default Title,3300,4650,USD,https://jacobandco.shop/products/securus-diamond-pin-white-gold
+2026-08-19 04:40:25,VARIANT:40216454791304,92354794,40216454791304,Securus Diamond Ring,6,7200,10146,USD,https://jacobandco.shop/products/securus-ring-2
+2026-08-19 04:40:25,VARIANT:40216462983304,92354790,40216462983304,Securus Diamond Ring,6,7200,10146,USD,https://jacobandco.shop/products/securus-ring-1
+2026-08-19 04:40:25,VARIANT:40216469110920,92354800,40216469110920,Securus Diamond Ring,6,10400,14655,USD,https://jacobandco.shop/products/safety-pin-ring-1
+2026-08-19 04:40:25,VARIANT:43337283928200,92354797,43337283928200,Securus Diamond Ring,6,10400,14655,USD,https://jacobandco.shop/products/securus-diamond-ring-white-gold-full-pave
+2026-08-19 04:40:25,VARIANT:40216454824072,92354795,40216454824072,Securus Diamond Ring,7,7200,10146,USD,https://jacobandco.shop/products/securus-ring-2
+2026-08-19 04:40:25,VARIANT:40216463016072,92354792,40216463016072,Securus Diamond Ring,7,7200,10146,USD,https://jacobandco.shop/products/securus-ring-1
+2026-08-19 04:40:25,VARIANT:40216469143688,92354801,40216469143688,Securus Diamond Ring,7,10400,14655,USD,https://jacobandco.shop/products/safety-pin-ring-1
+2026-08-19 04:40:25,VARIANT:43337283993736,92354798,43337283993736,Securus Diamond Ring,7,10400,14655,USD,https://jacobandco.shop/products/securus-diamond-ring-white-gold-full-pave
+2026-08-19 04:40:25,VARIANT:40216454856840,92354796,40216454856840,Securus Diamond Ring,8,7200,10146,USD,https://jacobandco.shop/products/securus-ring-2
+2026-08-19 04:40:25,VARIANT:40216463048840,92354793,40216463048840,Securus Diamond Ring,8,7200,10146,USD,https://jacobandco.shop/products/securus-ring-1
+2026-08-19 04:40:25,VARIANT:40216469176456,92354802,40216469176456,Securus Diamond Ring,8,10400,14655,USD,https://jacobandco.shop/products/safety-pin-ring-1
+2026-08-19 04:40:25,VARIANT:43337284059272,92354799,43337284059272,Securus Diamond Ring,8,10400,14655,USD,https://jacobandco.shop/products/securus-diamond-ring-white-gold-full-pave
+2026-08-19 04:40:25,VARIANT:42304699203720,92149247,42304699203720,Securus Double Pin Bracelet,18cm,3500,4932,USD,https://jacobandco.shop/products/securus-bracelet-white-gold
+2026-08-19 04:40:25,VARIANT:42304700153992,92253004,42304700153992,Securus Double Pin Bracelet,18cm,3500,4932,USD,https://jacobandco.shop/products/securus-double-pin-bracelet
+2026-08-19 04:40:25,VARIANT:42304697041032,92562122,42304697041032,Securus Ruby Bracelet,18cm,3100,4369,USD,https://jacobandco.shop/products/securus-bracelet-rubies
+2026-08-19 04:40:25,VARIANT:42304705626248,92251934,42304705626248,Securus Ruby Bracelet,18cm,8000,11273,USD,https://jacobandco.shop/products/small-securus-ruby-bracelet
+2026-08-19 04:40:25,VARIANT:42304696221832,92458626,42304696221832,Securus Sapphire Bracelet,18cm,3100,4369,USD,https://jacobandco.shop/products/securus-bracelet-3
+2026-08-19 04:40:25,VARIANT:42304703692936,92251932,42304703692936,Securus Sapphire Bracelet,18cm,8000,11273,USD,https://jacobandco.shop/products/small-securus-sapphire-bracelet
+2026-08-19 04:40:25,VARIANT:41998703198344,92355270,41998703198344,Securus Sapphire Earrings,Default Title,15500,21841,USD,https://jacobandco.shop/products/securus-sapphire-earrings
+2026-08-19 04:40:25,VARIANT:42304704315528,92251932,42304704315528,Securus Tsavorites Bracelet,18cm,8000,11273,USD,https://jacobandco.shop/products/small-securus-tsavorites-bracelet
+2026-08-19 04:40:25,VARIANT:42557580181640,92458977,42557580181640,Securus Tsavorites Bracelet,18cm,3100,4369,USD,https://jacobandco.shop/products/securus-tsavorites-bracelet
+2026-08-19 04:40:25,VARIANT:42305067974792,92356203,42305067974792,Sharq Bracelet,18cm,5900,8314,USD,https://jacobandco.shop/products/sharq-bracelet
+2026-08-19 04:40:25,VARIANT:42305068171400,92457260,42305068171400,Sharq Bracelet,18cm,5900,8314,USD,https://jacobandco.shop/products/sharq-bracelet-1
+2026-08-19 04:40:25,VARIANT:42305118470280,92457262,42305118470280,Sharq Bracelet,18cm,5900,8314,USD,https://jacobandco.shop/products/sharq-bracelet-6
+2026-08-19 04:40:25,VARIANT:42305119912072,92149935,42305119912072,Sharq Diamond Bracelet,21cm,6800,9582,USD,https://jacobandco.shop/products/sharq-bracelet-5
+2026-08-19 04:40:25,VARIANT:40391855702152,92354653,40391855702152,Sharq Diamond Bracelet,Default Title,6800,9582,USD,https://jacobandco.shop/products/sharq-bracelet-2
+2026-08-19 04:40:25,VARIANT:40414946492552,92149973,40414946492552,Sharq Diamond Bracelet,Default Title,3400,4791,USD,https://jacobandco.shop/products/sharq-bracelet-3
+2026-08-19 04:40:25,VARIANT:40415025430664,92149934,40415025430664,Sharq Diamond Bracelet,Default Title,6800,9582,USD,https://jacobandco.shop/products/sharq-bracelet-4
+2026-08-19 04:40:25,VARIANT:40391896989832,92354172,40391896989832,Sharq Diamond Necklace,Default Title,5700,8032,USD,https://jacobandco.shop/products/sharq-necklace-1
+2026-08-19 04:40:25,VARIANT:40391911932040,92150530,40391911932040,Sharq Necklace,Default Title,10500,14796,USD,https://jacobandco.shop/products/sharq-necklace-2
+2026-08-19 04:40:25,VARIANT:41140290322568,92354465,41140290322568,Sharq Necklace,Default Title,10500,14796,USD,https://jacobandco.shop/products/sharq-necklace
+2026-08-19 04:40:25,VARIANT:44358636765320,92562378,44358636765320,Sharq Necklace,Default Title,10500,14796,USD,https://jacobandco.shop/products/sharq-necklace-rose-gold
+2026-08-19 04:40:25,VARIANT:40414984306824,92149933,40414984306824,Sharq Pendant,Default Title,21000,29591,USD,https://jacobandco.shop/products/sharq-pendant-1
+2026-08-19 04:40:25,VARIANT:40414994694280,92459241,40414994694280,Sharq Pendant,Default Title,21000,29591,USD,https://jacobandco.shop/products/sharq-pendant-2
+2026-08-19 04:40:25,VARIANT:42305187577992,92354835,42305187577992,Sharq Prayer Beads,10,41000,57772,USD,https://jacobandco.shop/products/sharq-prayer-beads
+2026-08-19 04:40:25,VARIANT:42305187610760,92355826,42305187610760,Sharq Prayer Beads,10,14000,19727,USD,https://jacobandco.shop/products/prayer-beads
+2026-08-19 04:40:25,VARIANT:42304806584456,92148661,42304806584456,Spread The Love Bracelet,16cm,24000,33818,USD,https://jacobandco.shop/products/spread-the-love-bracelet
+2026-08-19 04:40:25,VARIANT:41825596637320,91944316,41825596637320,Spread The Love Necklace,Default Title,73000,102862,USD,https://jacobandco.shop/products/spread-the-love-necklace
+2026-08-19 04:40:25,VARIANT:41829105696904,92253372,41829105696904,Spread The Love Necklace,Default Title,13000,18318,USD,https://jacobandco.shop/products/spread-the-love-necklace-1
+2026-08-19 04:40:25,VARIANT:43096307794056,92459516,43096307794056,Super Arrow Bracelet,15,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet
+2026-08-19 04:40:25,VARIANT:43096318509192,92457809,43096318509192,Super Arrow Bracelet,15,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:43096326701192,92459517,43096326701192,Super Arrow Bracelet,15,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:43096307826824,92459516,43096307826824,Super Arrow Bracelet,16,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet
+2026-08-19 04:40:25,VARIANT:43096318541960,92457809,43096318541960,Super Arrow Bracelet,16,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:43096326733960,92459517,43096326733960,Super Arrow Bracelet,16,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:43096307859592,92459516,43096307859592,Super Arrow Bracelet,17,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet
+2026-08-19 04:40:25,VARIANT:43096318574728,92457809,43096318574728,Super Arrow Bracelet,17,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:43096326766728,92459517,43096326766728,Super Arrow Bracelet,17,17600,24800,USD,https://jacobandco.shop/products/super-arrow-bracelet-yellow-gold
+2026-08-19 04:40:25,VARIANT:42963705299080,92458304,42963705299080,Super Arrow Diamond Bracelet,15,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:42963708674184,92458328,42963708674184,Super Arrow Diamond Bracelet,15,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet
+2026-08-19 04:40:25,VARIANT:42963709591688,92458330,42963709591688,Super Arrow Diamond Bracelet,15,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet-yellowgold
+2026-08-19 04:40:25,VARIANT:42963705331848,92458304,42963705331848,Super Arrow Diamond Bracelet,16,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:42963708706952,92458328,42963708706952,Super Arrow Diamond Bracelet,16,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet
+2026-08-19 04:40:25,VARIANT:42963709624456,92458330,42963709624456,Super Arrow Diamond Bracelet,16,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet-yellowgold
+2026-08-19 04:40:25,VARIANT:43096340234376,92458328,43096340234376,Super Arrow Diamond Bracelet,17,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet
+2026-08-19 04:40:25,VARIANT:43096353538184,92458304,43096353538184,Super Arrow Diamond Bracelet,17,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet-rose-gold
+2026-08-19 04:40:25,VARIANT:43096358355080,92458330,43096358355080,Super Arrow Diamond Bracelet,17,18300,25786,USD,https://jacobandco.shop/products/super-arrow-diamond-bracelet-yellowgold
+2026-08-19 04:40:25,VARIANT:42069596569736,92458305,42069596569736,Super Arrow Diamond Earrings,Default Title,8800,12400,USD,https://jacobandco.shop/products/super-arrow-diamond-earrings-rose-gold
+2026-08-19 04:40:25,VARIANT:42069630877832,92458306,42069630877832,Super Arrow Diamond Earrings,Default Title,8800,12400,USD,https://jacobandco.shop/products/super-arrow-diamond-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:42069650210952,92458307,42069650210952,Super Arrow Diamond Earrings,Default Title,8800,12400,USD,https://jacobandco.shop/products/super-arrow-diamond-earrings-yellow-gold
+2026-08-19 04:40:25,VARIANT:42068125057160,92458826,42068125057160,Super Arrow Diamond Pendant,Default Title,5000,7046,USD,https://jacobandco.shop/products/super-arrow-diamond-pendant-rose-gold
+2026-08-19 04:40:25,VARIANT:42068138066056,92458934,42068138066056,Super Arrow Diamond Pendant,Default Title,5000,7046,USD,https://jacobandco.shop/products/super-arrow-diamond-pendant-white-gold
+2026-08-19 04:40:25,VARIANT:42068156022920,92458936,42068156022920,Super Arrow Diamond Pendant,Default Title,5000,7046,USD,https://jacobandco.shop/products/super-arrow-diamond-pendant-yellow-gold
+2026-08-19 04:40:25,VARIANT:42068890026120,92458461,42068890026120,Super Arrow Diamond Ring,5,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:42068901429384,92458325,42068901429384,Super Arrow Diamond Ring,5,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42068912963720,92458460,42068912963720,Super Arrow Diamond Ring,5,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-yellow-gold
+2026-08-19 04:40:25,VARIANT:42068890058888,92458461,42068890058888,Super Arrow Diamond Ring,6,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:42068901462152,92458325,42068901462152,Super Arrow Diamond Ring,6,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42068912996488,92458460,42068912996488,Super Arrow Diamond Ring,6,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-yellow-gold
+2026-08-19 04:40:25,VARIANT:42068890091656,92458461,42068890091656,Super Arrow Diamond Ring,7,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:42068901494920,92458325,42068901494920,Super Arrow Diamond Ring,7,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42068913029256,92458460,42068913029256,Super Arrow Diamond Ring,7,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-yellow-gold
+2026-08-19 04:40:25,VARIANT:42068890124424,92458461,42068890124424,Super Arrow Diamond Ring,8,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:42068901527688,92458325,42068901527688,Super Arrow Diamond Ring,8,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42068913062024,92458460,42068913062024,Super Arrow Diamond Ring,8,4900,6905,USD,https://jacobandco.shop/products/super-arrow-diamond-ring-yellow-gold
+2026-08-19 04:40:25,VARIANT:42069660696712,92458546,42069660696712,Super Arrow Earrings,Default Title,8000,11273,USD,https://jacobandco.shop/products/super-arrow-earrings-rose-gold
+2026-08-19 04:40:25,VARIANT:42069669838984,92458335,42069669838984,Super Arrow Earrings,Default Title,8000,11273,USD,https://jacobandco.shop/products/super-arrow-earrings-yellow-gold
+2026-08-19 04:40:25,VARIANT:42069675507848,92458334,42069675507848,Super Arrow Earrings,Default Title,8000,11273,USD,https://jacobandco.shop/products/super-arrow-earrings-white-gold
+2026-08-19 04:40:25,VARIANT:42068251869320,92458988,42068251869320,Super Arrow Pendant,Default Title,4600,6482,USD,https://jacobandco.shop/products/super-arrow-pendant-white-gold
+2026-08-19 04:40:25,VARIANT:42068267925640,92458990,42068267925640,Super Arrow Pendant,Default Title,4600,6482,USD,https://jacobandco.shop/products/super-arrow-pendant-yellow-gold
+2026-08-19 04:40:25,VARIANT:42493593747592,92458989,42493593747592,Super Arrow Pendant,Default Title,4600,6482,USD,https://jacobandco.shop/products/super-arrow-pendant-rose-gold
+2026-08-19 04:40:25,VARIANT:42068926333064,92458829,42068926333064,Super Arrow Ring,5,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:42069032796296,92458828,42069032796296,Super Arrow Ring,5,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42069038071944,92458830,42069038071944,Super Arrow Ring,5,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-yellow-gold
+2026-08-19 04:40:25,VARIANT:42068926365832,92458829,42068926365832,Super Arrow Ring,6,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:42069032829064,92458828,42069032829064,Super Arrow Ring,6,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42069038104712,92458830,42069038104712,Super Arrow Ring,6,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-yellow-gold
+2026-08-19 04:40:25,VARIANT:42068926398600,92458829,42068926398600,Super Arrow Ring,7,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:42069032861832,92458828,42069032861832,Super Arrow Ring,7,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42069038137480,92458830,42069038137480,Super Arrow Ring,7,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-yellow-gold
+2026-08-19 04:40:25,VARIANT:42068926431368,92458829,42068926431368,Super Arrow Ring,8,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-rose-gold
+2026-08-19 04:40:25,VARIANT:42069032894600,92458828,42069032894600,Super Arrow Ring,8,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-white-gold
+2026-08-19 04:40:25,VARIANT:42069038170248,92458830,42069038170248,Super Arrow Ring,8,4500,6341,USD,https://jacobandco.shop/products/super-arrow-ring-yellow-gold
+2026-08-19 04:40:25,VARIANT:40138343678088,92250784,40138343678088,Taken Necklace,Default Title,18400,25927,USD,https://jacobandco.shop/products/taken-necklace-1
