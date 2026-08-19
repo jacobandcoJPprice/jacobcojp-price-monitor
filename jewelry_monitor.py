@@ -8,6 +8,10 @@ from playwright.async_api import async_playwright
 
 BASE_URL = "https://jacobandco.shop"
 
+TARGET_COUNTRY = "US"
+TARGET_LANGUAGE = "en"
+TARGET_CURRENCY = "USD"
+
 # ONLY the collections visibly listed on:
 # https://jacobandco.shop/pages/collections
 COLLECTIONS = [
@@ -122,6 +126,65 @@ def build_current_map(rows):
     return result
 
 
+async def set_us_localization(request_context):
+    """
+    Force the Shopify storefront session into the United States market
+    before any collection/product prices are fetched.
+
+    Shopify stores localization in the visitor session. We submit the same
+    /localization form that the storefront country selector uses, then verify
+    the resulting presentment currency through /cart.js.
+    """
+
+    response = await request_context.post(
+        f"{BASE_URL}/localization",
+        form={
+            "_method": "PUT",
+            "country_code": TARGET_COUNTRY,
+            "language_code": TARGET_LANGUAGE,
+        },
+        timeout=60000,
+    )
+
+    if not response.ok:
+        raise RuntimeError(
+            "Unable to set Shopify localization to "
+            f"{TARGET_COUNTRY}: HTTP {response.status}"
+        )
+
+    cart_response = await request_context.get(
+        f"{BASE_URL}/cart.js",
+        timeout=60000,
+    )
+
+    if not cart_response.ok:
+        raise RuntimeError(
+            "Unable to verify Shopify presentment currency: "
+            f"HTTP {cart_response.status}"
+        )
+
+    cart = await cart_response.json()
+
+    currency = str(
+        cart.get("currency", "")
+        or ""
+    ).strip().upper()
+
+    if currency != TARGET_CURRENCY:
+        raise RuntimeError(
+            "SAFETY STOP: Shopify market is not USD after localization. "
+            f"Expected {TARGET_CURRENCY}, got {currency or 'UNKNOWN'}."
+        )
+
+    print(
+        "Shopify market locked:",
+        TARGET_COUNTRY,
+        "/",
+        currency,
+    )
+
+
+
 async def fetch_collection_products(request_context, collection_name, handle):
     api_url = (
         f"{BASE_URL}/collections/{handle}"
@@ -168,6 +231,10 @@ async def scrape_current_state():
                     "Chrome/151 Safari/537.36"
                 )
             }
+        )
+
+        await set_us_localization(
+            request
         )
 
         for index, (name, handle) in enumerate(COLLECTIONS, start=1):
@@ -346,7 +413,7 @@ async def scrape_current_state():
                 "Collections": collections_text,
                 "Price": price,
                 "Compare At Price": compare_at_price,
-                "Currency": "USD",
+                "Currency": TARGET_CURRENCY,
                 "Available": "YES" if available else "NO",
                 "Option 1": option1,
                 "Option 2": option2,
@@ -422,7 +489,7 @@ def detect_price_changes(old_rows, new_rows, history):
             "Variant": row.get("Variant", ""),
             "Old Price": clean_price(old_price),
             "New Price": clean_price(new_price),
-            "Currency": "USD",
+            "Currency": TARGET_CURRENCY,
             "URL": row.get("URL", ""),
         }
 
