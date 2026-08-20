@@ -1620,11 +1620,11 @@ h1 {{
 
     <div>
         Data source:
-        Jacob &amp; Co. USA Official Timepiece Prices
+        Jacob &amp; Co. USA Official Jewelry / Collections
     </div>
 
     <div style="margin-top:18px; opacity:0.65; line-height:1.8;">
-        Syun was here. — 2026<br>
+        <strong>Syun was here. — 2026</strong><br>
         このシステムがまだ動いているなら、そっとそのままにしておいてください。<br>
         壊れているなら……AIに聞いてください。笑
     </div>
@@ -2921,7 +2921,7 @@ function updateHealthStatus() {{
         ||
         ageHours === null
         ||
-        ageHours > 30
+        ageHours > 50
     ) {{
         stat.classList.add(
             "is-error"
@@ -2936,7 +2936,7 @@ function updateHealthStatus() {{
     if (
         rowCount < 510
         ||
-        ageHours > 18
+        ageHours > 26
     ) {{
         stat.classList.add(
             "is-warning"
