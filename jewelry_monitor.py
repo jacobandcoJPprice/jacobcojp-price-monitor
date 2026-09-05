@@ -1,9 +1,12 @@
-import asyncio
 import csv
 import os
-from datetime import datetime
+from datetime import datetime, timezone
+from urllib.parse import urlparse
 
-from playwright.async_api import async_playwright
+import requests
+from bs4 import BeautifulSoup
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 
 BASE_URL = "https://jacobandco.shop"
@@ -12,34 +15,10 @@ TARGET_COUNTRY = "US"
 TARGET_LANGUAGE = "en"
 TARGET_CURRENCY = "USD"
 
-# ONLY the collections visibly listed on:
-# https://jacobandco.shop/pages/collections
-COLLECTIONS = [
-    ("Jacob & Co. X PEACEMINUSONE", "g-dragon-peaceminusone-collection"),
-    ("Love Lockdown", "love-lockdown"),
-    ("Evil Eye", "evil-eye"),
-    ("Lucky You", "lucky-you"),
-    ("Infinia", "the-infinia-collection"),
-    ("Jezebel", "jezebel"),
-    ("Rare Touch", "rare-touch"),
-    ("Securus", "securus"),
-    ("Office Supplies By Virgil Abloh", "office-supplies"),
-    ("Match Collection", "matchstick-collection"),
-    ("Estribo", "estribo"),
-    ("Cuban Link", "cuban-link"),
-    ("Carabin", "carabin"),
-    ("Cufflinks", "cufflinks"),
-    ("Espada", "espada"),
-    ("Super Arrow", "super-arrow"),
-    ("Papillon", "papillon"),
-    ("Hematite", "hematite"),
-    ("Jacob's Code", "jacobs-code"),
-    ("Sharq", "sharq"),
-    ("Spread The Love", "the-spread-the-love-collection"),
-    ("You Are You", "you-are-you"),
-    ("Taken", "taken"),
-    ("Zodiac", "zodiac-sign"),
-]
+COLLECTIONS_URL = f"{BASE_URL}/pages/collections"
+REQUEST_TIMEOUT = 90
+PRODUCTS_PER_PAGE = 250
+MAX_COLLECTION_PAGES = 20
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -58,7 +37,9 @@ REMOVED_CONFIRM_RUNS = 2
 
 
 def now():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # GitHub Actions runs in UTC. Keep the legacy text format used by the
+    # dashboard, but make the timezone explicit so local runs behave the same.
+    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def read_csv(path):
@@ -126,7 +107,7 @@ def build_current_map(rows):
     return result
 
 
-async def set_us_localization(request_context):
+def create_usd_session():
     """
     Force the Shopify storefront session into the United States market
     before any collection/product prices are fetched.
@@ -136,34 +117,64 @@ async def set_us_localization(request_context):
     the resulting presentment currency through /cart.js.
     """
 
-    response = await request_context.post(
+    session = requests.Session()
+    retry_policy = Retry(
+        total=3,
+        connect=3,
+        read=3,
+        status=3,
+        backoff_factor=1,
+        status_forcelist=(429, 500, 502, 503, 504),
+        allowed_methods=frozenset({"GET", "POST"}),
+        respect_retry_after_header=True,
+    )
+    session.mount("https://", HTTPAdapter(max_retries=retry_policy))
+    session.headers.update({
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/151 Safari/537.36"
+        ),
+        "Accept-Language": "en-US,en;q=0.9",
+    })
+
+    response = session.post(
         f"{BASE_URL}/localization",
-        form={
+        data={
             "_method": "PUT",
             "country_code": TARGET_COUNTRY,
             "language_code": TARGET_LANGUAGE,
         },
-        timeout=60000,
+        timeout=REQUEST_TIMEOUT,
     )
 
-    if not response.ok:
+    response.raise_for_status()
+    verify_usd_session(session)
+
+    localization_cookies = [
+        cookie.value
+        for cookie in session.cookies
+        if cookie.name == "localization"
+    ]
+
+    if TARGET_COUNTRY not in localization_cookies:
         raise RuntimeError(
-            "Unable to set Shopify localization to "
-            f"{TARGET_COUNTRY}: HTTP {response.status}"
+            "SAFETY STOP: Shopify did not store the US localization cookie."
         )
 
-    cart_response = await request_context.get(
+    print("Shopify market locked: US / USD")
+    return session
+
+
+def verify_usd_session(session):
+    """Fail closed unless Shopify confirms USD for this exact session."""
+
+    cart_response = session.get(
         f"{BASE_URL}/cart.js",
-        timeout=60000,
+        timeout=REQUEST_TIMEOUT,
     )
-
-    if not cart_response.ok:
-        raise RuntimeError(
-            "Unable to verify Shopify presentment currency: "
-            f"HTTP {cart_response.status}"
-        )
-
-    cart = await cart_response.json()
+    cart_response.raise_for_status()
+    cart = cart_response.json()
 
     currency = str(
         cart.get("currency", "")
@@ -176,41 +187,93 @@ async def set_us_localization(request_context):
             f"Expected {TARGET_CURRENCY}, got {currency or 'UNKNOWN'}."
         )
 
-    print(
-        "Shopify market locked:",
-        TARGET_COUNTRY,
-        "/",
-        currency,
+    return currency
+
+
+def discover_visible_collections(session):
+    """Read every collection card currently shown on /pages/collections."""
+    response = session.get(
+        COLLECTIONS_URL,
+        timeout=REQUEST_TIMEOUT,
     )
+    response.raise_for_status()
 
+    soup = BeautifulSoup(response.text, "html.parser")
+    collections = []
+    seen_handles = set()
 
+    for box in soup.select('[data-pf-type="CollectionBox"]'):
+        link = box.select_one('a[href^="/collections/"]')
 
-async def fetch_collection_products(request_context, collection_name, handle):
-    api_url = (
-        f"{BASE_URL}/collections/{handle}"
-        "/products.json?limit=250"
-    )
+        if link is None:
+            continue
 
-    response = await request_context.get(
-        api_url,
-        timeout=60000,
-    )
+        path = urlparse(link.get("href", "")).path.rstrip("/")
+        handle = path.rsplit("/", 1)[-1].strip()
 
-    if not response.ok:
-        raise RuntimeError(
-            f"{collection_name}: HTTP {response.status}"
+        if not handle or handle in seen_handles:
+            continue
+
+        title = box.select_one('[data-pf-type="CollectionTitle"]')
+        name = (
+            title.get_text(" ", strip=True)
+            if title is not None
+            else handle
         )
 
-    data = await response.json()
-    products = data.get("products", [])
+        seen_handles.add(handle)
+        collections.append((name, handle))
 
-    if not isinstance(products, list):
-        return []
+    if len(collections) < MIN_COLLECTIONS:
+        raise RuntimeError(
+            "SAFETY STOP: only "
+            f"{len(collections)}/{MIN_COLLECTIONS} visible collections "
+            "were discovered from /pages/collections."
+        )
 
-    return products
+    return collections
 
 
-async def scrape_current_state():
+def fetch_collection_products(session, collection_name, handle):
+    """Fetch every product page for one collection, including pagination."""
+    products = []
+    seen_product_ids = set()
+
+    for page_number in range(1, MAX_COLLECTION_PAGES + 1):
+        api_url = f"{BASE_URL}/collections/{handle}/products.json"
+        response = session.get(
+            api_url,
+            params={
+                "limit": PRODUCTS_PER_PAGE,
+                "page": page_number,
+            },
+            timeout=REQUEST_TIMEOUT,
+        )
+        response.raise_for_status()
+
+        batch = response.json().get("products", [])
+
+        if not isinstance(batch, list):
+            raise RuntimeError(
+                f"{collection_name}: products.json did not return a list."
+            )
+
+        for product in batch:
+            product_id = str(product.get("id", "")).strip()
+
+            if product_id and product_id not in seen_product_ids:
+                seen_product_ids.add(product_id)
+                products.append(product)
+
+        if len(batch) < PRODUCTS_PER_PAGE:
+            return products
+
+    raise RuntimeError(
+        f"{collection_name}: pagination exceeded {MAX_COLLECTION_PAGES} pages."
+    )
+
+
+def scrape_current_state():
     print()
     print("=" * 70)
     print("READING VISIBLE JEWELRY COLLECTIONS")
@@ -220,27 +283,17 @@ async def scrape_current_state():
     success_count = 0
     failed_count = 0
 
-    async with async_playwright() as p:
-        request = await p.request.new_context(
-            extra_http_headers={
-                "User-Agent": (
-                    "Mozilla/5.0 "
-                    "(Windows NT 10.0; Win64; x64) "
-                    "AppleWebKit/537.36 "
-                    "(KHTML, like Gecko) "
-                    "Chrome/151 Safari/537.36"
-                )
-            }
-        )
+    session = create_usd_session()
 
-        await set_us_localization(
-            request
-        )
+    try:
+        collections = discover_visible_collections(session)
 
-        for index, (name, handle) in enumerate(COLLECTIONS, start=1):
+        print("Visible collections discovered:", len(collections))
+
+        for index, (name, handle) in enumerate(collections, start=1):
             try:
-                products = await fetch_collection_products(
-                    request,
+                products = fetch_collection_products(
+                    session,
                     name,
                     handle,
                 )
@@ -278,13 +331,13 @@ async def scrape_current_state():
                         "collections": set(),
                     }
 
-                product_map[
-                    product_id
-                ][
-                    "collections"
-                ].add(name)
+                product_map[product_id]["collections"].add(name)
 
-        await request.dispose()
+        # Verify again after all product responses. If the storefront ever
+        # changes the session market mid-scan, do not write mixed-currency data.
+        verify_usd_session(session)
+    finally:
+        session.close()
 
     if success_count < MIN_COLLECTIONS:
         raise RuntimeError(
@@ -447,7 +500,7 @@ async def scrape_current_state():
             f"only {len(rows)} variants found."
         )
 
-    return product_map, rows
+    return product_map, rows, collections
 
 
 def detect_price_changes(old_rows, new_rows, history):
@@ -672,7 +725,7 @@ def detect_structure_changes(
     return events, updated_missing
 
 
-async def main():
+def main():
     print()
     print("=" * 70)
     print(
@@ -688,8 +741,8 @@ async def main():
 
     print()
     print(
-        "Expected collections:",
-        len(COLLECTIONS),
+        "Minimum collections:",
+        MIN_COLLECTIONS,
     )
 
     print(
@@ -707,7 +760,7 @@ async def main():
         len(change_history),
     )
 
-    product_map, new_rows = await scrape_current_state()
+    product_map, new_rows, collections = scrape_current_state()
 
     print()
     print("=" * 70)
@@ -716,7 +769,7 @@ async def main():
 
     print(
         "Collections:",
-        len(COLLECTIONS),
+        len(collections),
     )
 
     print(
@@ -895,4 +948,4 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
