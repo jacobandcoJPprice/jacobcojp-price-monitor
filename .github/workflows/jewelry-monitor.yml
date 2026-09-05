@@ -6,6 +6,15 @@ permissions:
 on:
   workflow_dispatch:
 
+  schedule:
+    # 09:15 and 21:15 Japan time. Staggered from the watch monitor to
+    # prevent both workflows from pushing to main at the same moment.
+    - cron: "15 0,12 * * *"
+
+concurrency:
+  group: jewelry-price-monitor
+  cancel-in-progress: false
+
 jobs:
   monitor-jewelry:
     runs-on: ubuntu-latest
@@ -23,7 +32,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          playwright install chromium
 
       - name: Run jewelry monitor
         run: |
@@ -48,5 +56,6 @@ jobs:
             echo "No jewelry changes to commit."
           else
             git commit -m "Update jewelry monitor data and dashboard"
+            git pull --rebase origin main
             git push
           fi
