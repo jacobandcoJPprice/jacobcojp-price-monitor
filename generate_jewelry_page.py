@@ -27,7 +27,6 @@ OUTPUT_HTML = os.path.join(
 )
 
 CONFIRM_API_URL = "https://script.google.com/macros/s/AKfycbzSYIw5g1YSVdh6-pAgrKoCf0MFh4TwWjwNIJzudhnZuYyTFwx6QYwXM19gUOQs28-q-A/exec"
-STRUCTURE_CONFIRM_API_URL = "https://script.google.com/macros/s/AKfycby_kPhxICq5kzM-5FnoXQ7pn83bXshujxw8M-egP3r88G2wNbN6o_BdIgY4_Lg_GTG9OQ/exec"
 
 
 # ============================================================
@@ -1965,9 +1964,6 @@ search.addEventListener(
 const CONFIRM_API_URL =
     "{CONFIRM_API_URL}";
 
-const STRUCTURE_CONFIRM_API_URL =
-    "{STRUCTURE_CONFIRM_API_URL}";
-
 const changeCards =
     Array.from(
         document.querySelectorAll(
@@ -3013,7 +3009,7 @@ priceBulkSelection.confirmButton?.addEventListener(
 
 // ============================================================
 // JEWELRY STRUCTURE CONFIRMATION
-// Separate Apps Script endpoint; WATCHES is untouched.
+// Namespaced records share the working jewelry confirmation endpoint.
 // ============================================================
 
 const structureCards =
@@ -3045,6 +3041,9 @@ const structureBulkSelection =
 const confirmedStructureRecords =
     new Map();
 
+const STRUCTURE_CONFIRM_PREFIX =
+    "structure::";
+
 
 function structureConfirmationKey(
     eventKey
@@ -3055,117 +3054,36 @@ function structureConfirmationKey(
 }}
 
 
-function structureJsonpRequest(params) {{
+function structureStorageItemNumber(
+    eventKey
+) {{
+    return STRUCTURE_CONFIRM_PREFIX
+        + structureConfirmationKey(
+            eventKey
+        );
+}}
 
-    return new Promise(
-        (resolve, reject) => {{
 
-            const callbackName =
-                "__jacobJewelryStructure_"
-                + Date.now()
-                + "_"
-                + Math.random()
-                    .toString(36)
-                    .slice(2);
+function structureConfirmationKeyFromRow(
+    row
+) {{
+    const itemNumber =
+        String(
+            row.itemNumber || ""
+        ).trim();
 
-            const timeout =
-                setTimeout(
-                    () => {{
-                        cleanup();
-                        reject(
-                            new Error(
-                                "Request timeout"
-                            )
-                        );
-                    }},
-                    15000
-                );
+    if (
+        itemNumber.startsWith(
+            STRUCTURE_CONFIRM_PREFIX
+        )
+    ) {{
+        return itemNumber.slice(
+            STRUCTURE_CONFIRM_PREFIX.length
+        );
+    }}
 
-            const script =
-                document.createElement(
-                    "script"
-                );
-
-            function cleanup() {{
-                clearTimeout(
-                    timeout
-                );
-
-                if (
-                    script.parentNode
-                ) {{
-                    script.parentNode
-                        .removeChild(
-                            script
-                        );
-                }}
-
-                try {{
-                    delete window[
-                        callbackName
-                    ];
-                }} catch (e) {{
-                    window[
-                        callbackName
-                    ] = undefined;
-                }}
-            }}
-
-            window[
-                callbackName
-            ] = data => {{
-                cleanup();
-                resolve(
-                    data
-                );
-            }};
-
-            const url =
-                new URL(
-                    STRUCTURE_CONFIRM_API_URL
-                );
-
-            Object.entries(
-                params || {{}}
-            ).forEach(
-                ([key, value]) => {{
-                    url.searchParams.set(
-                        key,
-                        String(
-                            value ?? ""
-                        )
-                    );
-                }}
-            );
-
-            url.searchParams.set(
-                "callback",
-                callbackName
-            );
-
-            url.searchParams.set(
-                "_",
-                Date.now()
-            );
-
-            script.src =
-                url.toString();
-
-            script.onerror =
-                () => {{
-                    cleanup();
-                    reject(
-                        new Error(
-                            "Request failed"
-                        )
-                    );
-                }};
-
-            document.body
-                .appendChild(
-                    script
-                );
-        }}
+    return structureConfirmationKey(
+        row.eventKey
     );
 }}
 
@@ -3250,7 +3168,7 @@ async function loadStructureConfirmations() {{
 
     try {{
         const result =
-            await structureJsonpRequest({{
+            await jsonpRequest({{
                 action: "list"
             }});
 
@@ -3282,8 +3200,8 @@ async function loadStructureConfirmations() {{
             }}
 
             const key =
-                structureConfirmationKey(
-                    row.eventKey
+                structureConfirmationKeyFromRow(
+                    row
                 );
 
             if (key) {{
@@ -3330,29 +3248,21 @@ async function confirmStructureCard(
     confirmedBy
 ) {{
     const result =
-        await structureJsonpRequest({{
+        await jsonpRequest({{
             action:
                 "confirm",
-            eventKey:
-                card.dataset.eventKey,
-            changeType:
-                card.dataset.changeType,
-            sku:
-                card.dataset.sku,
-            product:
-                card.dataset.product,
-            variant:
-                card.dataset.variant,
-            changedAt:
-                card.dataset.changedAt,
-            url:
-                card.dataset.url,
-            oldStatus:
-                card.dataset.oldStatus,
-            newStatus:
-                card.dataset.newStatus,
-            price:
-                card.dataset.price,
+            itemNumber:
+                structureStorageItemNumber(
+                    card.dataset.eventKey
+                ),
+            oldPrice:
+                card.dataset.oldStatus
+                || card.dataset.changeType
+                || "structure",
+            newPrice:
+                card.dataset.newStatus
+                || card.dataset.price
+                || "confirmed",
             confirmedBy:
                 confirmedBy
         }});
