@@ -340,6 +340,15 @@ for row in history_rows:
             data-new-price="{esc(new_price_raw)}"
         >
 
+            <label class="selection-control">
+                <input
+                    type="checkbox"
+                    class="selection-checkbox price-selection-checkbox"
+                    aria-label="この価格変更を選択"
+                >
+                <span>選択</span>
+            </label>
+
             <a
                 class="change-main-link"
                 href="{url}"
@@ -559,6 +568,15 @@ for row in product_history_rows[:100]:
             data-new-status="{esc(new_status_raw)}"
             data-price="{esc(price_raw)}"
         >
+            <label class="selection-control">
+                <input
+                    type="checkbox"
+                    class="selection-checkbox structure-selection-checkbox"
+                    aria-label="この商品構成変更を選択"
+                >
+                <span>選択</span>
+            </label>
+
             <div class="product-change-type">
                 {change_type}
             </div>
@@ -917,6 +935,50 @@ h1 {{
     font-size: 13px;
 }}
 
+.bulk-actions {{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 14px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+}}
+
+.bulk-button {{
+    border: 1px solid #111;
+    background: #fff;
+    color: #111;
+    padding: 9px 13px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}}
+
+.bulk-button:hover:not(:disabled) {{
+    background: #111;
+    color: #fff;
+}}
+
+.bulk-button.bulk-confirm-button {{
+    background: #111;
+    color: #fff;
+}}
+
+.bulk-button:disabled {{
+    opacity: .38;
+    cursor: default;
+}}
+
+.bulk-selection-count {{
+    margin-left: auto;
+    color: #666;
+    font-size: 12px;
+    white-space: nowrap;
+}}
+
 .change-list {{
     display: grid;
     gap: 10px;
@@ -940,6 +1002,32 @@ h1 {{
 .change-card:hover {{
     transform: translateY(-1px);
     border-color: #888;
+}}
+
+.change-card.is-selected,
+.product-change-card.is-selected {{
+    border-color: #111;
+    box-shadow: inset 3px 0 0 #111;
+}}
+
+.selection-control {{
+    flex: 0 0 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    color: #777;
+    font-size: 10px;
+    cursor: pointer;
+    user-select: none;
+}}
+
+.selection-checkbox {{
+    width: 19px;
+    height: 19px;
+    margin: 0;
+    accent-color: #111;
+    cursor: pointer;
 }}
 
 .change-main-link {{
@@ -1073,7 +1161,7 @@ h1 {{
     border: 1px solid #ddd;
     padding: 18px 20px;
     display: grid;
-    grid-template-columns: 150px minmax(0, 1fr) auto 210px;
+    grid-template-columns: 56px 150px minmax(0, 1fr) auto 210px;
     gap: 20px;
     align-items: center;
 }}
@@ -1305,8 +1393,32 @@ h1 {{
         margin-top: 8px;
     }}
 
+    .bulk-actions {{
+        align-items: stretch;
+    }}
+
+    .bulk-button {{
+        flex: 1 1 auto;
+    }}
+
+    .bulk-confirm-button {{
+        flex-basis: 100%;
+    }}
+
+    .bulk-selection-count {{
+        width: 100%;
+        margin-left: 0;
+        text-align: right;
+    }}
+
     .change-card {{
         display: block;
+    }}
+
+    .change-card > .selection-control {{
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-bottom: 14px;
     }}
 
     .change-prices {{
@@ -1341,6 +1453,11 @@ h1 {{
 
     .product-change-card {{
         grid-template-columns: 1fr;
+    }}
+
+    .product-change-card > .selection-control {{
+        flex-direction: row;
+        justify-content: flex-start;
     }}
 
     .structure-confirm-area {{
@@ -1488,6 +1605,44 @@ h1 {{
 
         </div>
 
+        <div
+            class="bulk-actions"
+            id="priceBulkActions"
+        >
+            <button
+                type="button"
+                class="bulk-button"
+                id="priceSelectAll"
+            >
+                全選択
+            </button>
+
+            <button
+                type="button"
+                class="bulk-button"
+                id="priceClearSelection"
+                disabled
+            >
+                選択解除
+            </button>
+
+            <button
+                type="button"
+                class="bulk-button bulk-confirm-button"
+                id="priceBulkConfirm"
+                disabled
+            >
+                選択した項目を確認済みにする（0件）
+            </button>
+
+            <div
+                class="bulk-selection-count"
+                id="priceSelectionCount"
+            >
+                0件選択中
+            </div>
+        </div>
+
 
         <div
             class="change-list"
@@ -1529,6 +1684,44 @@ h1 {{
 
             </div>
 
+        </div>
+
+        <div
+            class="bulk-actions"
+            id="structureBulkActions"
+        >
+            <button
+                type="button"
+                class="bulk-button"
+                id="structureSelectAll"
+            >
+                全選択
+            </button>
+
+            <button
+                type="button"
+                class="bulk-button"
+                id="structureClearSelection"
+                disabled
+            >
+                選択解除
+            </button>
+
+            <button
+                type="button"
+                class="bulk-button bulk-confirm-button"
+                id="structureBulkConfirm"
+                disabled
+            >
+                選択した項目を確認済みにする（0件）
+            </button>
+
+            <div
+                class="bulk-selection-count"
+                id="structureSelectionCount"
+            >
+                0件選択中
+            </div>
         </div>
 
         <div
@@ -1780,6 +1973,370 @@ const changeCards =
         document.querySelectorAll(
             ".change-card"
         )
+    );
+
+
+function createBulkSelection(
+    cards,
+    options
+) {{
+    const actions =
+        document.getElementById(
+            options.actionsId
+        );
+
+    const selectAllButton =
+        document.getElementById(
+            options.selectAllId
+        );
+
+    const clearButton =
+        document.getElementById(
+            options.clearId
+        );
+
+    const confirmButton =
+        document.getElementById(
+            options.confirmId
+        );
+
+    const count =
+        document.getElementById(
+            options.countId
+        );
+
+    let busy = false;
+
+
+    function availableCards() {{
+        return cards.filter(
+            card =>
+                !card.classList.contains(
+                    "is-confirmed"
+                )
+        );
+    }}
+
+
+    function selectedCards() {{
+        return availableCards().filter(
+            card =>
+                card.querySelector(
+                    options.checkboxSelector
+                )?.checked
+        );
+    }}
+
+
+    function refresh() {{
+        const available =
+            availableCards();
+
+        const selected =
+            selectedCards();
+
+        cards.forEach(card => {{
+            const checkbox =
+                card.querySelector(
+                    options.checkboxSelector
+                );
+
+            const isSelected =
+                Boolean(
+                    checkbox?.checked
+                )
+                &&
+                !card.classList.contains(
+                    "is-confirmed"
+                );
+
+            card.classList.toggle(
+                "is-selected",
+                isSelected
+            );
+        }});
+
+        if (actions) {{
+            actions.style.display =
+                available.length > 0
+                ? "flex"
+                : "none";
+        }}
+
+        if (count) {{
+            count.textContent =
+                selected.length
+                + "件選択中";
+        }}
+
+        if (selectAllButton) {{
+            selectAllButton.disabled =
+                busy
+                ||
+                available.length === 0;
+        }}
+
+        if (clearButton) {{
+            clearButton.disabled =
+                busy
+                ||
+                selected.length === 0;
+        }}
+
+        if (confirmButton) {{
+            confirmButton.disabled =
+                busy
+                ||
+                selected.length === 0;
+
+            if (!busy) {{
+                confirmButton.textContent =
+                    "選択した項目を確認済みにする（"
+                    + selected.length
+                    + "件）";
+            }}
+        }}
+    }}
+
+
+    function setBusy(
+        value,
+        completed = 0,
+        total = 0
+    ) {{
+        busy = Boolean(value);
+
+        availableCards().forEach(card => {{
+            const checkbox =
+                card.querySelector(
+                    options.checkboxSelector
+                );
+
+            if (checkbox) {{
+                checkbox.disabled = busy;
+            }}
+        }});
+
+        if (
+            busy
+            &&
+            confirmButton
+        ) {{
+            confirmButton.textContent =
+                "確認中…（"
+                + completed
+                + "/"
+                + total
+                + "件）";
+        }}
+
+        refresh();
+    }}
+
+
+    cards.forEach(card => {{
+        const checkbox =
+            card.querySelector(
+                options.checkboxSelector
+            );
+
+        checkbox?.addEventListener(
+            "change",
+            refresh
+        );
+    }});
+
+
+    selectAllButton?.addEventListener(
+        "click",
+        () => {{
+            availableCards().forEach(card => {{
+                const checkbox =
+                    card.querySelector(
+                        options.checkboxSelector
+                    );
+
+                if (checkbox) {{
+                    checkbox.checked = true;
+                }}
+            }});
+
+            refresh();
+        }}
+    );
+
+
+    clearButton?.addEventListener(
+        "click",
+        () => {{
+            cards.forEach(card => {{
+                const checkbox =
+                    card.querySelector(
+                        options.checkboxSelector
+                    );
+
+                if (checkbox) {{
+                    checkbox.checked = false;
+                }}
+            }});
+
+            refresh();
+        }}
+    );
+
+
+    refresh();
+
+    return {{
+        confirmButton,
+        selectedCards,
+        refresh,
+        setBusy
+    }};
+}}
+
+
+async function runBulkConfirmation(
+    selection,
+    confirmCard,
+    errorLabel
+) {{
+    const selected =
+        selection.selectedCards();
+
+    if (selected.length === 0) {{
+        return;
+    }}
+
+    const name =
+        window.prompt(
+            "確認者の名前を入力してください"
+        );
+
+    if (
+        name === null
+        ||
+        !name.trim()
+    ) {{
+        return;
+    }}
+
+    const confirmedBy =
+        name.trim();
+
+    const failures = [];
+    let completed = 0;
+
+    selection.setBusy(
+        true,
+        completed,
+        selected.length
+    );
+
+    selected.forEach(card => {{
+        const button =
+            card.querySelector(
+                ".confirm-button"
+            );
+
+        if (button) {{
+            button.disabled = true;
+            button.textContent =
+                "一括登録中...";
+        }}
+    }});
+
+    const batchSize = 3;
+
+    for (
+        let index = 0;
+        index < selected.length;
+        index += batchSize
+    ) {{
+        const batch =
+            selected.slice(
+                index,
+                index + batchSize
+            );
+
+        const results =
+            await Promise.allSettled(
+                batch.map(
+                    card =>
+                        confirmCard(
+                            card,
+                            confirmedBy
+                        )
+                )
+            );
+
+        results.forEach(
+            (result, resultIndex) => {{
+                const card =
+                    batch[resultIndex];
+
+                completed++;
+
+                if (
+                    result.status
+                    === "rejected"
+                ) {{
+                    failures.push(card);
+
+                    const button =
+                        card.querySelector(
+                            ".confirm-button"
+                        );
+
+                    if (button) {{
+                        button.disabled = false;
+                        button.textContent =
+                            "確認済みにする";
+                    }}
+                }}
+            }}
+        );
+
+        selection.setBusy(
+            true,
+            completed,
+            selected.length
+        );
+    }}
+
+    selection.setBusy(false);
+    selection.refresh();
+
+    if (failures.length > 0) {{
+        alert(
+            errorLabel
+            + "のうち、"
+            + failures.length
+            + "件を保存できませんでした。"
+            + "\\n"
+            + "選択状態を残しているため、もう一度お試しください。"
+        );
+    }}
+}}
+
+
+const priceBulkSelection =
+    createBulkSelection(
+        changeCards,
+        {{
+            actionsId:
+                "priceBulkActions",
+            selectAllId:
+                "priceSelectAll",
+            clearId:
+                "priceClearSelection",
+            confirmId:
+                "priceBulkConfirm",
+            countId:
+                "priceSelectionCount",
+            checkboxSelector:
+                ".price-selection-checkbox"
+        }}
     );
 
 
@@ -2203,8 +2760,22 @@ function showConfirmed(
         "is-confirmed"
     );
 
+    card.classList.remove(
+        "is-selected"
+    );
+
+    const checkbox =
+        card.querySelector(
+            ".price-selection-checkbox"
+        );
+
+    if (checkbox) {{
+        checkbox.checked = false;
+    }}
+
     renderConfirmedHistory();
     refreshUnconfirmedEmpty();
+    priceBulkSelection.refresh();
 }}
 
 
@@ -2304,6 +2875,50 @@ async function loadConfirmations() {{
 }}
 
 
+async function confirmPriceCard(
+    card,
+    confirmedBy
+) {{
+    const result =
+        await jsonpRequest({{
+            action:
+                "confirm",
+            itemNumber:
+                card.dataset.itemNumber,
+            oldPrice:
+                card.dataset.oldPrice,
+            newPrice:
+                card.dataset.newPrice,
+            confirmedBy:
+                confirmedBy
+        }});
+
+    if (
+        !result
+        ||
+        result.ok !== true
+    ) {{
+        throw new Error(
+            (
+                result
+                &&
+                result.error
+            )
+            ||
+            "Save failed"
+        );
+    }}
+
+    showConfirmed(
+        card,
+        result.confirmedBy
+            || confirmedBy,
+        result.confirmedAt
+            || ""
+    );
+}}
+
+
 changeCards.forEach(card => {{
 
     const button =
@@ -2311,6 +2926,10 @@ changeCards.forEach(card => {{
             ".confirm-button"
         );
 
+
+    if (!button) {{
+        return;
+    }}
 
     button.addEventListener(
         "click",
@@ -2348,50 +2967,9 @@ changeCards.forEach(card => {{
 
             try {{
 
-                const result =
-                    await jsonpRequest({{
-
-                        action:
-                            "confirm",
-
-                        itemNumber:
-                            card.dataset.itemNumber,
-
-                        oldPrice:
-                            card.dataset.oldPrice,
-
-                        newPrice:
-                            card.dataset.newPrice,
-
-                        confirmedBy:
-                            name.trim()
-                    }});
-
-
-                if (
-                    !result
-                    ||
-                    result.ok !== true
-                ) {{
-
-                    throw new Error(
-                        (
-                            result
-                            &&
-                            result.error
-                        )
-                        ||
-                        "Save failed"
-                    );
-                }}
-
-
-                showConfirmed(
+                await confirmPriceCard(
                     card,
-                    result.confirmedBy
-                        || name.trim(),
-                    result.confirmedAt
-                        || ""
+                    name.trim()
                 );
 
 
@@ -2421,6 +2999,17 @@ changeCards.forEach(card => {{
 }});
 
 
+priceBulkSelection.confirmButton?.addEventListener(
+    "click",
+    () =>
+        runBulkConfirmation(
+            priceBulkSelection,
+            confirmPriceCard,
+            "価格変更"
+        )
+);
+
+
 
 // ============================================================
 // JEWELRY STRUCTURE CONFIRMATION
@@ -2432,6 +3021,25 @@ const structureCards =
         document.querySelectorAll(
             ".structure-change-card"
         )
+    );
+
+const structureBulkSelection =
+    createBulkSelection(
+        structureCards,
+        {{
+            actionsId:
+                "structureBulkActions",
+            selectAllId:
+                "structureSelectAll",
+            clearId:
+                "structureClearSelection",
+            confirmId:
+                "structureBulkConfirm",
+            countId:
+                "structureSelectionCount",
+            checkboxSelector:
+                ".structure-selection-checkbox"
+        }}
     );
 
 const confirmedStructureRecords =
@@ -2613,7 +3221,21 @@ function showStructureConfirmed(
         "is-confirmed"
     );
 
+    card.classList.remove(
+        "is-selected"
+    );
+
+    const checkbox =
+        card.querySelector(
+            ".structure-selection-checkbox"
+        );
+
+    if (checkbox) {{
+        checkbox.checked = false;
+    }}
+
     refreshStructureEmpty();
+    structureBulkSelection.refresh();
 }}
 
 
@@ -2703,6 +3325,64 @@ async function loadStructureConfirmations() {{
 }}
 
 
+async function confirmStructureCard(
+    card,
+    confirmedBy
+) {{
+    const result =
+        await structureJsonpRequest({{
+            action:
+                "confirm",
+            eventKey:
+                card.dataset.eventKey,
+            changeType:
+                card.dataset.changeType,
+            sku:
+                card.dataset.sku,
+            product:
+                card.dataset.product,
+            variant:
+                card.dataset.variant,
+            changedAt:
+                card.dataset.changedAt,
+            url:
+                card.dataset.url,
+            oldStatus:
+                card.dataset.oldStatus,
+            newStatus:
+                card.dataset.newStatus,
+            price:
+                card.dataset.price,
+            confirmedBy:
+                confirmedBy
+        }});
+
+    if (
+        !result
+        ||
+        result.ok !== true
+    ) {{
+        throw new Error(
+            (
+                result
+                &&
+                result.error
+            )
+            ||
+            "Save failed"
+        );
+    }}
+
+    showStructureConfirmed(
+        card,
+        result.confirmedBy
+            || confirmedBy,
+        result.confirmedAt
+            || ""
+    );
+}}
+
+
 structureCards.forEach(card => {{
 
     const button =
@@ -2744,56 +3424,9 @@ structureCards.forEach(card => {{
                 "登録中...";
 
             try {{
-                const result =
-                    await structureJsonpRequest({{
-                        action:
-                            "confirm",
-                        eventKey:
-                            card.dataset.eventKey,
-                        changeType:
-                            card.dataset.changeType,
-                        sku:
-                            card.dataset.sku,
-                        product:
-                            card.dataset.product,
-                        variant:
-                            card.dataset.variant,
-                        changedAt:
-                            card.dataset.changedAt,
-                        url:
-                            card.dataset.url,
-                        oldStatus:
-                            card.dataset.oldStatus,
-                        newStatus:
-                            card.dataset.newStatus,
-                        price:
-                            card.dataset.price,
-                        confirmedBy:
-                            name.trim()
-                    }});
-
-                if (
-                    !result
-                    ||
-                    result.ok !== true
-                ) {{
-                    throw new Error(
-                        (
-                            result
-                            &&
-                            result.error
-                        )
-                        ||
-                        "Save failed"
-                    );
-                }}
-
-                showStructureConfirmed(
+                await confirmStructureCard(
                     card,
-                    result.confirmedBy
-                        || name.trim(),
-                    result.confirmedAt
-                        || ""
+                    name.trim()
                 );
 
             }} catch (error) {{
@@ -2817,6 +3450,17 @@ structureCards.forEach(card => {{
         }}
     );
 }});
+
+
+structureBulkSelection.confirmButton?.addEventListener(
+    "click",
+    () =>
+        runBulkConfirmation(
+            structureBulkSelection,
+            confirmStructureCard,
+            "商品構成変更"
+        )
+);
 
 
 loadStructureConfirmations();
