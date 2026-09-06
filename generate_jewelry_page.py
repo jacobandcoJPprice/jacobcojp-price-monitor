@@ -151,6 +151,13 @@ for row in current_rows:
         )
     )
 
+    product = esc(
+        row.get(
+            "Product",
+            ""
+        )
+    )
+
     item_number = esc(
         row.get(
             "SKU",
@@ -223,6 +230,10 @@ for row in current_rows:
                     {price}
                 </div>
 
+            </div>
+
+            <div class="product-name">
+                {product}
             </div>
 
             <div class="variant">
@@ -1202,8 +1213,16 @@ h1 {{
     white-space: nowrap;
 }}
 
+.product-name {{
+    margin-top: 22px;
+
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.45;
+}}
+
 .variant {{
-    margin-top: 24px;
+    margin-top: 12px;
 
     font-size: 17px;
     line-height: 1.35;
@@ -1545,7 +1564,7 @@ h1 {{
                 </h2>
 
                 <div class="section-description">
-                    SKU・Collection・Variant から検索できます
+                    商品名・SKU・Collection・Variant から検索できます
                 </div>
 
             </div>
@@ -1559,7 +1578,7 @@ h1 {{
                 id="search"
                 class="search"
                 type="text"
-                placeholder="SKU / COLLECTION / VARIANT を検索..."
+                placeholder="商品名 / SKU / COLLECTION / VARIANT を検索..."
                 autocomplete="off"
             >
 
