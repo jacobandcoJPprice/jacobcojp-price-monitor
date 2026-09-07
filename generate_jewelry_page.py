@@ -290,6 +290,22 @@ for row in history_rows:
         )
     ).strip()
 
+    confirmation_id_raw = (
+        item_number_raw
+        or str(
+            row.get(
+                "Unique Key",
+                ""
+            )
+        ).strip()
+        or str(
+            row.get(
+                "Variant ID",
+                ""
+            )
+        ).strip()
+    )
+
     old_price_raw = str(
         row.get(
             "Old Price",
@@ -335,6 +351,7 @@ for row in history_rows:
         <div
             class="change-card"
             data-item-number="{esc(item_number_raw)}"
+            data-confirmation-id="{esc(confirmation_id_raw)}"
             data-old-price="{esc(old_price_raw)}"
             data-new-price="{esc(new_price_raw)}"
         >
@@ -2700,7 +2717,7 @@ function showConfirmed(
 ) {{
     const key =
         confirmationKey(
-            card.dataset.itemNumber,
+            card.dataset.confirmationId,
             card.dataset.oldPrice,
             card.dataset.newPrice
         );
@@ -2840,7 +2857,7 @@ async function loadConfirmations() {{
 
             const key =
                 confirmationKey(
-                    card.dataset.itemNumber,
+                    card.dataset.confirmationId,
                     card.dataset.oldPrice,
                     card.dataset.newPrice
                 );
@@ -2880,7 +2897,7 @@ async function confirmPriceCard(
             action:
                 "confirm",
             itemNumber:
-                card.dataset.itemNumber,
+                card.dataset.confirmationId,
             oldPrice:
                 card.dataset.oldPrice,
             newPrice:
