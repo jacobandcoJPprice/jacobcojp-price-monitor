@@ -276,6 +276,13 @@ for row in history_rows:
         )
     )
 
+    product = esc(
+        row.get(
+            "Product",
+            ""
+        )
+    )
+
     variant = esc(
         row.get(
             "Variant",
@@ -376,6 +383,10 @@ for row in history_rows:
 
                     <div class="change-collection">
                         {collection}
+                    </div>
+
+                    <div class="change-product-name">
+                        {product}
                     </div>
 
                     <div class="change-variant">
@@ -1057,6 +1068,13 @@ h1 {{
     align-items: center;
     justify-content: space-between;
     gap: 25px;
+}}
+
+.change-product-name {{
+    margin-top: 5px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
 }}
 
 .confirm-area {{
