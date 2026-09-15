@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   update-prices:
@@ -16,6 +17,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Record notification baseline
+        id: notification_baseline
+        run: |
+          python monitor_notifications.py snapshot \
+            --price-history price_history_v2.csv \
+            --structure-history product_change_history.csv
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -39,10 +47,44 @@ jobs:
         run: |
           python generate_page.py
 
+      - name: Detect meaningful changes
+        id: meaningful_changes
+        run: |
+          python monitor_notifications.py compare \
+            --price-history price_history_v2.csv \
+            --structure-history product_change_history.csv \
+            --before-price "${{ steps.notification_baseline.outputs.price_rows }}" \
+            --before-structure "${{ steps.notification_baseline.outputs.structure_rows }}" \
+            --current-data current_prices.csv \
+            --minimum-healthy-rows 580 \
+            --max-healthy-age-hours 18 \
+            --required-currency USD
+
       - name: Save updated prices
         run: |
           git config user.name "JacobCo Price Monitor"
           git config user.email "actions@github.com"
-          git add current_prices.csv price_history_v2.csv index.html
+          git add current_prices.csv
+          git add price_history_v2.csv
+          git add product_change_history.csv
+          git add missing_item_candidates.csv
+          git add index.html
           git diff --cached --quiet || git commit -m "Auto update Jacob & Co. prices"
           git push
+
+      - name: Notify changes or errors
+        if: ${{ always() && (failure() || cancelled() || steps.meaningful_changes.outputs.changed == 'true' || steps.meaningful_changes.outputs.healthy != 'true') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MONITOR_NAME: 時計
+          DASHBOARD_URL: https://jacobandcojpprice.github.io/jacobcojp-price-monitor/
+          JOB_STATUS: ${{ job.status }}
+          PRICE_CHANGES: ${{ steps.meaningful_changes.outputs.price_changes }}
+          STRUCTURE_CHANGES: ${{ steps.meaningful_changes.outputs.structure_changes }}
+          HEALTHY: ${{ steps.meaningful_changes.outputs.healthy }}
+          CURRENT_ROWS: ${{ steps.meaningful_changes.outputs.current_rows }}
+          CURRENCIES: ${{ steps.meaningful_changes.outputs.currencies }}
+          DATA_AGE_HOURS: ${{ steps.meaningful_changes.outputs.data_age_hours }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          bash .github/scripts/notify-monitor.sh

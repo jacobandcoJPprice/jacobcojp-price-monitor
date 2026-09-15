@@ -2,6 +2,7 @@ name: Jacob & Co. USA Jewelry Monitor
 
 permissions:
   contents: write
+  issues: write
 
 on:
   workflow_dispatch:
@@ -23,6 +24,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Record notification baseline
+        id: notification_baseline
+        run: |
+          python monitor_notifications.py snapshot \
+            --price-history jewelry_price_history.csv \
+            --structure-history jewelry_change_history.csv
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -40,6 +48,19 @@ jobs:
       - name: Generate jewelry dashboard
         run: |
           python generate_jewelry_page.py
+
+      - name: Detect meaningful changes
+        id: meaningful_changes
+        run: |
+          python monitor_notifications.py compare \
+            --price-history jewelry_price_history.csv \
+            --structure-history jewelry_change_history.csv \
+            --before-price "${{ steps.notification_baseline.outputs.price_rows }}" \
+            --before-structure "${{ steps.notification_baseline.outputs.structure_rows }}" \
+            --current-data jewelry_current_prices.csv \
+            --minimum-healthy-rows 510 \
+            --max-healthy-age-hours 26 \
+            --required-currency USD
 
       - name: Commit jewelry data and dashboard
         run: |
@@ -59,3 +80,20 @@ jobs:
             git pull --rebase origin main
             git push
           fi
+
+      - name: Notify changes or errors
+        if: ${{ always() && (failure() || cancelled() || steps.meaningful_changes.outputs.changed == 'true' || steps.meaningful_changes.outputs.healthy != 'true') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MONITOR_NAME: ジュエリー
+          DASHBOARD_URL: https://jacobandcojpprice.github.io/jacobcojp-price-monitor/jewelry.html
+          JOB_STATUS: ${{ job.status }}
+          PRICE_CHANGES: ${{ steps.meaningful_changes.outputs.price_changes }}
+          STRUCTURE_CHANGES: ${{ steps.meaningful_changes.outputs.structure_changes }}
+          HEALTHY: ${{ steps.meaningful_changes.outputs.healthy }}
+          CURRENT_ROWS: ${{ steps.meaningful_changes.outputs.current_rows }}
+          CURRENCIES: ${{ steps.meaningful_changes.outputs.currencies }}
+          DATA_AGE_HOURS: ${{ steps.meaningful_changes.outputs.data_age_hours }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          bash .github/scripts/notify-monitor.sh
