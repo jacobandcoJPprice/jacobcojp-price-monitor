@@ -410,97 +410,105 @@ product_change_cards = []
 
 for row in product_history_rows[:50]:
 
-    change_type = esc(
-        row.get(
-            "Change Type",
-            ""
-        )
-    )
+    change_type_raw = str(
+        row.get("Change Type", "")
+    ).strip()
 
-    item_number = esc(
-        row.get(
-            "Item Number",
-            ""
-        )
-    )
+    item_number_raw = str(
+        row.get("Item Number", "")
+    ).strip()
 
-    collection = esc(
-        row.get(
-            "Collection",
-            ""
-        )
-    )
+    collection_raw = str(
+        row.get("Collection", "")
+    ).strip()
 
-    variant = esc(
-        row.get(
-            "Variant",
-            ""
-        )
-    )
+    variant_raw = str(
+        row.get("Variant", "")
+    ).strip()
 
-    old_status = esc(
-        row.get(
-            "Old Status",
-            ""
-        )
-    )
+    old_status_raw = str(
+        row.get("Old Status", "")
+    ).strip()
 
-    new_status = esc(
-        row.get(
-            "New Status",
-            ""
-        )
-    )
+    new_status_raw = str(
+        row.get("New Status", "")
+    ).strip()
 
-    price = format_price(
-        row.get(
-            "Price",
-            ""
-        )
-    )
+    price_raw = str(
+        row.get("Price", "")
+    ).strip()
 
-    changed_at = esc(
-        row.get(
-            "Changed At",
-            ""
-        )
-    )
+    changed_at_raw = str(
+        row.get("Changed At", "")
+    ).strip()
 
-    url = esc(
-        row.get(
-            "URL",
-            ""
-        )
-    )
+    url_raw = str(
+        row.get("URL", "")
+    ).strip()
+
+    event_key_raw = "||".join([
+        change_type_raw,
+        item_number_raw,
+        changed_at_raw
+    ])
+
+    change_type = esc(change_type_raw)
+    item_number = esc(item_number_raw)
+    collection = esc(collection_raw)
+    variant = esc(variant_raw)
+    old_status = esc(old_status_raw)
+    new_status = esc(new_status_raw)
+    price = format_price(price_raw)
+    changed_at = esc(changed_at_raw)
+    url = esc(url_raw)
 
     product_change_cards.append(
         f"""
-        <a
-            class="product-change-card"
-            href="{url}"
-            target="_blank"
-            rel="noopener noreferrer"
+        <div
+            class="product-change-card structure-change-card"
+            data-event-key="{esc(event_key_raw)}"
+            data-change-type="{esc(change_type_raw)}"
+            data-item-number="{esc(item_number_raw)}"
+            data-old-status="{esc(old_status_raw)}"
+            data-new-status="{esc(new_status_raw)}"
+            data-price="{esc(price_raw)}"
         >
+            <label class="selection-control">
+                <input
+                    type="checkbox"
+                    class="selection-checkbox structure-selection-checkbox"
+                    aria-label="この商品構成変更を選択"
+                >
+                <span>選択</span>
+            </label>
+
             <div class="product-change-type">
                 {change_type}
             </div>
 
             <div class="product-change-info">
-                <div class="change-collection">
-                    {collection}
-                </div>
+                <a
+                    class="product-change-main-link"
+                    href="{url}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <div class="change-collection">
+                        {collection}
+                    </div>
 
-                <div class="change-variant">
-                    {variant}
-                </div>
+                    <div class="change-variant">
+                        {variant}
+                    </div>
 
-                <div class="change-item">
-                    {item_number}
-                </div>
+                    <div class="change-item">
+                        {item_number}
+                    </div>
 
-                <div class="change-date">
-                    {changed_at}
-                </div>
+                    <div class="change-date">
+                        {changed_at}
+                    </div>
+                </a>
             </div>
 
             <div class="product-change-status">
@@ -514,7 +522,20 @@ for row in product_history_rows[:50]:
                     {price}
                 </strong>
             </div>
-        </a>
+
+            <div class="confirm-area structure-confirm-area">
+                <button
+                    type="button"
+                    class="confirm-button structure-confirm-button"
+                >
+                    確認済みにする
+                </button>
+
+                <div class="confirm-status">
+                    未確認
+                </div>
+            </div>
+        </div>
         """
     )
 
@@ -810,6 +831,50 @@ h1 {{
     font-size: 13px;
 }}
 
+.bulk-actions {{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 14px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #ddd;
+}}
+
+.bulk-button {{
+    border: 1px solid #111;
+    background: #fff;
+    color: #111;
+    padding: 9px 13px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}}
+
+.bulk-button:hover:not(:disabled) {{
+    background: #111;
+    color: #fff;
+}}
+
+.bulk-button.bulk-confirm-button {{
+    background: #111;
+    color: #fff;
+}}
+
+.bulk-button:disabled {{
+    opacity: .38;
+    cursor: default;
+}}
+
+.bulk-selection-count {{
+    margin-left: auto;
+    color: #666;
+    font-size: 12px;
+    white-space: nowrap;
+}}
+
 .change-list {{
     display: grid;
     gap: 10px;
@@ -833,6 +898,31 @@ h1 {{
 .change-card:hover {{
     transform: translateY(-1px);
     border-color: #888;
+}}
+
+.product-change-card.is-selected {{
+    border-color: #111;
+    box-shadow: inset 3px 0 0 #111;
+}}
+
+.selection-control {{
+    flex: 0 0 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    color: #777;
+    font-size: 10px;
+    cursor: pointer;
+    user-select: none;
+}}
+
+.selection-checkbox {{
+    width: 19px;
+    height: 19px;
+    margin: 0;
+    accent-color: #111;
+    cursor: pointer;
 }}
 
 .change-main-link {{
@@ -963,17 +1053,26 @@ h1 {{
 .product-change-card {{
     background: #fff;
     color: inherit;
-    text-decoration: none;
     border: 1px solid #ddd;
     padding: 18px 20px;
     display: grid;
-    grid-template-columns: 150px 1fr auto;
+    grid-template-columns: 56px 150px minmax(0, 1fr) auto 210px;
     gap: 20px;
     align-items: center;
 }}
 
 .product-change-card:hover {{
     border-color: #888;
+}}
+
+.product-change-card.is-confirmed {{
+    display: none;
+}}
+
+.product-change-main-link {{
+    color: inherit;
+    text-decoration: none;
+    display: block;
 }}
 
 .product-change-type {{
@@ -1175,6 +1274,24 @@ h1 {{
         margin-top: 8px;
     }}
 
+    .bulk-actions {{
+        align-items: stretch;
+    }}
+
+    .bulk-button {{
+        flex: 1 1 auto;
+    }}
+
+    .bulk-confirm-button {{
+        flex-basis: 100%;
+    }}
+
+    .bulk-selection-count {{
+        width: 100%;
+        margin-left: 0;
+        text-align: right;
+    }}
+
     .change-card {{
         display: block;
     }}
@@ -1211,6 +1328,16 @@ h1 {{
 
     .product-change-card {{
         grid-template-columns: 1fr;
+    }}
+
+    .product-change-card > .selection-control {{
+        flex-direction: row;
+        justify-content: flex-start;
+    }}
+
+    .structure-confirm-area {{
+        width: 100%;
+        text-align: left;
     }}
 
     .product-change-status {{
@@ -1385,8 +1512,57 @@ h1 {{
 
         </div>
 
-        <div class="product-change-list">
-            {product_changes_html}
+        <div
+            class="bulk-actions"
+            id="structureBulkActions"
+        >
+            <button
+                type="button"
+                class="bulk-button"
+                id="structureSelectAll"
+            >
+                全選択
+            </button>
+
+            <button
+                type="button"
+                class="bulk-button"
+                id="structureClearSelection"
+                disabled
+            >
+                選択解除
+            </button>
+
+            <button
+                type="button"
+                class="bulk-button bulk-confirm-button"
+                id="structureBulkConfirm"
+                disabled
+            >
+                選択した項目を確認済みにする（0件）
+            </button>
+
+            <div
+                class="bulk-selection-count"
+                id="structureSelectionCount"
+            >
+                0件選択中
+            </div>
+        </div>
+
+        <div
+            class="product-change-list"
+            id="unconfirmedProductChangeList"
+        >
+{product_changes_html}
+        </div>
+
+        <div
+            class="no-changes"
+            id="unconfirmedProductEmpty"
+            style="display:none;"
+        >
+            未確認の商品構成変更はありません。
         </div>
 
     </section>
@@ -1621,6 +1797,335 @@ const changeCards =
             ".change-card"
         )
     );
+
+
+function createBulkSelection(
+    cards,
+    options
+) {{
+    const actions =
+        document.getElementById(
+            options.actionsId
+        );
+
+    const selectAllButton =
+        document.getElementById(
+            options.selectAllId
+        );
+
+    const clearButton =
+        document.getElementById(
+            options.clearId
+        );
+
+    const confirmButton =
+        document.getElementById(
+            options.confirmId
+        );
+
+    const count =
+        document.getElementById(
+            options.countId
+        );
+
+    let busy = false;
+
+
+    function availableCards() {{
+        return cards.filter(
+            card =>
+                !card.classList.contains(
+                    "is-confirmed"
+                )
+        );
+    }}
+
+
+    function selectedCards() {{
+        return availableCards().filter(
+            card =>
+                card.querySelector(
+                    options.checkboxSelector
+                )?.checked
+        );
+    }}
+
+
+    function refresh() {{
+        const available = availableCards();
+        const selected = selectedCards();
+
+        cards.forEach(card => {{
+            const checkbox =
+                card.querySelector(
+                    options.checkboxSelector
+                );
+
+            card.classList.toggle(
+                "is-selected",
+                Boolean(checkbox?.checked)
+                &&
+                !card.classList.contains(
+                    "is-confirmed"
+                )
+            );
+        }});
+
+        if (actions) {{
+            actions.style.display =
+                available.length > 0
+                ? "flex"
+                : "none";
+        }}
+
+        if (count) {{
+            count.textContent =
+                selected.length
+                + "件選択中";
+        }}
+
+        if (selectAllButton) {{
+            selectAllButton.disabled =
+                busy
+                ||
+                available.length === 0;
+        }}
+
+        if (clearButton) {{
+            clearButton.disabled =
+                busy
+                ||
+                selected.length === 0;
+        }}
+
+        if (confirmButton) {{
+            confirmButton.disabled =
+                busy
+                ||
+                selected.length === 0;
+
+            if (!busy) {{
+                confirmButton.textContent =
+                    "選択した項目を確認済みにする（"
+                    + selected.length
+                    + "件）";
+            }}
+        }}
+    }}
+
+
+    function setBusy(
+        value,
+        completed = 0,
+        total = 0
+    ) {{
+        busy = Boolean(value);
+
+        availableCards().forEach(card => {{
+            const checkbox =
+                card.querySelector(
+                    options.checkboxSelector
+                );
+
+            if (checkbox) {{
+                checkbox.disabled = busy;
+            }}
+        }});
+
+        if (
+            busy
+            &&
+            confirmButton
+        ) {{
+            confirmButton.textContent =
+                "確認中…（"
+                + completed
+                + "/"
+                + total
+                + "件）";
+        }}
+
+        refresh();
+    }}
+
+
+    cards.forEach(card => {{
+        card.querySelector(
+            options.checkboxSelector
+        )?.addEventListener(
+            "change",
+            refresh
+        );
+    }});
+
+
+    selectAllButton?.addEventListener(
+        "click",
+        () => {{
+            availableCards().forEach(card => {{
+                const checkbox =
+                    card.querySelector(
+                        options.checkboxSelector
+                    );
+
+                if (checkbox) {{
+                    checkbox.checked = true;
+                }}
+            }});
+
+            refresh();
+        }}
+    );
+
+
+    clearButton?.addEventListener(
+        "click",
+        () => {{
+            cards.forEach(card => {{
+                const checkbox =
+                    card.querySelector(
+                        options.checkboxSelector
+                    );
+
+                if (checkbox) {{
+                    checkbox.checked = false;
+                }}
+            }});
+
+            refresh();
+        }}
+    );
+
+
+    refresh();
+
+    return {{
+        confirmButton,
+        selectedCards,
+        refresh,
+        setBusy
+    }};
+}}
+
+
+async function runBulkConfirmation(
+    selection,
+    confirmCard,
+    errorLabel
+) {{
+    const selected =
+        selection.selectedCards();
+
+    if (selected.length === 0) {{
+        return;
+    }}
+
+    const name =
+        window.prompt(
+            "確認者の名前を入力してください"
+        );
+
+    if (
+        name === null
+        ||
+        !name.trim()
+    ) {{
+        return;
+    }}
+
+    const confirmedBy = name.trim();
+    const failures = [];
+    let completed = 0;
+
+    selection.setBusy(
+        true,
+        completed,
+        selected.length
+    );
+
+    selected.forEach(card => {{
+        const button =
+            card.querySelector(
+                ".confirm-button"
+            );
+
+        if (button) {{
+            button.disabled = true;
+            button.textContent =
+                "一括登録中...";
+        }}
+    }});
+
+    const batchSize = 3;
+
+    for (
+        let index = 0;
+        index < selected.length;
+        index += batchSize
+    ) {{
+        const batch =
+            selected.slice(
+                index,
+                index + batchSize
+            );
+
+        const results =
+            await Promise.allSettled(
+                batch.map(
+                    card =>
+                        confirmCard(
+                            card,
+                            confirmedBy
+                        )
+                )
+            );
+
+        results.forEach(
+            (result, resultIndex) => {{
+                const card = batch[resultIndex];
+                completed++;
+
+                if (
+                    result.status
+                    === "rejected"
+                ) {{
+                    failures.push(card);
+
+                    const button =
+                        card.querySelector(
+                            ".confirm-button"
+                        );
+
+                    if (button) {{
+                        button.disabled = false;
+                        button.textContent =
+                            "確認済みにする";
+                    }}
+                }}
+            }}
+        );
+
+        selection.setBusy(
+            true,
+            completed,
+            selected.length
+        );
+    }}
+
+    selection.setBusy(false);
+    selection.refresh();
+
+    if (failures.length > 0) {{
+        alert(
+            errorLabel
+            + "のうち、"
+            + failures.length
+            + "件を保存できませんでした。"
+            + "\\n"
+            + "選択状態を残しているため、もう一度お試しください。"
+        );
+    }}
+}}
 
 
 function confirmationKey(
@@ -1880,7 +2385,7 @@ function formatJapanTime(value) {{
 
     return raw
         .replace(
-            /\s+JST$/i,
+            /\\s+JST$/i,
             ""
         );
 }}
@@ -2268,6 +2773,313 @@ changeCards.forEach(card => {{
 }});
 
 
+// ============================================================
+// WATCHES STRUCTURE CONFIRMATION
+// Namespaced records share the existing confirmation endpoint.
+// ============================================================
+
+const structureCards =
+    Array.from(
+        document.querySelectorAll(
+            ".structure-change-card"
+        )
+    );
+
+const structureBulkSelection =
+    createBulkSelection(
+        structureCards,
+        {{
+            actionsId:
+                "structureBulkActions",
+            selectAllId:
+                "structureSelectAll",
+            clearId:
+                "structureClearSelection",
+            confirmId:
+                "structureBulkConfirm",
+            countId:
+                "structureSelectionCount",
+            checkboxSelector:
+                ".structure-selection-checkbox"
+        }}
+    );
+
+const WATCH_STRUCTURE_CONFIRM_PREFIX =
+    "watch-structure::";
+
+
+function structureConfirmationKey(
+    eventKey
+) {{
+    return String(
+        eventKey || ""
+    ).trim();
+}}
+
+
+function structureStorageItemNumber(
+    eventKey
+) {{
+    return WATCH_STRUCTURE_CONFIRM_PREFIX
+        + structureConfirmationKey(
+            eventKey
+        );
+}}
+
+
+function structureConfirmationKeyFromRow(
+    row
+) {{
+    const itemNumber =
+        String(
+            row.itemNumber || ""
+        ).trim();
+
+    if (
+        itemNumber.startsWith(
+            WATCH_STRUCTURE_CONFIRM_PREFIX
+        )
+    ) {{
+        return itemNumber.slice(
+            WATCH_STRUCTURE_CONFIRM_PREFIX.length
+        );
+    }}
+
+    return "";
+}}
+
+
+function refreshStructureEmpty() {{
+    const visible =
+        structureCards.filter(
+            card =>
+                !card.classList.contains(
+                    "is-confirmed"
+                )
+        );
+
+    const empty =
+        document.getElementById(
+            "unconfirmedProductEmpty"
+        );
+
+    if (empty) {{
+        empty.style.display =
+            visible.length === 0
+            ? "block"
+            : "none";
+    }}
+}}
+
+
+function showStructureConfirmed(
+    card
+) {{
+    card.classList.add(
+        "is-confirmed"
+    );
+
+    card.classList.remove(
+        "is-selected"
+    );
+
+    const checkbox =
+        card.querySelector(
+            ".structure-selection-checkbox"
+        );
+
+    if (checkbox) {{
+        checkbox.checked = false;
+    }}
+
+    refreshStructureEmpty();
+    structureBulkSelection.refresh();
+}}
+
+
+async function loadStructureConfirmations() {{
+    if (structureCards.length === 0) {{
+        refreshStructureEmpty();
+        return;
+    }}
+
+    try {{
+        const result =
+            await jsonpRequest({{
+                action: "list"
+            }});
+
+        const rows =
+            Array.isArray(result)
+            ? result
+            : (result.rows || []);
+
+        const confirmedKeys =
+            new Set();
+
+        rows.forEach(row => {{
+            const confirmed =
+                row.confirmed === true
+                ||
+                String(
+                    row.confirmed
+                ).toLowerCase()
+                === "true";
+
+            if (!confirmed) {{
+                return;
+            }}
+
+            const key =
+                structureConfirmationKeyFromRow(
+                    row
+                );
+
+            if (key) {{
+                confirmedKeys.add(key);
+            }}
+        }});
+
+        structureCards.forEach(card => {{
+            const key =
+                structureConfirmationKey(
+                    card.dataset.eventKey
+                );
+
+            if (confirmedKeys.has(key)) {{
+                showStructureConfirmed(card);
+            }}
+        }});
+
+    }} catch (error) {{
+        console.error(
+            "Watch structure confirmation load failed:",
+            error
+        );
+    }} finally {{
+        refreshStructureEmpty();
+    }}
+}}
+
+
+async function confirmStructureCard(
+    card,
+    confirmedBy
+) {{
+    const result =
+        await jsonpRequest({{
+            action:
+                "confirm",
+            itemNumber:
+                structureStorageItemNumber(
+                    card.dataset.eventKey
+                ),
+            oldPrice:
+                card.dataset.oldStatus
+                || card.dataset.changeType
+                || "structure",
+            newPrice:
+                card.dataset.newStatus
+                || card.dataset.price
+                || "confirmed",
+            confirmedBy:
+                confirmedBy
+        }});
+
+    if (
+        !result
+        ||
+        result.ok !== true
+    ) {{
+        throw new Error(
+            (
+                result
+                &&
+                result.error
+            )
+            ||
+            "Save failed"
+        );
+    }}
+
+    showStructureConfirmed(card);
+}}
+
+
+structureCards.forEach(card => {{
+    const button =
+        card.querySelector(
+            ".structure-confirm-button"
+        );
+
+    if (!button) {{
+        return;
+    }}
+
+    button.addEventListener(
+        "click",
+        async event => {{
+            event.preventDefault();
+            event.stopPropagation();
+
+            const name =
+                window.prompt(
+                    "確認者の名前を入力してください"
+                );
+
+            if (
+                name === null
+                ||
+                !name.trim()
+            ) {{
+                return;
+            }}
+
+            const originalText =
+                button.textContent;
+
+            button.disabled = true;
+            button.textContent =
+                "登録中...";
+
+            try {{
+                await confirmStructureCard(
+                    card,
+                    name.trim()
+                );
+
+            }} catch (error) {{
+                console.error(
+                    "Watch structure confirmation save failed:",
+                    error
+                );
+
+                alert(
+                    "確認状態を保存できませんでした。"
+                    + "\\n"
+                    + "もう一度お試しください。"
+                );
+
+                button.disabled = false;
+                button.textContent =
+                    originalText;
+            }}
+        }}
+    );
+}});
+
+
+structureBulkSelection.confirmButton?.addEventListener(
+    "click",
+    () =>
+        runBulkConfirmation(
+            structureBulkSelection,
+            confirmStructureCard,
+            "商品構成変更"
+        )
+);
+
+
 const confirmedHistoryButton =
     document.getElementById(
         "confirmedHistoryButton"
@@ -2356,6 +3168,7 @@ document.addEventListener(
 renderConfirmedHistory();
 refreshUnconfirmedEmpty();
 loadConfirmations();
+loadStructureConfirmations();
 
 
 function updateHealthStatus() {{
