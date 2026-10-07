@@ -800,10 +800,18 @@ h1 {
                 id="healthStat"
                 data-current-rows="579"
                 data-last-seen="2026-10-07 03:21:16"
+                data-currency-ok="true"
             >
                 監視状態：
                 <strong id="healthStatus">
                     確認中…
+                </strong>
+            </div>
+
+            <div class="stat">
+                監視通貨：
+                <strong>
+                    USD（米国市場に固定）
                 </strong>
             </div>
 
@@ -835,7 +843,7 @@ h1 {
             <div class="stat">
                 最終更新：
                 <strong>
-                    2026-10-07 03:21
+                    2026-10-07 12:49
                 </strong>
             </div>
 
@@ -25025,6 +25033,9 @@ function updateHealthStatus() {
             stat.dataset.lastSeen || ""
         ).trim();
 
+    const currencyOk =
+        stat.dataset.currencyOk === "true";
+
     let ageHours = null;
 
     if (lastSeenRaw) {
@@ -25059,6 +25070,8 @@ function updateHealthStatus() {
     if (
         rowCount < 570
         ||
+        !currencyOk
+        ||
         !lastSeenRaw
         ||
         ageHours === null
@@ -25076,8 +25089,6 @@ function updateHealthStatus() {
     }
 
     if (
-        rowCount < 580
-        ||
         ageHours > 18
     ) {
         stat.classList.add(

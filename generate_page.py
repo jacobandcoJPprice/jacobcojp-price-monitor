@@ -587,6 +587,19 @@ last_successful_scan = (
     else ""
 )
 
+currencies = sorted({
+    str(row.get("Currency", "")).strip().upper()
+    for row in current_rows
+    if str(row.get("Currency", "")).strip()
+})
+
+currency_is_usd = currencies == ["USD"]
+currency_display = (
+    "USD（米国市場に固定）"
+    if currency_is_usd
+    else "要確認"
+)
+
 
 # ============================================================
 # HTML
@@ -1394,10 +1407,18 @@ h1 {{
                 id="healthStat"
                 data-current-rows="{len(current_rows)}"
                 data-last-seen="{esc(last_successful_scan)}"
+                data-currency-ok="{'true' if currency_is_usd else 'false'}"
             >
                 監視状態：
                 <strong id="healthStatus">
                     確認中…
+                </strong>
+            </div>
+
+            <div class="stat">
+                監視通貨：
+                <strong>
+                    {currency_display}
                 </strong>
             </div>
 
@@ -3196,6 +3217,9 @@ function updateHealthStatus() {{
             stat.dataset.lastSeen || ""
         ).trim();
 
+    const currencyOk =
+        stat.dataset.currencyOk === "true";
+
     let ageHours = null;
 
     if (lastSeenRaw) {{
@@ -3230,6 +3254,8 @@ function updateHealthStatus() {{
     if (
         rowCount < 570
         ||
+        !currencyOk
+        ||
         !lastSeenRaw
         ||
         ageHours === null
@@ -3247,8 +3273,6 @@ function updateHealthStatus() {{
     }}
 
     if (
-        rowCount < 580
-        ||
         ageHours > 18
     ) {{
         stat.classList.add(
