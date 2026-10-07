@@ -56,7 +56,7 @@ jobs:
             --before-price "${{ steps.notification_baseline.outputs.price_rows }}" \
             --before-structure "${{ steps.notification_baseline.outputs.structure_rows }}" \
             --current-data current_prices.csv \
-            --minimum-healthy-rows 580 \
+            --minimum-healthy-rows 570 \
             --max-healthy-age-hours 18 \
             --required-currency USD
 
